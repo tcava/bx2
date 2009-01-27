@@ -1,0 +1,25 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+# Simulate /set hold_mode and /set hold_mode_interval for ircII users
+load addset;
+
+addset hold_mode bool {
+	fe ($winrefs()) x {
+		window $x hold_mode $0;
+	};
+};
+set hold_mode off;
+
+addset hold_interval int {
+	fe ($winrefs()) x {
+		window $x hold_interval $0;
+	};
+};
+set hold_interval 10;
+
+on #^window_create -125 * {
+	window $0 hold_mode $getset(hold_mode);
+	window $0 hold_interval $getset(hold_interval);
+};
+
+#hop'y2k3

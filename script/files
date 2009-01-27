@@ -1,0 +1,91 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+: {
+/*
+ * FILES script -- complements the new file functions.
+ * Written by Jeremy Nelson -- EPIC project
+ *
+ * These aliases are not anywhere near as fast as /exec'ing the
+ * c programs, but they are here to illustrate the usage of the fns.
+ */
+}
+
+# dump a file out to the screen w/o using /exec 
+alias cat {
+	@ fd = open($0 R);
+	while (!eof($fd)) { echo $read($fd) };
+	@ close($fd);
+};
+
+# Search for a string in a group of files 
+# This is, of course, case insensitive 
+alias grep {
+	for x in ($1-) {
+		@ fd = open($x R);
+		while (!eof($fd)) { 
+			@ line = read($fd);
+			if (match(*$0* $line))
+				{echo $x: $line};
+		};
+		@close($fd);
+	};
+};
+
+: {/* Write a line to a file w/o using the logging features */}
+alias log_it {
+	@ fd = open($0 W);
+	@ write($fd $1-);
+	@ close($fd);
+};
+
+# 
+# Call as /exclude filename pattern
+#
+alias exclude { 
+        @ :reg = regcomp($1-);
+        @ :rd = open($0 R);
+        @ :wd = open($0.new W);
+        
+	@ line = read($rd);
+	do
+        {       
+                if (regexec($reg $line)) {
+                        @ write($wd $line);
+                };
+		@ line = read($rd);
+        } while (!eof($rd));
+
+        @ close($rd);
+        @ close($wd);
+        @ regfree($reg);
+
+        @ unlink($0);
+        @ rename($0.new $0);
+};
+
+#
+# This is exactly the same as $randread() except that
+# $randread() seeks to a random _point_ in the file
+# whereas this seeks to a random _line_.
+#
+# Also, you can specify any number of files/globs and
+# it will return one line from every file.
+#
+alias randomread {
+	@ :ret = glob($*);
+	fe ret ret {
+		@ :fd = open("$ret" r);
+		@ :line = 2 ** 30;
+		@ :line = fskip($fd $line);
+		@ :line = rand($line);
+		@ fseek($fd 0 set);
+		@ fskip($fd $line);
+		@ :ret = read($fd);
+		@ close($fd);
+	};
+	if (functioncall()) {
+		return $ret;
+	} else {
+		echo $ret;
+	};
+};

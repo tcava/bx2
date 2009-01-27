@@ -1,0 +1,45 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+#
+# Here's the story.  We want to suppress server-side MOTDs.
+# I don't know why anyone would want to do this, but eh, this
+# used to be an epic function and i removed it and people noticed
+# it so I'm honor bound to script it at the very least.
+#
+load addset;
+addset suppress_server_motd bool;
+set suppress_server_motd off;
+
+# # #
+@ negser = getserial(HOOK - 0);
+@ posser = getserial(HOOK + 0);
+
+# The first time we see the MOTD, trigger the "doing motd" flag.
+on #^375 $negser * {
+	if (!done_motd[$lastserver()]) {
+		^assign doing_motd[$lastserver()] 1;
+	};
+};
+# When we see the end of the first MOTD, trigger the "done motd" flag.
+on #^376 $posser * {
+	if (doing_motd[$lastserver()]) {
+		^assign -doing_motd[$lastserver()];
+		^assign done_motd[$lastserver()] 1;
+	};
+};
+# When the connection is closed, reset the flag.
+on #^server_lost $posser * {
+	^assign -done_motd[$lastserver()];
+};
+
+# Only suppress the first MOTD from each server connection.
+for i in (372 375 376 377) { 
+    on ^$i * { 
+	if (getset(suppress_server_motd) == 'ON' && doing_motd[$lastserver()]) {
+		return;
+	};
+	xecho -b $1-;
+    };
+};
+
+#hop'y2k+3

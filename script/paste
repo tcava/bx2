@@ -1,0 +1,63 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+#
+# Here's the plan...
+#
+# We want a scripted /set paste, when we turn it on, it sends whatever we type
+# to the current target.  We also need to be able to turn it off automatically
+# because we won't be able to type any commands while it's active.  We need
+# to be able to configure the timeout, and we also want to be able to strip
+# any leading whitespace on the lines we paste.  (AnguzHawk asked for this
+# feature particularly.)
+#
+
+load addset;
+
+# Uncomment this if you want a key binding.
+bind ^P parse_command { set paste toggle; };
+
+# # #
+addset paste bool {
+	if (*0 == 'on') {
+		setup_paste;
+		xecho -c -b PASTE automatically turns off in $paste_delay seconds;
+	} elsif (*0 == 'off') {
+		remove_paste;
+	};
+};
+set paste off;
+
+addset paste_strip bool;
+set paste_strip 0;
+
+addset paste_delay int;
+set paste_delay 30;
+
+# # #
+alias setup_paste 
+{
+	stack push bind ^I;
+	bind ^I self_insert;
+
+	stack push on input;
+	on input -*;
+	on ^input * {
+		if (getset(paste_strip) == 'ON') {
+			//send $0 $1-;
+		} else {
+			//send $*;
+		};
+	};
+	timer -refnum PASTEOFF $getset(paste_delay) set paste off;
+};
+
+# The 'defer' is for epic clients before epic4-1.1.8
+alias remove_paste
+{
+	on input -*;
+	stack pop on input;
+	stack pop bind ^I;
+	defer ^timer -delete PASTEOFF;
+};
+
+#hop'y2k3

@@ -1,0 +1,17 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+#
+# This is the default ircrc
+# The basic setup for ircII
+# Please make your installation changes in 'local'
+#
+# Note that this file is not loaded if you have your own ~/.epicrc!
+#
+package global;
+
+load builtins;
+load history;
+load hold_mode;
+load help;
+load 2.8script;
+load local;

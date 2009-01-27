@@ -1,0 +1,161 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+package autojoin;
+
+# autojoin -- maintains a list of permanent channels and if reconnect
+# script is loaded, rejoins channels after a disconnection. permanent
+# channels are stored in ~/.irc/channels, syntax:
+# <channel> <winnum> <group> [key], i.e.:
+# #epic   2 efnet
+# #test321 3 efnet test.8
+
+addset autocreate_split_channels bool;
+set autocreate_split_channels off;
+
+alias purge {
+  foreach $0 ii {
+    purge $0.$ii;
+  };
+  ^assign -ii;
+  ^assign -$0;
+};
+
+alias join {
+  if (!@) {
+    echo Usage: /join #channel1[,#channel...] [key[,key]...];
+    return;
+  };
+  @ :channels = tolower($split(, $0));
+  @ :keys = split(, $1);
+  @ :num = numwords($channels);
+  if (num == 0) {
+    return;
+  };
+  @ :i = 0;
+  for i from 0 to ${num - 1} {
+    @ :ch = word($i $channels);
+    @ :k = word($i $keys);
+    if (ch == []) {
+      continue;
+    };
+    if (!ischannel($ch)) {
+      @ :ch = [#$ch];
+    };
+    if ((:wch = winchan($ch $servernum())) != -1) {
+      ^window swap $wch;
+      break;
+    };
+    if (k == [] && (:gr = servergroup()) != []) {
+      @ :k = word(1 $channels[$encode($gr)][$encode($ch)]);
+    };
+    if (k == []) {
+      @ :k = [*];
+    };
+    if (left(1 $ch) != [!]) {
+      _autocreate $ch 0 $k;
+    } else {
+      //join $ch $k;
+    };
+  };
+};
+
+alias _loadchannels {
+  @ :fd = open(~/.irc/channels R);
+  if (fd == -1) {
+    return;
+  };
+  purge channels;
+  while (1) {
+    if (eof($fd)) {
+      break;
+    };
+    @ :line = read($fd);
+    @ :group = word(2 $line);
+    if (group == []) {
+      continue;
+    };
+    @ :chan = word(0 $line);
+    @ :num = word(1 $line);
+    @ :key = word(3 $line);
+    @ channels[$encode($group)][$encode($tolower($chan))] = [$num $key];
+  };
+  @ close($fd);
+};
+
+_loadchannels;
+
+alias _autocreate (channel, auto, key, void) {
+  ^local num,wcmd;
+  if ((:num = winnum($encode($servergroup(),$channel))) != -1) {
+    window $num server $servernum() channel "$channel";
+  } else {
+    @ num = word(0 $channels[$encode($servergroup())][$encode($channel)]);
+    if (getset(autocreate_split_channels) == [ON]) {
+      push wcmd new;
+    } else {
+      push wcmd new_hide swap last;
+    };
+    push wcmd name $encode($servergroup(),$channel);
+    push wcmd server $servernum();
+    push wcmd channel "$channel $key";
+    if (num != []) {
+      push wcmd number $num;
+    };
+    if (auto) {
+      push wcmd swap last;
+    };
+    window $wcmd;
+  };
+};
+
+on #-join -28 "*" {
+  if ([$0] == servernick()) {
+    _autocreate $tolower($1) 1 *;
+  };
+};
+
+alias _svkey (ref, void) {
+  ^local gr;
+  @ gr = servergroup($ref);
+  if (gr == [<default>]) {
+    return sv $ref;
+  };
+  return gr $gr;
+};
+
+on #-SERVER_STATUS 286 "% % ACTIVE" {
+  @ :svk = encode($_svkey($0));
+  @ :egr = encode($servergroup($0));
+  foreach channels[$egr] i {
+    @ :ch = decode($i);
+    @ :k = word(1 $channels[$egr][$i]);
+    xeval -s $0 { //join $ch $k; };
+  };
+  @ :nw = numwords($reconn[$svk][channels]);
+  for i from 0 to ${nw - 1} {
+    @ :ch = word($i $reconn[$svk][channels]);
+    @ :ech = encode($ch);
+    if (channels[$svk][$ech] == []) {
+      @ :k = word($i $reconn[$svk][keys]);
+      xeval -s $0 { //join $ch $k; };
+    };
+  };
+  ^ASSIGN -i;
+};
+
+on #-window_beforekill -28 "*" {
+  @ :sv = winserv($0);
+  if (sv == -1) {
+    return;
+  };
+  fe ($mychannels($sv)) ch {
+    if (winchan($ch $sv) == [$0]) {
+      xeval -s $sv {
+        //part $ch;
+      };
+    };
+  };
+  ^assign -ch;
+};
+
+# weirdo'2k6

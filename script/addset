@@ -1,0 +1,43 @@
+if (word(2 $loadinfo()) != [pf]) {
+	load -pf $word(1 $loadinfo());
+	return;
+};
+
+#	Written by David B. Kratter (BlackJac@EFNet)
+#
+#	Version: 1.0.2005.06.25.1
+#
+#	These commands provide a simple and standard method for creating
+#	user-defined SETs.
+#
+#	Usage:
+#		addset <name> <type> [<script>]
+#
+#			The <name> is the name of the set
+#			The <type> must be one of: bool char int str
+#			The <script> is optional and would include all code
+#				associated with changing the value of the set
+#
+#		delset <name>
+#
+#			The <name> is the name of the set
+
+package addset;
+
+alias addset (name, type, ...) {
+        if (@name && type) {
+                @ symbolctl(create $name);
+                @ symbolctl(set $name 1 builtin_variable type $type);
+                if (@) {
+                        @ symbolctl(set $name 1 builtin_variable script $*);
+                };
+        };
+};
+
+alias delset (name, void) {
+        if (@name) {
+                @ symbolctl(delete $name builtin_variable);
+                @ symbolctl(check $name);
+        };
+};
+

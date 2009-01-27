@@ -1,0 +1,92 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+# 23 Feb 1999 - Dracus
+
+alias debug_section {
+        @ logstate = log;
+        if (log == [on]) {
+                @ logfile_old = logfile;
+                ^set log off;
+        };
+        ^set logfile epic.dbg;
+        ^set log on;
+        ^set debug 7;
+};
+
+alias debug_endsection {
+        set debug 0;
+        ^set log off;
+        ^set logfile $logfile_old;
+        ^set log $logstate;
+};
+
+#dracus'99
+
+# Time the execution of a given command.
+#
+# Usage:
+#  call.time [command]
+#
+alias call.time {
+	@ :u1 = utime();
+	$*;
+	@ :u2 = utime();
+	stack push set floating_point_math;
+	^set floating_point_math on;
+	@ :time = (shift(u2) - shift(u1)) + ((shift(u2) - shift(u1)) / 1000000);
+	@ :time = trunc(6 $time);
+	stack pop set floating_point_math;
+	if (functioncall()) {
+		return $time;
+	} else {
+		echo $tdiff($time): $*;
+	};
+};
+
+# Trace a given command.
+#
+# This works by setting the value of debug to debug_level.
+# See "/help 4 set debug" for information about this setting.
+#
+# Usage:
+#  call.trace [debug_level [command]]
+#
+alias call.trace {
+	@ :hooks = [set debug set output_rewrite on window on yell on status_update];
+	fe ($hooks) foo bar {
+		stack push $foo $bar;
+		$foo -$bar;
+	};
+	^set debug $0;
+	$1-;
+	fe ($hooks) foo bar {
+		stack pop $foo $bar;
+	};
+};
+
+# Trace a given command.
+#
+# Debug_levels is a comma seperated list of values to apply to /xdebug.
+# See "/help 4 xdebug" for information about debug_levels, but seperate
+# the values with commas instead of spaces.
+#
+# Usage:
+#  call.xtrace [debug_levels [command]]
+#
+alias call.xtrace {
+	@ :hooks = [set output_rewrite on window on yell on status_update];
+	@ :debugon = split(, $0);
+	@ :oxd = strip(+- $debugon);
+	fe oxd foo {
+		@ foo = xdebug(*$foo*);
+	};
+	fe ($hooks) foo bar {
+		stack push $foo $bar;
+	};
+	xdebug $debugon;
+	$1-;
+	xdebug $oxd;
+	fe ($hooks) foo bar {
+		stack pop $foo $bar;
+	};
+};

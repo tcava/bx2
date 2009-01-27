@@ -1,0 +1,607 @@
+if (word(2 $loadinfo()) != 'pf') {
+	load -pf $word(1 $loadinfo());
+	return;
+};
+
+#	Copyright (c) 2007 BlackJac@EFNet
+#
+#	Version: 1.9.2007.09.28.2
+#
+#	This script ensures backward-compatibility with epic4-2.2 by adding the
+#	following commands, functions and sets that have been removed from epic5.
+#	In places where exact duplication of the behavior of epic4-2.2 is not
+#	possible or practical, a close approximation of the original behavior has
+#	been made.
+#
+#	COMMANDS:
+#		BYE, DATE, DUMP, EXIT, HOST, IRCHOST, IRCNAME, LEAVE, REALNAME,
+#		SAVE, SIGNOFF, WHOWAS
+#
+#	FUNCTIONS:
+#		B64DECODE, B64ENCODE, DECODE, ENCODE, IGMASK, IGTYPE, LASTSERVER,
+#		MYSERVERS, NOTIFYWINDOWS, RIGMASK, RIGTYPE, SEDCRYPT, SERVERGROUP,
+#		SERVERNAME, SERVERNICK, SERVERNUM, SERVEROURNAME, SERVERTYPE,
+#		SERVPORTS, SHA256, URLDECODE, URLENCODE, WINBOUND, WINCURSORLINE,
+#		WINLEVEL, WINLINE, WINNAM, WINNICKLIST, WINNUM, WINQUERY, WINREFS,
+#		WINSCREEN, WINSCROLLBACKSIZE, WINSERV, WINSIZE, WINSTATSIZE,
+#		WINVISIBLE
+#
+#	SETS:
+#		AUTO_REJOIN, AUTO_REJOIN_DELAY, AUTO_UNMARK_AWAY, AUTO_WHOWAS,
+#		BEEP_ON_MSG, COMMAND_MODE, DCC_TIMEOUT, FULL_STATUS_LINE,
+#		NUM_OF_WHOWAS, SHOW_END_OF_MSGS, SHOW_WHO_HOPCOUNT, VERBOSE_CTCP
+#
+#	The following new commands have been added in the 'addset' script for
+#	additional functionality:
+#
+#	COMMANDS:
+#		ADDSET - a user-friendly interface to create your own /SETs
+#			 example: addset <name> <type> [<script>]
+#		DELSET - a user-friendly interface to delete your own /SETs
+#			 example: delset <name>
+
+package builtins;
+
+load addset;
+
+# COMMANDS #
+
+alias bye (...) {
+	//quit $*;
+};
+
+alias date (...) {
+	//time $*;
+};
+
+stub alias dump -pf dump;
+
+alias exit (...) {
+	//quit $*;
+};
+
+alias host (...) {
+	//userhost $*;
+};
+
+alias irchost (...) {
+	//hostname $*;
+};
+
+alias ircname (...) {
+	//set realname $*;
+};
+
+alias ircuser (...) {
+	//set default_username $*;
+};
+
+alias leave (...) {
+	//part $*;
+};
+
+alias realname (...) {
+	//set realname $*;
+};
+
+stub alias save -pf save;
+
+alias signoff (...) {
+	//quit $*;
+};
+
+alias whowas (nick, args default "$getset(num_of_whowas)") {
+	//whowas $nick $args;
+};
+
+# FUNCTIONS #
+
+alias b64decode (...) {
+	return $xform(-B64 $*);
+};
+
+alias b64encode (...) {
+	return $xform(+B64 $*);
+};
+
+alias decode (...) {
+	return $xform(-ENC $*);
+};
+
+alias encode (...) {
+	return $xform(+ENC $*);
+};
+
+alias igmask (pattern, void) {
+	return $ignorectl(pattern $pattern);
+};
+
+alias igtype (pattern, void) {
+	fe ($ignorectl(get $ignorectl(refnum $pattern) levels)) ii {
+		push function_return ${ii =~ [+*] ? [$rest(1 $ii)] : sar(#/##$sar(#^#DONT-#$ii))};
+	};
+};
+
+alias lastserver (void) {
+	return $serverctl(last_server);
+};
+
+alias myservers (arg, void) {
+	fe ($serverctl(omatch *)) mm {
+		if (serverctl(get $mm connected)) {
+			push :servers $mm;
+		};
+	};
+	fe ($servers) nn {
+		push function_return ${@arg ? nn : servername($nn)};
+	};
+		
+};
+
+alias notifywindows (void) {
+	fe ($windowctl(refnums)) nn {
+		if (windowctl(get $nn notified)) {
+			push function_return $nn;
+		};
+	};
+};
+
+alias rigmask (pattern, void) {
+	return $ignorectl(rpattern $pattern);
+};
+
+alias rigtype (...) {
+	return $ignorectl(with_type $*);
+};
+
+alias sedcrypt (encode, who, ...) {
+	if (!(:val = encryptparm(who))) {
+		return;
+	};
+	@ :key = word(1 $val);
+	if (encode == 1) {
+		return $xform(+SED $key $who $*);
+	} else if (encode == 0) {
+		return $xform(-SED $key $who $*);
+	};
+	return;
+};
+
+alias servergroup (refnum default "$serverctl(from_server)", void) {
+	if (:group = serverctl(get $refnum group)) {
+		return $group;
+	};
+	return <default>;
+};
+
+alias servername (refnum default "$serverctl(from_server)", void) {
+	if (:name = serverctl(get $refnum itsname)) {
+		return $name;
+	};
+	return <none>;
+};
+
+alias servernick (refnum default "$serverctl(from_server)", void) {
+	return $serverctl(get $refnum nickname);
+};
+
+alias servernum (refnum default "$serverctl(from_server)", void) {
+	if ((:num = serverctl(refnum $refnum)) >= -1) {
+		return $num;
+	};
+	return -1;
+};
+
+alias serverourname (refnum default "$serverctl(from_server)", void) {
+	if (:ourname = serverctl(get $refnum name)) {
+		return $ourname;
+	};
+	return <none>;
+};
+
+alias servertype (refnum default "$serverctl(from_server)", void) {
+	return $serverctl(get $refnum protocol);
+};
+
+alias servports (refnum default "$serverctl(from_server)", void) {
+	return $serverctl(get $refnum port) $serverctl(get $refnum localport);
+};
+
+alias sha256 (...) {
+	return $xform(+SHA256 $*);
+};
+
+alias urldecode (...) {
+	return $xform(-URL $*);
+};
+
+alias urlencode (...) {
+	return $xform(+URL $*);
+};
+
+alias winbound (winnum default 0, void) {
+	return;
+};
+
+alias wincursorline (winnum default 0, void) {
+	if ((:cursorline = windowctl(get $windowctl(refnum $winnum) cursor)) >= -1) {
+		return $cursorline;
+	};
+	return -1;
+};
+
+alias winlevel (winnum default 0, void) {
+	return $windowctl(get $windowctl(refnum $winnum) window_level);
+};
+
+alias winline (linenum, winnum default 0, void) {
+	if ((:line = windowctl(get $windowctl(get refnum $winnum) line $linenum)) >= -1) {
+		return $line;
+	};
+	return -1;
+};
+
+alias winnam (winnum default 0, void) {
+	return $windowctl(get $windowctl(refnum $winnum) name);
+};
+
+alias winnicklist (winnum default 0, void) {
+	return $windowctl(get $windowctl(refnum $winnum) nicklist);
+};
+
+alias winnum (winnum default 0, void) {
+	if (:num = windowctl(get $windowctl(refnum $winnum) refnum)) {
+		return $num;
+	};
+	return -1;
+};
+
+alias winquery (winnum default 0, void) {
+	return $windowctl(get $windowctl(refnum $winnum) query);
+};
+
+alias winrefs (void) {
+	return $windowctl(refnums);
+};
+
+alias winscreen (winnum default 0, void) {
+	if ((:screen = windowctl(get $windowctl(refnum $winnum) screen)) >= -1) {
+		return $screen;
+	};
+	return -1;
+};
+
+alias winscrollbacksize (winnum default 0, void) {
+	if ((:scrollbacksize = windowctl(get $windowctl(refnum $winnum) display_buffer_size)) >= -1) {
+		return $scrollbacksize;
+	};
+	return -1;
+};
+
+alias winserv (winnum default 0, void) {
+	if ((:serv = windowctl(get $windowctl(refnum $winnum) server)) >= -2) {
+		return $serv;
+	};
+	return -1;
+};
+
+alias winsize (winnum default 0, void) {
+	return $windowctl(get $windowctl(refnum $winnum) display_size);
+};
+
+alias winstatsize (winnum default 0, void) {
+	if ((:statsize = windowctl(get $windowctl(refnum $winnum) double)) > -1) {
+		return ${statsize + 1};
+	};
+	return -1;
+};
+
+alias winvisible (winnum default 0, void) {
+	if ((:visible = windowctl(get $windowctl(refnum $winnum) visible)) >= -1) {
+		return $visible;
+	};
+	return -1;
+};
+
+# HOOKS #
+
+^on ^send_public "*" {
+	echo ${!iscurchan($0) ? (*) : ''}> $1-;
+};
+
+# SETS #
+
+# AUTO_NEW_NICK
+
+load -pf newnick;
+
+# AUTO_REJOIN, AUTO_REJOIN_DELAY
+
+addset auto_rejoin bool;
+
+set auto_rejoin off;
+
+addset auto_rejoin_delay int;
+
+set auto_rejoin_delay 0;
+
+^on #-kick 1 '$$servernick() *' {
+	if (getset(auto_rejoin) == 'on') {
+		if (:delay = getset(auto_rejoin_delay)) {
+			timer -w $winnum() $delay join $2;
+		} else {
+			defer join $2;
+		};
+	};
+};
+
+# AUTO_UNMARK_AWAY
+
+addset auto_unmark_away bool;
+
+set auto_unmark_away off;
+
+^on #-input 1 "*" {
+	if (getset(auto_unmark_away) == 'on' && serverctl(get $servernum() away)) {
+		away;
+	};
+};
+
+^on #-input 1 "/*" {
+	if (getset(auto_unmark_away) == 'on' && serverctl(get $servernum() away) && findw($0 /me /msg /notice /say) > -1) {
+		away;
+	};
+};
+
+# AUTO_WHOWAS
+
+addset auto_whowas bool;
+
+set auto_whowas on;
+
+^on #-401 1 "*" {
+	if (getset(auto_whowas) == 'on' && !ischannel($1)) {
+		whowas $1;
+	};
+};
+
+# BEEP_ON_MSG
+
+addset beep_on_msg str;
+
+set beep_on_msg none;
+
+^on #-action 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(action $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-channel_sync 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-ctcp 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(ctcp $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-dcc_activity 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(dcc $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-dcc_connect 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(dcc $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-dcc_list 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(dcc $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-dcc_lost 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(dcc $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-dcc_offer 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(dcc $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-dcc_request 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(dcc $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-join 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-mail 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-mode 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-msg 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(msgs $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-notice 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(notices $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-numeric 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-oper_notice 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(opnotes $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-part 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-pong 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-public 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(public $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-server_notice 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(snotes $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-wallop 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(wallops $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+^on #-who 1 "*" {
+	if (getset(beep_on_msg) == 'all' || findw(crap $getset(beep_on_msg)) > -1) {
+		beep;
+	};
+};
+
+set beep_on_msg none;
+
+# COMMAND_MODE
+
+addset command_mode bool;
+
+set command_mode off;
+
+^on ^input "*" {
+	//sendline ${getset(command_mode) == 'on' ? '/' : ''}$*;
+};
+
+^on ^input "'*" {
+	//send ${getset(command_mode) == 'on' ? rest(1 $*) : (*)};
+};
+
+^on ^input "/*" {
+	//sendline $*;
+};
+
+# DCC_TIMEOUT
+
+addset dcc_timeout int;
+
+set dcc_timeout 3600;
+
+^on #-timer 1 "*" {
+	if (:timeout = getset(dcc_timeout)) {
+		fe ($dccctl(refnums)) dd {
+			if (time() - word(0 $dccctl(get $dd lasttime)) >= timeout) {
+				@ :nick = dccctl(get $dd user);
+				@ :type = dccctl(get $dd type);
+				shook dcc_lost $nick $type $urlencode($dccctl(get $dd description)) IDLE TIME EXCEEDED;
+				dcc close $type $nick;
+			};
+		};
+	};
+};
+
+# FULL_STATUS_LINE
+
+addset full_status_line bool {
+	if (*0 == 'on') {
+		^set status_format $before(-1  $status_format);
+		^set status_format1 $before(-1  $status_format1);
+		^set status_format2 $before(-1  $status_format2);
+	} else {
+		^set status_format $status_format;
+		^set status_format1 $status_format1;
+		^set status_format2 $status_format2;
+	};
+};
+
+set full_status_line on;
+
+# NUM_OF_WHOWAS
+
+addset num_of_whowas int;
+
+set num_of_whowas 1;
+
+# REALNAME
+
+^on %set "REALNAME *" {
+	set default_realname $1-;
+};
+
+# SHOW_END_OF_MSGS
+
+addset show_end_of_msgs bool;
+
+set show_end_of_msgs on;
+
+fe (219 232 262 315 318 347 349 365 366 368 369 374 394) ss {
+	^on ?$ss "*" {
+		return ${getset(show_end_of_msgs) == 'on' ? 0 : 1};
+	};
+};
+
+# SHOW_WHO_HOPCOUNT
+
+addset show_who_hopcount bool;
+
+set show_who_hopcount on;
+
+^on ?who "*" {
+	if (getset(show_who_hopcount) == 'on') {
+		echo $[15]0 $[9]1 $[3]2 $3@$4 \($7-\);
+		return 1;
+	};
+	return 0;
+};
+
+# VERBOSE_CTCP
+
+addset verbose_ctcp bool;
+
+set verbose_ctcp on;
+
+^on ?ctcp "*" {
+	return ${getset(verbose_ctcp) == 'on' ? 0 : 1};
+};

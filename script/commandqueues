@@ -1,0 +1,197 @@
+if (word(2 $loadinfo()) != [pf]) { load -pf $word(1 $loadinfo()); return; };
+
+# All these aliases take commands as arguments and have the property that
+# they will not exand those commands prior to execution, making them safe.
+#
+# This may require some explanation:
+#
+# The ircii language has the concept of "expansion", whereby variable
+# references are replaced with the variable values and escaped characters
+# are unescaped.  This is one of the side effects of an eval.  In the
+# following two commands, if entered from the command line, the first will
+# whois the nick "\\`anderer", and the second will whois "\`anderer",
+# because the eval will unescape it.
+#
+#  /whois \\`anderer
+#  /eval whois \\`anderer
+#
+# This is from the command line.  If these commands are executed from an
+# alias, the first command will whois "\`anderer", and the second will
+# whois "`anderer".  This is because commands within an alias are always
+# expanded prior to execution.  There is no way to stop this, but you can
+# control it by passing a variable to the whois command instead of the raw
+# text.  Since expansion only occurs once, the variables expansion will
+# "shelter" the text from being expanded.
+#
+# If you wish to add more levels of expansion, you use more evals.  If you
+# wish to have _no_ expansion, you keep all your text in variables, and
+# avoid using eval.
+#
+# It is easy to see that there may be occasions where you may want to whois
+# someone from within a hook without having to worry about expansion.  This
+# is easy enough.  /whois does not expand its arguments, however, hooks can
+# generate floods, so you put the whois in a timer say.  The problem with
+# this is that /timer _does_ expand its arguments, so you end up with an
+# extra level of expansion to deal with.
+#
+# These aliases solve these problems.  Commands are given as arguments and
+# are normally not expanded, just as if they had been given to a built in
+# command.  If you wish to have them expanded when they are run, precede
+# them with /eval, or use a /timer or a /queue instead.
+
+package qcmd;
+
+#
+# Synonym for /timer, but which doesn't expand args.
+#
+# This is less than perfect and will break if numbers are used for commands.
+#
+alias timer.ue (args) {
+	while (word(0 $args) =~ [-*]) {
+		push :pre $shift(args);
+		if (isnumber(b10 $word(1 $args))) {
+			push :pre $shift(args);
+		};
+	};
+	timer $pre $shift(args) \$decode\($encode($args)\);
+};
+
+#
+# Usage:
+#  scmd [server [command]]
+#
+# Execute command on server _without_ expanding command.
+#
+alias scmd (args) fe ($split(, $shift(args))) serv {
+	xeval -s $serv -w $serverwin($serv) {$args};
+};
+
+#
+# Usage:
+#  1cmd [time,reset [command]]
+#
+# command will not be executed if the same command has been executed in
+# the last time seconds.
+#
+# The time of the last execution of the command will be set to the current time
+# if it was executed, or if the last execution was less than "reset" seconds
+# ago.  This is useful for riding events which occur in waves.
+#
+alias 1cmd (sec,cmd) {
+	@ :foo = encode($tolower($cmd));
+	@ :time = time();
+	@ :eserv = 0 > servernum() ? [] : servernum();
+	@ :reset = split(, $sec);
+	@ :sec = shift(reset);
+	@ :reset = shift(reset);
+	if (!sec) {
+		$cmd;
+		return;
+	} elsif (time - onecmd[$eserv][$foo][t] <= reset) {
+		@ onecmd[$eserv][$foo][e] = time + sec;
+		@ onecmd[$eserv][$foo][t] = time;
+	} elsif (time - onecmd[$eserv][$foo][t] >= sec) {
+		@ onecmd[$eserv][$foo][e] = time + sec;
+		@ onecmd[$eserv][$foo][t] = time;
+		$cmd;
+	};
+	if (time != onecmd[$eserv][lp] && !(++onecmd[$eserv][cnt] % 10)) {
+		@ onecmd[$eserv] = time;
+		foreach onecmd[$eserv] bar {
+			if (onecmd[$eserv][$bar][e] < time) {
+				@ onecmd[$eserv][$bar][t] = [];
+				@ onecmd[$eserv][$bar][e] = [];
+			};
+		};
+	};
+};
+
+#
+# Usage:
+#  qcmd [queue [command]]
+#  fqcmd [queue [command]]
+#
+# Queue command, and schedule a timer for later execution.  Prevents flooding.
+# fqcmd adds the command to the beginning of the queue instead of the end.
+#
+#  q1cmd [time [queue [command]]]
+#  fq1cmd [time [queue [command]]]
+#
+# The same as "1cmd {time} qcmd {queue} {command}", only, the command also
+# won't be scheduled if the same command is already scheduled.
+#
+# Also, with [f]q1cmd, you can specify a coma separated list of queues for
+# the second argument.  All these queues will be searched for duplicates but
+# the first will be the queue given to qcmd.
+#
+stack push alias alias.tt;
+alias alias.tt (cmd,op,args) {
+	@ sar(gr/\${cmd}/${cmd}/args);
+	@ sar(gr/\${op}/${op}/args);
+	alias $args;
+};
+fe (q push fq unshift) cmd op {
+	alias.tt $cmd $op ${cmd}1cmd (qo,qc,args) {
+		@ :oxd = xdebug(dword);
+		xdebug dword;
+		@ :sn = servernum();
+		@ :sn = sn < 0 ? [_] : sn;
+		@ :argz = args;
+		#@ sar(gr/\\/\\\\/argz);
+		#@ sar(gr/\"/\\\"/argz);
+		@ :qc = split(, $qc);
+		fe ($qc) qqcc {
+			if (0 <= findw("$argz" $qcmd[$sn][$qqcc])) {
+				xdebug $oxd;
+				return;
+			};
+		};
+		xdebug -dword;
+		1cmd $qo ${cmd}cmd $shift(qc) $args;
+		xdebug $oxd;
+	};
+	alias.tt $cmd $op ${cmd}cmd {
+		@ :oxd = xdebug(dword);
+		@ :sn = servernum();
+		@ :sn = sn < 0 ? [_] : sn;
+		xdebug dword;
+		if (1 < #) {
+			@ :foo = [$1-];
+			#@ :foo = ${op}(qcmd.${sn}.$0 "$msar(gr/\\/\\\\/\"/\\\"/foo)");
+			@ :foo = ${op}(qcmd.${sn}.$0 $foo);
+		} else {
+			if (1 == #) {
+				@ :foo = [qcmd.${sn}.$0];
+				@ :foo = aliasctl(assign match $foo);
+				@ :foo = shift(foo);
+				@ :foo = after(2 . $foo);
+			} elsif (islagged()) {
+				@ :bar = [ ];
+				# Do nothing if we're lagged.
+				# This is meant to be a link to a
+				# fictitious lag measurement script.
+			} elsif (0 == #) {
+				foreach qcmd[$sn] bar {
+					@ :foo = bar;
+					break;
+				};
+			};
+			@ :bar = shift(qcmd[$sn][$foo]);
+		};
+		xdebug $oxd;
+		if (functioncall()) {
+			#return $msar(gr/\\\\/\\/\\\"/\"/bar);
+			return $msar(gr/\\\"/\"/bar);
+			#return $bar;
+		} elsif (@bar) {
+			#$msar(gr/\\\\/\\/\\\"/\"/bar);
+			$msar(gr/\\\"/\"/bar);
+			#$bar;
+			^timer -ref qcmd.$sn -update 5 qcmd;
+		} elsif (@foo) {
+			^timer -ref qcmd.$sn 5 qcmd;
+		};
+	};
+};
+stack pop alias alias.tt;
+
