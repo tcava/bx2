@@ -11,7 +11,7 @@
 #ifndef __irc_h__
 #define __irc_h__
 
-#define IRCII_COMMENT   "Accept no limitations."
+#define IRCII_COMMENT   "Keep it to yourself!"
 #define IRCRC_NAME 	"/.ircrc"
 #define EPICRC_NAME 	"/.epicrc"
 #define EMAIL_CONTACT 	"list@epicsol.org"

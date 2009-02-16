@@ -403,13 +403,13 @@ CTCP_HANDLER(do_version)
 	}
 
 	send_ctcp(CTCP_NOTICE, from, CTCP_VERSION, 
-			"ircII %s %s %s - %s", 
+			"%s by panasync - %s %s : %s", 
 			irc_version, the_unix, the_version,
 			(tmp = get_string_var(CLIENT_INFORMATION_VAR)) ? 
 				tmp : IRCII_COMMENT);
 #else
 	send_ctcp(CTCP_NOTICE, from, CTCP_VERSION, 
-			"ircII %s *IX - %s", 
+			"%s by panasync - *IX : %s", 
 			irc_version,
 			(tmp = get_string_var(CLIENT_INFORMATION_VAR)) ? 
 				tmp : IRCII_COMMENT);

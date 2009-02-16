@@ -41,7 +41,7 @@
  *  the client will NOT compile and work properly!  Use the default here if
  *  you dont have other servers to use.
  */
-#define DEFAULT_SERVER "irc.choopa.ca"
+#define DEFAULT_SERVER "irc.choopa.net"
 
 /*
  * This is an experimental feature to thwart infinite recursion.  It is not
