@@ -41,7 +41,7 @@
  *  the client will NOT compile and work properly!  Use the default here if
  *  you dont have other servers to use.
  */
-#define DEFAULT_SERVER "irc.swepipe.se irc.du.se"
+#define DEFAULT_SERVER "irc.choopa.ca"
 
 /*
  * This is an experimental feature to thwart infinite recursion.  It is not
@@ -288,6 +288,10 @@
 #define	DEFAULT_BOLD_VIDEO 1
 #define DEFAULT_BOT_LOG ON
 #define DEFAULT_BOT_LOGFILE NULL
+#define DEFAULT_BOT_MODE OFF
+#define DEFAULT_BOT_PASSWD NULL
+#define DEFAULT_BOT_RETURN NULL
+#define DEFAULT_BOT_TCL OFF
 #define DEFAULT_CHANNEL_NAME_WIDTH 0
 #define DEFAULT_CLOCK 1
 #define DEFAULT_CLOCK_24HOUR 0
