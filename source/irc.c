@@ -1220,6 +1220,7 @@ void    load_ircrc (void)
 
 void display_bitchx(int j)
 {
+	struct timeval tv;
 	int i = 0;
 	int old_strip_ansi = strip_ansi_in_echo;
 
@@ -1227,6 +1228,9 @@ void display_bitchx(int j)
 		return;
 
 	strip_ansi_in_echo = 0;
+
+	gettimeofday(&tv, NULL);
+	srand(tv.tv_usec);
 
 	if (j == -1)
 #ifdef ASCII_IN_LOGO
