@@ -425,11 +425,17 @@ void 	init_variables_stage1 (void)
 	VAR(HOLD_MODE_MAX,		INT,  NULL)
 	VAR(HOLD_SLIDER,		INT,  NULL);
 	VAR(HTTP_GRAB,			BOOL, NULL)
+	VAR(IDENT_HACK,			STR,  NULL)
+	VAR(IDLE_CHECK,			INT,  NULL)
+	VAR(IGNORE_TIME,		INT,  NULL)
 	VAR(INDENT,			BOOL, set_indent);
+	VAR(INPUT_ALIASES,		BOOL, NULL)
+	VAR(INPUT_GLOB,			STR,  NULL)
         VAR(INPUT_INDICATOR_LEFT,	STR, NULL);
         VAR(INPUT_INDICATOR_RIGHT,	STR, NULL);
         VAR(INPUT_PROMPT,		STR,  set_input_prompt);
 	VAR(INSERT_MODE,		BOOL, update_all_status_wrapper);
+	VAR(INVERSE_VIDEO,		BOOL, NULL)
 	VAR(KEY_INTERVAL,		INT,  set_key_interval);
 	VAR(LASTLOG, 			INT,  set_lastlog_size);
 	VAR(LASTLOG_LEVEL,		STR,  set_lastlog_mask);
