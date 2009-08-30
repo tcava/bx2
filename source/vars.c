@@ -436,6 +436,10 @@ void 	init_variables_stage1 (void)
         VAR(INPUT_PROMPT,		STR,  set_input_prompt);
 	VAR(INSERT_MODE,		BOOL, update_all_status_wrapper);
 	VAR(INVERSE_VIDEO,		BOOL, NULL)
+	VAR(JOINFLOOD,			BOOL, NULL)
+	VAR(JOINFLOOD_TIME,		INT,  NULL)
+	VAR(JOIN_NEW_WINDOW,		BOOL, NULL)
+	VAR(JOIN_NEW_WINDOW_TYPE,	STR,  NULL)
 	VAR(KEY_INTERVAL,		INT,  set_key_interval);
 	VAR(LASTLOG, 			INT,  set_lastlog_size);
 	VAR(LASTLOG_LEVEL,		STR,  set_lastlog_mask);

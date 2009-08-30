@@ -418,6 +418,14 @@
 #define DEFAULT_INPUT_PROMPT "> "
 #define DEFAULT_INSERT_MODE 1
 #define DEFAULT_INVERSE_VIDEO 1
+#define DEFAULT_JOINFLOOD ON
+#define DEFAULT_JOINFLOOD_TIME 50
+#define DEFAULT_JOIN_NEW_WINDOW OFF
+#ifdef GUI
+#define DEFAULT_JOIN_NEW_WINDOW_TYPE "create hide swap last double on split on"
+#else
+#define DEFAULT_JOIN_NEW_WINDOW_TYPE "new hide_others swap last double on split on"
+#endif
 #define DEFAULT_KEY_INTERVAL 1000
 #define DEFAULT_LASTLOG 256
 #define DEFAULT_LASTLOG_LEVEL "ALL"
