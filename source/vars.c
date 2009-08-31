@@ -538,46 +538,72 @@ void 	init_variables_stage1 (void)
 	VAR(RANDOM_SOURCE, INT,  NULL);
 	VAR(REALNAME,			STR,  NULL)
 	VAR(REVERSE_STATUS,		BOOL, NULL)
+	VAR(SAVEFILE,			STR,  NULL)
 	VAR(SCREEN_OPTIONS, STR,  NULL);
+	VAR(SCRIPT_HELP,		STR,  NULL)
 	VAR(SCROLLBACK, INT,  set_scrollback_size);
 	VAR(SCROLLBACK_RATIO, INT,  NULL);
 	VAR(SCROLL_LINES, INT,  set_scroll_lines);
+	VAR(SEND_AWAY_MSG,		BOOL, NULL)
+	VAR(SEND_CTCP_MSG,		BOOL, NULL)
+	VAR(SEND_IGNORE_MSG,		BOOL, NULL)
+	VAR(SEND_OP_MSG,		BOOL, NULL)
+	VAR(SERVER_GROUPS,		BOOL, NULL)
+	VAR(SERVER_PROMPT,		STR,  NULL)
 	VAR(SHELL, STR,  NULL);
 	VAR(SHELL_FLAGS, STR,  NULL);
 	VAR(SHELL_LIMIT, INT,  NULL);
+	VAR(SHITLIST,			BOOL, NULL)
+	VAR(SHITLIST_REASON,		STR,  NULL)
+	VAR(SHOW_AWAY_ONCE,		BOOL, NULL)
 	VAR(SHOW_CHANNEL_NAMES, BOOL, NULL);
+	VAR(SHOW_END_OF_MSGS,		BOOL, NULL)
 	VAR(SHOW_NUMERICS, BOOL, NULL);
+	VAR(SHOW_NUMERICS_STR,		STR,  NULL)
 	VAR(SHOW_STATUS_ALL, BOOL, update_all_status_wrapper);
+	VAR(SHOW_WHO_HOPCOUNT,		BOOL, NULL)
+	VAR(SOCKS_HOST,			STR,  NULL)
+	VAR(SOCKS_PORT,			INT,  NULL)
 	VAR(STATUS_AWAY, STR,  build_status);
+	VAR(STATUS_CDCCCOUNT,		STR,  NULL)
 	VAR(STATUS_CHANNEL, STR,  build_status);
 	VAR(STATUS_CHANOP, STR,  build_status);
 	VAR(STATUS_CLOCK, STR,  build_status);
 	VAR(STATUS_CPU_SAVER, STR,  build_status);
+	VAR(STATUS_DCCCOUNT,		STR,  build_status);
 #define DEFAULT_STATUS_DOES_EXPANDOS 0
 	VAR(STATUS_DOES_EXPANDOS, BOOL, NULL);
+	VAR(STATUS_FLAG,		STR,  build_status);
 	VAR(STATUS_FORMAT, STR,  build_status);
 	VAR(STATUS_FORMAT1, STR,  build_status);
 	VAR(STATUS_FORMAT2, STR,  build_status);
+	VAR(STATUS_FORMAT3,		STR,  build_status);
 	VAR(STATUS_HALFOP, STR,  build_status);
 	VAR(STATUS_HOLD, STR,  build_status);
 	VAR(STATUS_HOLD_LINES, STR,  build_status);
 	VAR(STATUS_HOLDMODE, STR,  build_status);
 	VAR(STATUS_INSERT, STR,  build_status);
+	VAR(STATUS_LAG,			STR,  build_status);
 	VAR(STATUS_MAIL, STR,  build_status);
 	VAR(STATUS_MODE, STR,  build_status);
+	VAR(STATUS_MSGCOUNT,		STR,  build_status);
+	VAR(STATUS_NICK,		STR,  build_status);
 	VAR(STATUS_NICKNAME, STR,  build_status);
 	VAR(STATUS_NOSWAP, STR,  build_status);
 	VAR(STATUS_NOTIFY, STR,  build_status);
 	VAR(STATUS_NO_REPEAT, BOOL, build_status);
 	VAR(STATUS_OPER, STR,  build_status);
+	VAR(STATUS_OPER_KILLS,		STR,  build_status);
 	VAR(STATUS_OVERWRITE, STR,  build_status);
 	VAR(STATUS_QUERY, STR,  build_status);
 	VAR(STATUS_SCROLLBACK, STR,  build_status);
 	VAR(STATUS_SERVER, STR,  build_status);
 	VAR(STATUS_SSL_OFF, STR,  build_status);
 	VAR(STATUS_SSL_ON, STR,  build_status);
+	VAR(STATUS_TOPIC,		STR,  build_status);
 	VAR(STATUS_UMODE, STR,  build_status);
 	VAR(STATUS_USER, STR,  build_status);
+	VAR(STATUS_USER0,		STR,  build_status);
 	VAR(STATUS_USER1, STR,  build_status);
 	VAR(STATUS_USER10, STR,  build_status);
 	VAR(STATUS_USER11, STR,  build_status);
@@ -617,9 +643,12 @@ void 	init_variables_stage1 (void)
 	VAR(STATUS_USER7, STR,  build_status);
 	VAR(STATUS_USER8, STR,  build_status);
 	VAR(STATUS_USER9, STR,  build_status);
+	VAR(STATUS_USERS,		STR,  build_status);
 	VAR(STATUS_VOICE, STR,  build_status);
 	VAR(STATUS_WINDOW, STR,  build_status);
 	VAR(SUPPRESS_FROM_REMOTE_SERVER, BOOL, NULL);
+	VAR(SUPPRESS_SERVER_MOTD,	BOOL,  NULL)
+	VAR(SWATCH,			STR,  NULL)
 	VAR(SWITCH_CHANNELS_BETWEEN_WINDOWS, BOOL, NULL);
 	VAR(TERM_DOES_BRIGHT_BLINK, BOOL, NULL);
 	VAR(TIMESTAMP, BOOL, NULL);
