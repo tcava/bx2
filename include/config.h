@@ -504,6 +504,13 @@
 #define DEFAULT_PROTECT_CHANNELS NULL
 #define DEFAULT_PUBFLOOD OFF
 #define DEFAULT_PUBFLOOD_TIME 20
+#define DEFAULT_QUERY_NEW_WINDOW OFF
+#ifdef GUI
+#define DEFAULT_QUERY_NEW_WINDOW_TYPE "create hide swap last double on split on"
+#else
+#define DEFAULT_QUERY_NEW_WINDOW_TYPE "new hide_others swap last double on split on"
+#endif
+#define DEFAULT_QUEUE_SENDS 0
 #define DEFAULT_QUIT_MESSAGE "%s -- just do it."
 #define DEFAULT_RANDOM_SOURCE 0
 #define DEFAULT_SCREEN_OPTIONS NULL
