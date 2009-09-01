@@ -646,6 +646,9 @@
 #define DEFAULT_XTERM "xterm"
 #define DEFAULT_XTERM_OPTIONS NULL
 #define DEFAULT_XTERM_TITLE OFF
+#define DEFAULT__CDCC_CLOSE_IDLE_SENDS_TIME 55
+#define DEFAULT__CDCC_MINSPEED_TIME 0
+#define DEFAULT__CDCC_PACKS_OFFERED 0
 
 /*
  * People have wanted me to explain some of these #defines.  Well,

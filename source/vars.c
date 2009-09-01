@@ -675,6 +675,9 @@ void 	init_variables_stage1 (void)
 	VAR(XTERM, STR,  NULL);
 	VAR(XTERM_OPTIONS, STR,  NULL);
 	VAR(XTERM_TITLE,		BOOL, NULL)
+	VAR(_CDCC_CLOSE_IDLE_SENDS_TIME, INT, NULL)
+	VAR(_CDCC_MINSPEED_TIME,	INT,  NULL)
+	VAR(_CDCC_PACKS_OFFERED,	INT,  NULL)
 }
 
 void 	init_variables_stage2 (void)
