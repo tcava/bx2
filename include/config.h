@@ -645,6 +645,7 @@
 #define DEFAULT_WSERV_TYPE "screen"
 #define DEFAULT_XTERM "xterm"
 #define DEFAULT_XTERM_OPTIONS NULL
+#define DEFAULT_XTERM_TITLE OFF
 
 /*
  * People have wanted me to explain some of these #defines.  Well,

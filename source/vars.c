@@ -442,7 +442,7 @@ void 	init_variables_stage1 (void)
 	VAR(JOIN_NEW_WINDOW_TYPE,	STR,  NULL)
 	VAR(KEY_INTERVAL,		INT,  set_key_interval);
 	VAR(KICKFLOOD,			BOOL, NULL)
-	VAR(KICKFLOOD_TIME,		BOOL, NULL)
+	VAR(KICKFLOOD_TIME,		INT, NULL)
 	VAR(KICK_IF_BANNED,		BOOL, NULL)
 	VAR(KICK_ON_DEOPFLOOD,		INT,  NULL)
 	VAR(KICK_ON_JOINFLOOD,		INT,  NULL)
@@ -674,6 +674,7 @@ void 	init_variables_stage1 (void)
 	VAR(WSERV_TYPE, STR,  set_wserv_type);
 	VAR(XTERM, STR,  NULL);
 	VAR(XTERM_OPTIONS, STR,  NULL);
+	VAR(XTERM_TITLE,		BOOL, NULL)
 }
 
 void 	init_variables_stage2 (void)
