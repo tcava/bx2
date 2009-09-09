@@ -42,6 +42,7 @@
  */
 const char irc_version[] = "BitchX-2.0";
 const char useful_info[] = "BitchX 2 0 0";
+const char BX_version[] = "BitchX";
 
 const unsigned long bitchx_numver = 200000;
 
@@ -93,6 +94,7 @@ const char ridiculous_version_name[] = "Bitch-X, baby!";
 #include "extlang.h"
 #include "irc_std.h"
 #include "misc.h"
+#include "cset.h"
 #include <pwd.h>
 
 /* XXX: These should go in irc.h */
@@ -233,6 +235,7 @@ const char	empty_string[] = "",		/* just an empty string */
 		space[] = " ",			/* just a lonely space */
 		space_plus[] = " +",
 		space_minus[] = " -",
+		three_stars[] = "***",
 		on[] = "ON",
 /*		my_off[] = "OFF", */
 		zero[] = "0",
@@ -1278,6 +1281,7 @@ int 	main (int argc, char *argv[])
 	init_levels();
 	init_transforms();
 	init_variables_stage1();
+	create_fsets(current_window, get_int_var(DISPLAY_ANSI_VAR));
 	parse_args(argc, argv);
 	init_binds();
 	init_keys();

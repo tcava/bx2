@@ -62,6 +62,7 @@
 /* Last two bytes are always reserved for \r\n */
 #define MAX_PROTOCOL_SIZE	IRCD_BUFFER_SIZE - 2
 #define BIG_BUFFER_SIZE		(IRCD_BUFFER_SIZE * 4)
+#define LARGE_BIG_BUFFER_SIZE	(BIG_BUFFER_SIZE * 10)
 
 /* 
  * This assumes a channel size less than 10 characters.
@@ -96,15 +97,19 @@ extern		int	use_iexten;
 extern		int	use_input;
 extern		int	waiting_out;
 extern		int	waiting_in;
+extern		int	strip_ansi_in_echo;
 extern const	char *	compile_info;
 extern		unsigned char *	cut_buffer;
+extern		char *	thing_ansi;
 extern		char *	default_channel;
 extern	const	char 	empty_string[];
+extern	const	char	three_stars[];
 extern	const	char	space[];
 extern	const	char	star[];
 extern	const	char	dot[];
 extern		char	hostname[NAME_LEN + 1];
 extern const 	char 	internal_version[];
+extern const	char	BX_version[];
 extern		char *	startup_file;
 extern		char *	irc_lib;
 extern const 	char 	irc_version[];
