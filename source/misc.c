@@ -12,7 +12,7 @@ extern char *alias_special_char(char **, char *, const char *, char *, int *);
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.1 2009/01/27 11:02:48 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.2 2009/09/09 06:07:17 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -156,7 +156,7 @@ char *convert_time (time_t ltime)
 	hours = ltime % 24;
 	days = (ltime - hours) / 24;
 	sprintf(buffer, "%2lud %2luh %2lum %2lus", days, hours, minutes, seconds);
-	return(*buffer ? buffer : empty_string);
+	return(*buffer ? buffer : (char *) empty_string);
 }
 
 #if 0
@@ -4386,7 +4386,7 @@ static char time_str[61];
 		strftime(time_str, 60, timestr, &timeval);
 		return time_str;
 	}
-	return empty_string;	
+	return (char *) empty_string;	
 }
 
 static int cparse_recurse = -1;
@@ -4419,7 +4419,7 @@ int do_timestamp = get_int_var(TIMESTAMP_VAR);
 char *timestamp_str = get_string_var(TIMESTAMP_STRING_VAR);
 
 	if (!format)
-		return empty_string;
+		return (char *) empty_string;
 	copy = LOCAL_COPY(format);
 	
 
@@ -4857,8 +4857,9 @@ void check_server_connect(int server)
 	}
 #endif
 }
+#endif
 
-char *country(char *hostname)
+char *country(const char *hostname)
 {
 #ifndef BITCHX_LITE
 typedef struct _domain {
@@ -5129,7 +5130,7 @@ Domain domain[] = {
 	{"PRO", "Professional" },
 	{NULL, NULL}
 };
-char *p;
+const char *p;
 int i = 0;
 	if (!hostname || !*hostname || isdigit((unsigned char)hostname[strlen(hostname)-1]))
 		return "unknown";
@@ -5143,5 +5144,3 @@ int i = 0;
 #endif
 	return "unknown";
 }
-
-#endif

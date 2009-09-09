@@ -133,7 +133,7 @@ extern LastMsg last_sent_ctcp[2];
 
 	int		timer_unban (void *, char *);
 	void		check_server_connect (int);
-	char		*country(char *);
+	char		*country(const char *);
 	int		do_newuser (char *, char *, char *);
 	int		char_fucknut (register unsigned char *, char, int);
 //	BanList		*ban_is_on_channel(register char *, register ChannelList *);
