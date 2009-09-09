@@ -5633,3 +5633,9 @@ int num_code_points(const char *i)
 }
 
 
+char * m_s3cat(char **one, const char *maybe, const char *definitely)
+{
+	if (*one && **one)
+		return malloc_strdup3(one, maybe, definitely);
+	return malloc_strcpy(one, definitely);
+}

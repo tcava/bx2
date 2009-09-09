@@ -7,7 +7,7 @@
  *
  * See the COPYRIGHT file, or do a HELP IRCII COPYRIGHT 
  *
- * @(#)$Id: ircaux.h,v 1.1 2009/01/27 11:01:44 fb Exp $
+ * @(#)$Id: ircaux.h,v 1.2 2009/09/09 06:05:37 fb Exp $
  */
 
 #ifndef _IRCAUX_H_
@@ -187,6 +187,8 @@ char *	malloc_strcat3_c	(char **, const char *, const char *, const char *, size
 char *	malloc_strcat_wordlist_c (char **, const char *, const char *,size_t *);
 char *	malloc_strcat_word_c    (char **, const char *, const char *, int, size_t *);
 char *	malloc_sprintf 		(char **, const char *, ...) __A(2);
+
+char *	m_s3cat			(char **, const char *, const char *);
 
 #define malloc_strcpy(x,y) malloc_strcpy_c((x),(y),NULL)
 #define malloc_strcat(x,y) malloc_strcat_c((x),(y),NULL)
