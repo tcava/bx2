@@ -1375,6 +1375,17 @@ int 	main (int argc, char *argv[])
 
 	load_ircrc();
 
+	/* XXX $IRCUMODE overrides /set usermode */
+	if (send_umode)
+		set_var_value(USERMODE_VAR, send_umode, 0);
+	else
+	{
+		if (get_string_var(USERMODE_VAR))
+			malloc_strcpy(&send_umode, get_string_var(USERMODE_VAR));
+		else
+			malloc_strcpy(&send_umode, DEFAULT_USERMODE);
+	}
+
 	/* We are ready to load scripts */
 	run_level = 1;
 
