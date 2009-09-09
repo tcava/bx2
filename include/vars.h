@@ -443,6 +443,8 @@ typedef struct
 
 	BUILT_IN_COMMAND(setcmd);
 
+extern	const char *	var_settings[];
+
 	int	do_boolean 		(char *, int *);
 	int	do_short_boolean 	(char *, short *);
 	int	get_int_var 		(int);
