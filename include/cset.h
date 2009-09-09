@@ -404,8 +404,7 @@ char		*BX_fget_string_var(enum FSET_TYPES);
 /* XXX */
 char		*fget_string_var(enum FSET_TYPES);
 void		BX_fset_string_var(enum FSET_TYPES, char *);
-/* XXX */
-//void		fset_variable(char *, char *, char *, char *);
+void		fset_variable(const char *, char *, const char *);
 char		*make_fstring_var(const char *);
 char		**get_wset_format_var_address(WSet *, int);
 char		*get_cset(char *, ChannelList *, char *);
