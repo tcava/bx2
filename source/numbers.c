@@ -250,6 +250,8 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 	{
 		server_is_registered(from_server, from, recipient);
 		set_server_motd(from_server, 1);
+		if (send_umode && *send_umode == '+')
+			send_to_server("MODE %s %s", recipient, send_umode);
 		break;
 	}
 
