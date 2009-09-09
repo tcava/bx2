@@ -393,3 +393,26 @@ void    syserr (int server, const char *format, ...)
         va_end(args);
 }
 
+/* XXX */
+void bitchsay (const char *format, ...)
+{
+int len;
+	if (window_display && format)
+	{
+		va_list args;
+		va_start (args, format);
+		sprintf(putbuf, "%s \002%s\002: ", thing_ansi?thing_ansi:three_stars, BX_version);
+		len = strlen(putbuf);
+		vsnprintf(&(putbuf[len]), LARGE_BIG_BUFFER_SIZE, format, args);
+		va_end(args);
+		if (strip_ansi_in_echo) 
+		{
+			register char *ptr;
+			for (ptr = putbuf+len; *ptr; ptr++)
+				if (*ptr < 31 && *ptr > 13)
+					if (*ptr != 15 && *ptr != 22)
+						*ptr = (*ptr & 127) | 64;
+		}
+		put_echo(putbuf);
+	}
+}
