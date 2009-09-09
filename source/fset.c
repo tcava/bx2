@@ -1,5 +1,5 @@
 #include "irc.h"
-static char cvsrevision[] = "$Id: fset.c,v 1.1 2009/09/09 05:55:58 fb Exp $";
+static char cvsrevision[] = "$Id: fset.c,v 1.2 2009/09/09 06:50:44 fb Exp $";
 //CVS_REVISION(fset_c)
 #include "struct.h"
 
@@ -451,9 +451,9 @@ static inline void fset_variable_noargs(char *name)
 int var_index = 0;
 FsetNumber *tmp;
 	for (var_index = 0; var_index < NUMBER_OF_FSET; var_index++)
-		set_fset_var_value(var_index, NULL, empty_string);
+		set_fset_var_value(var_index, NULL, (char *) empty_string);
 	for (var_index = 0; var_index < ext_fset_list.max; var_index++)
-		set_fset_var_value(var_index, (*ext_fset_list.list[var_index]).name, empty_string);
+		set_fset_var_value(var_index, (*ext_fset_list.list[var_index]).name, (char *) empty_string);
 	for (tmp = numeric_fset; tmp; tmp = tmp->next)
 		put_it("%s", convert_output_format(fget_string_var(FORMAT_SET_FSET), "%d %s", tmp->numeric, tmp->format));
 }
@@ -515,7 +515,7 @@ BUILT_IN_COMMAND(fset_variable)
 					return;
 				default:
 					say("%s is ambiguous", var);
-					fset_variable_casedef(name, cnt, var_index, empty_string);
+					fset_variable_casedef(name, cnt, var_index, (char *) empty_string);
 					return;
 			}
 		}
