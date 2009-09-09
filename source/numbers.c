@@ -54,10 +54,15 @@
 #include "who.h"
 #include "alias.h"
 #include "reg.h"
+#include "cset.h"
+#include "misc.h"
 
 static void	add_user_who (int refnum, const char *from, const char *comm, const char **ArgList);
 static void	add_user_end (int refnum, const char *from, const char *comm, const char **ArgList);
 static 	int	number_of_bans = 0;
+
+/* XXX */
+char *		thing_ansi = DEFAULT_SHOW_NUMERICS_STR;
 
 /*
  * banner: This returns in a static string of either "xxx" where
@@ -244,6 +249,7 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 	case 001:	/* #define RPL_WELCOME          001 */
 	{
 		server_is_registered(from_server, from, recipient);
+		set_server_motd(from_server, 1);
 		break;
 	}
 
@@ -940,6 +946,16 @@ DISPLAY:
 		break;
 	}
 
+	case 250:
+	case 251:
+	case 252:
+	case 253:
+	case 254:
+	case 255:
+		if (!handle_server_stats(from, (const char **) ArgList, numeric))
+			display_msg(from, comm, ArgList);
+		break;
+
 	case 271:		/* #define SILENCE_LIST		271 */
 	{
 		const char *perp, *victim;
@@ -964,7 +980,7 @@ DISPLAY:
 		if (!(message = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s %s is away: %s", banner(), nick, message);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_AWAY_FSET),"%s %s", nick, message));
 		break;
 	}
 
@@ -984,7 +1000,9 @@ DISPLAY:
 		if (!(name = ArgList[4]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s %s is %s@%s (%s)", banner(), nick, user, host, name);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_HEADER_FSET), NULL));
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_NICK_FSET),"%s %s %s %s", nick, user, host, country(host)));
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_NAME_FSET),"%s", name));
 		break;
 	}
 
@@ -1000,7 +1018,7 @@ DISPLAY:
 		if (!(pithy = ArgList[2]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s on irc via server %s (%s)", banner(), server, pithy);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_SERVER_FSET),"%s %s", server, pithy));
 		break;
 	}
 
@@ -1077,7 +1095,9 @@ DISPLAY:
 	case 318:		/* #define RPL_ENDOFWHOIS       318 */
 	{
 		PasteArgs(ArgList, 0);
-		display_msg(from, comm, ArgList);
+//		display_msg(from, comm, ArgList);
+		if (fget_string_var(FORMAT_WHOIS_FOOTER_FSET))
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_FOOTER_FSET), NULL));
 		break;
 	}
 
@@ -1091,7 +1111,7 @@ DISPLAY:
 		if (!(channels = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s on channels: %s", banner(), channels);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_CHANNELS_FSET),"%s", channels));
 		break;
 	}
 
@@ -1401,6 +1421,33 @@ DISPLAY:
 		break;
 	}
 
+	case 375:
+		if (!get_int_var(SUPPRESS_SERVER_MOTD_VAR) || !get_server_motd(from_server))
+		{
+			PasteArgs(ArgList, 0);
+			put_it("%s %s", banner(), ArgList[0]);
+		}
+		break;
+		
+	case 376:
+		set_server_motd(from_server, 0);
+		if (get_int_var(SHOW_END_OF_MSGS_VAR) && (!get_int_var(SUPPRESS_SERVER_MOTD_VAR) ||
+				!get_server_motd(from_server)))
+		{
+			PasteArgs(ArgList, 0);
+			put_it("%s %s", banner(), ArgList[0]);
+		}
+		break;
+
+	case 372:
+	case 377:
+		if (!get_int_var(SUPPRESS_SERVER_MOTD_VAR) || !get_server_motd(from_server))
+		{
+			PasteArgs(ArgList, 0);
+			put_it("%s %s", banner(), ArgList[0]);
+		}
+		break;
+
 	case 401:		/* #define ERR_NOSUCHNICK       401 */
 	{
 		const char	*nick, *stuff;
@@ -1580,3 +1627,93 @@ static void	add_user_end (int refnum, const char *from, const char *comm, const 
 	channel_not_waiting(channel, refnum);
 }
 
+int handle_server_stats(char *from, const char **ArgList, int comm)
+{
+static	int 	norm = 0, 
+		invisible = 0, 
+		services = 0,
+		servers = 0, 
+		ircops = 0, 
+		unknown = 0, 
+		chans = 0, 
+		local_users = 0,
+		total_users = 0,
+		services_flag = 0;
+	char	tmp[80];
+	int	ret = 1;
+	char	*line;
+
+	line = LOCAL_COPY(ArgList[0]);
+	switch(comm)
+	{
+		case 251: /* number of users */
+			BX_BreakArgs(line, NULL, ArgList, 1);
+			if (ArgList[2] && ArgList[5] && ArgList[8])
+			{
+				servers = ircops = unknown = chans = 0;
+				norm = my_atol(ArgList[2]);
+				if ((services_flag = my_stricmp(ArgList[6], "services"))) 
+				    invisible = my_atol(ArgList[5]); 
+				else 
+				    services = my_atol(ArgList[5]);
+				servers = my_atol(ArgList[8]);
+			}
+			break;
+		case 252: /* number of ircops */
+			if (ArgList[0])
+				ircops = my_atol(ArgList[0]);
+			break;
+		case 253: /* number of unknown */
+			if (ArgList[0])
+				unknown = my_atol(ArgList[0]);
+			break;
+			
+		case 254: /* number of channels */
+			if (ArgList[0])
+				chans = my_atol(ArgList[0]);
+			break;
+		case 255: /* number of local print it out */
+			BX_BreakArgs(line, NULL, ArgList, 1);
+			if (ArgList[2])
+				local_users = my_atol(ArgList[2]);
+			total_users = norm + invisible;
+			if (total_users)
+			{
+				sprintf(tmp, "%3.0f", (float)(((float)local_users / (float)total_users) * 100));
+				put_it("%s", convert_output_format("$G %K[%nlocal users on irc%K(%n\002$0\002%K)]%n $1%%", "%d %s", local_users, tmp));
+				sprintf(tmp, "%3.0f", (float)(((float)norm / (float)total_users) * 100));
+				put_it("%s", convert_output_format("$G %K[%nglobal users on irc%K(%n\002$0\002%K)]%n $1%%", "%d %s", norm, tmp));
+				if (services_flag)
+				{
+					sprintf(tmp, "%3.0f", (float)(((float)invisible / (float)total_users) * 100));
+					put_it("%s", convert_output_format("$G %K[%ninvisible users on irc%K(%n\002$0\002%K)]%n $1%%", "%d %s", invisible, tmp));
+				}
+				else
+					put_it("%s", convert_output_format("$G %K[%nservices on irc%K(%n\002$0\002%K)]%n", "%d", services));
+				sprintf(tmp, "%3.0f", (float)(((float)ircops / (float)total_users) * 100));
+				put_it("%s", convert_output_format("$G %K[%nircops on irc%K(%n\002$0\002%K)]%n $1%%", "%d %s", ircops, tmp));
+			}
+			put_it("%s", convert_output_format("$G %K[%ntotal users on irc%K(%n\002$0\002%K)]%n", "%d", total_users));
+			put_it("%s", convert_output_format("$G %K[%nunknown connections%K(%n\002$0\002%K)]%n", "%d", unknown));
+
+			put_it("%s", convert_output_format("$G %K[%ntotal servers on irc%K(%n\002$0\002%K)]%n %K(%navg. $1 users per server%K)", "%d %d", servers, (servers) ? (int)(total_users/servers) : 0));
+
+			put_it("%s", convert_output_format("$G %K[%ntotal channels created%K(%n\002$0\002%K)]%n %K(%navg. $1 users per channel%K)", "%d %d", chans, (chans) ? (int)(total_users/chans) : 0));
+			break;
+		case 250:
+		{
+			const char *p;
+			BX_BreakArgs(line, NULL, ArgList, 1);
+			if (ArgList[3] && ArgList[4])
+			{
+				p = ArgList[4]; p++;
+				put_it("%s", convert_output_format("$G %K[%nHighest client connection count%K(%n\002$0\002%K) %K(%n\002$1\002%K)]%n", "%s %s", ArgList[3], p));
+			}
+			break;
+		}
+		default:
+			ret = 0;
+			break;
+	}
+	return ret;
+}
