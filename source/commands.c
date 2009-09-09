@@ -74,6 +74,7 @@
 #include "reg.h"
 #include "extlang.h"
 #include "elf.h"
+#include "cset.h"
 
 /* used with input_move_cursor */
 #define RIGHT 1
@@ -229,6 +230,7 @@ static	IrcCommand irc_command[] =
 	{ "FLUSH",	flush		},
         { "FOR",        forcmd		}, /* if.c */
 	{ "FOREACH",	foreach		}, /* if.c */
+	{ "FSET",	fset_variable	},
 	{ "HOOK",	hookcmd		},
 	{ "HOSTNAME",	e_hostname	},
 	{ "IF",		ifcmd		}, /* if.c */
