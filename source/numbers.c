@@ -1034,7 +1034,7 @@ DISPLAY:
 		if (!(message = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s %s %s", banner(), ArgList[0], ArgList[1]);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_OPER_FSET),"%s %s", nick, " (is \002NOT\002 an IRC warrior)"));
 		break;
 	}
 
