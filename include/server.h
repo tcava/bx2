@@ -73,6 +73,7 @@ const	AI	*next_addr;		/* The next one to try upon failure */
 	int	version;		/* the version of the server -
 					 * defined above */
 	int	server2_8;		/* defined if we get an 001 numeric */
+	int	motd;
 	char	*version_string;	/* what is says */
 	char	umode[54];		/* Currently set user modes */
 	int	des;			/* file descriptor to server */
@@ -304,6 +305,9 @@ const	char *	get_server_redirect		(int);
 	void	destroy_005			(int);
 const	char*	get_server_005			(int, const char *);
 	void	set_server_005			(int, char*, const char*);
+
+	int	get_server_motd			(int);
+	void	set_server_motd			(int, int);
 
         void    server_hard_wait 		(int);
         void    server_passive_wait 		(int, const char *);

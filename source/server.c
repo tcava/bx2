@@ -3680,3 +3680,21 @@ int	which_server_altname (int refnum, const char *name)
 	return -1;
 }
 
+int	get_server_motd (int refnum)
+{
+	Server	*s;
+
+	if (!(s = get_server(refnum)))
+		return 0;
+
+	return s->motd;
+}
+
+void	set_server_motd (int refnum, int flag)
+{
+	Server	*s;
+
+	s = get_server(refnum);
+	if (s)
+		s->motd = flag;
+}
