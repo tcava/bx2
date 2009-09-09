@@ -189,3 +189,36 @@ List 	*list_lookup (List **list, const char *name, int wild, int rem)
 	return (tmp);
 }
 
+/*
+ * add_to_list: This will add an element to a list.  The requirements for the
+ * list are that the first element in each list structure be a pointer to the
+ * next element in the list, and the second element in the list structure be
+ * a pointer to a character (char *) which represents the sort key.  For
+ * example 
+ *
+ * struct my_list{ struct my_list *next; char *name; <whatever else you want>}; 
+ *
+ * The parameters are:  "list" which is a pointer to the head of the list. "add"
+ * which is a pre-allocated element to be added to the list.  
+ */
+/* XXX */
+void add_to_list_ext(List **list, List *add, int (*cmp_func)(List *, List *))
+{
+register List	*tmp;
+	 List	*last;
+
+	if (!cmp_func)
+		cmp_func = add_list_strcmp;
+	last = NULL;
+	for (tmp = *list; tmp; tmp = tmp->next)
+	{
+		if (cmp_func(tmp, add) > 0)
+			break;
+		last = tmp;
+	}
+	if (last)
+		last->next = add;
+	else
+		*list = add;
+	add->next = tmp;
+}
