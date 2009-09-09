@@ -243,6 +243,85 @@ static void 	BreakArgs (char *Input, const char **Sender, const char **OutPut)
 	OutPut[ArgCount] = NULL;
 }
 
+int 	BX_BreakArgs (char *Input, const char **Sender, const char **OutPut, int ig_sender)
+{
+	int	ArgCount;
+
+	/*
+	 * Paranoia.  Clean out any bogus ptrs still left on OutPut...
+	 */
+	for (ArgCount = 0; ArgCount <= MAXPARA + 1; ArgCount++)
+		OutPut[ArgCount] = NULL;
+	ArgCount = 0;
+
+	/*
+	 * The RFC describes it fully, but in a short form, a line looks like:
+	 * [:sender[!user@host]] COMMAND ARGUMENT [[:]ARGUMENT]{0..14}
+	 */
+
+	/*
+	 * Look to see if the optional :sender is present.
+	 */
+	if (!ig_sender)
+	{
+		if (*Input == ':')
+		{
+			char	*fuh;
+
+			fuh = ++Input;
+			while (*Input && *Input != space)
+				Input++;
+			while (*Input == space)
+				*Input++ = 0;
+
+			/*
+			 * Look to see if the optional !user@host is present.
+			 */
+			*Sender = fuh;
+			while (*fuh && *fuh != '!')
+				fuh++;
+			if (*fuh == '!')
+				*fuh++ = 0;
+			FromUserHost = fuh;
+		}
+		/*
+		 * No sender present.
+		 */
+		else
+			*Sender = FromUserHost = empty_string;
+	}
+
+	/*
+	 * This changes all spaces (" ") in the protocol command to nuls ('\0')
+	 * and puts pointers at the start of every token into OutPut[].  Note
+	 * that if a token is followed by more than one space, they will be
+	 * all changed into nul's.  The PasteArgs() function (above) handles
+	 * that properly.
+	 */
+	for (;;)
+	{
+		if (!*Input)
+			break;
+
+		if (*Input == ':')
+		{
+			OutPut[ArgCount++] = ++Input;
+			break;
+		}
+
+		OutPut[ArgCount++] = Input;
+		if (ArgCount > MAXPARA)
+			break;
+
+		while (*Input && *Input != space)
+			Input++;
+		while (*Input && *Input == space)
+			*Input++ = 0;
+	}
+	OutPut[ArgCount] = NULL;
+	return ArgCount;
+}
+
 /* in response to a TOPIC message from the server */
 static void	p_topic (const char *from, const char *comm, const char **ArgList)
 {

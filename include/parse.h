@@ -22,6 +22,7 @@ extern	int		 num_protocol_cmds;
 
 	void    rfc1459_odd 	(const char *, const char *, const char **);
 const 	char	*PasteArgs 	(const char **, int);
+	int	BX_BreakArgs	(char *, const char **, const char **, int);
 	void	parse_server 	(const char *, size_t);
 	int	is_channel	(const char *);
 
