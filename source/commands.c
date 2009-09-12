@@ -164,6 +164,7 @@ static	void	xevalcmd 	(const char *, char *, const char *);
 static	void	xtypecmd 	(const char *, char *, const char *);
 static	void	allocdumpcmd	(const char *, char *, const char *);
 static	void	about		(const char *, char *, const char *);
+static	void	set_username	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -241,6 +242,7 @@ static	IrcCommand irc_command[] =
 	{ "INPUT",	inputcmd	},
 	{ "INPUT_CHAR",	inputcmd	},
 	{ "INVITE",	send_invite	},
+	{ "IRCUSER",	set_username	},
 	{ "ISON",	isoncmd		},
 	{ "JOIN",	e_channel	},
 	{ "KICK",	send_kick	},
@@ -3927,4 +3929,18 @@ Mailing list is at majordomo@lists.bitchx.com\n";
 #endif
 	strip_ansi_in_echo = i; 
 #endif
+}
+
+BUILT_IN_COMMAND(set_username)
+{
+	char *blah;
+
+	if ((blah = next_arg(args, &args)))
+	{
+		if (!strcmp(blah, "-"))
+			strlcpy(username, empty_string, NAME_LEN);
+		else
+			strlcpy(username, blah, NAME_LEN);
+		say("Username has been changed to '%s'",username);
+	}
 }
