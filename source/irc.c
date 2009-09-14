@@ -222,8 +222,8 @@ char		*startup_file = NULL,		/* Set when epicrc loaded */
 		*default_channel = NULL,	/* Channel to join on connect */
 		nickname[NICKNAME_LEN + 1],	/* users nickname */
 		hostname[NAME_LEN + 1],		/* name of current host */
-		username[NAME_LEN + 1],		/* usernameof user */
 #if 0
+		username[NAME_LEN + 1],		/* usernameof user */
 		userhost[NAME_LEN + 1],		/* userhost of user */
 #endif
 		*send_umode = NULL,		/* sent umode */

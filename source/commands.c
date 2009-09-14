@@ -3935,12 +3935,9 @@ BUILT_IN_COMMAND(set_username)
 {
 	char *blah;
 
-	if ((blah = next_arg(args, &args)))
+	if ((blah = next_arg(args, &args)) && *blah)
 	{
-		if (!strcmp(blah, "-"))
-			strlcpy(username, empty_string, NAME_LEN);
-		else
-			strlcpy(username, blah, NAME_LEN);
-		say("Username has been changed to '%s'",username);
+		set_var_value(DEFAULT_USERNAME_VAR, blah, 0);
+		say("Username has been changed to '%s'",get_string_var(DEFAULT_USERNAME_VAR));
 	}
 }
