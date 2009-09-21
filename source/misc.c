@@ -12,7 +12,7 @@ extern char *alias_special_char(char **, char *, const char *, char *, int *);
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.2 2009/09/09 06:07:17 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.3 2009/09/21 10:55:52 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -4381,8 +4381,10 @@ static char time_str[61];
 	if (do_timestamp && timestr)
 	{
 		struct tm timeval;
+/* XXX: Make use of epic's Timeval now */
+		time_t bx_now;
 		*time_str = 0;
-		timeval = *localtime(&now);
+		timeval = *localtime(&bx_now);
 		strftime(time_str, 60, timestr, &timeval);
 		return time_str;
 	}

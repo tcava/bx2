@@ -457,7 +457,7 @@ void serversay(int save, int from_server, const char *format, ...)
 		va_start (args, format);
 		vsnprintf(putbuf, LARGE_BIG_BUFFER_SIZE, format, args);
 		va_end(args);
-		strlcpy(servername, convert_output_format(get_string_var(SERVER_PROMPT_VAR), "%s", ov_server(from_server)?ov_server(from_server):empty_string), 79);
+		strlcpy(servername, (const char *) convert_output_format(get_string_var(SERVER_PROMPT_VAR), "%s", ov_server(from_server)?ov_server(from_server):empty_string), 79);
 		len = strlen(putbuf);
 		out = alloca(strlen(servername)+len+5);
 		len = strlen(servername);
