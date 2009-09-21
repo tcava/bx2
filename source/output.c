@@ -416,3 +416,59 @@ int len;
 		put_echo(putbuf);
 	}
 }
+
+const char *ov_server(int server)
+{
+	char *c;
+	char *d;
+	static char tmpstr[61];
+	const char *string = get_server_itsname(server);
+	    
+	if (!string || !*string)
+		string = get_server_name(server);
+	if (!string || !*string)
+		return  empty_string;
+	strlcpy(tmpstr, string, 60);
+	if (!(c = strrchr(tmpstr,'.')))
+		return(string);
+	*c = 0;
+	if (!(d = strrchr(tmpstr, '.'))) 
+		d = ++c; /* Extract domain */
+	d++;
+	return(d);
+}
+
+/* XXX */
+void serversay(int save, int from_server, const char *format, ...)
+{
+/*
+	Window	*old_target_window = target_window;
+*/
+	char 	servername[200];
+	int	len = 0;	
+	char	*out = NULL;
+/*
+	if (get_int_var(OV_VAR))
+		target_window = get_window_by_name("OPER_VIEW");
+*/
+        if (window_display && format)
+        {
+		va_list args;
+		va_start (args, format);
+		vsnprintf(putbuf, LARGE_BIG_BUFFER_SIZE, format, args);
+		va_end(args);
+		strlcpy(servername, convert_output_format(get_string_var(SERVER_PROMPT_VAR), "%s", ov_server(from_server)?ov_server(from_server):empty_string), 79);
+		len = strlen(putbuf);
+		out = alloca(strlen(servername)+len+5);
+		len = strlen(servername);
+		strcpy(out, servername); out[len] = ' '; out[len+1] = 0;
+		strcat(out, putbuf);
+		if (*out)
+			put_echo(out);
+	}
+/*
+	target_window = old_target_window;
+	if (save && out)
+		add_last_type(&last_servermsg[0], MAX_LAST_MSG, NULL, NULL, NULL, out);
+*/
+}

@@ -7,7 +7,7 @@
  *
  * See the COPYRIGHT file, or do a HELP IRCII COPYRIGHT 
  *
- * @(#)$Id: output.h,v 1.2 2009/09/09 06:12:45 fb Exp $
+ * @(#)$Id: output.h,v 1.3 2009/09/21 10:37:39 fb Exp $
  */
 
 #ifndef __output_h__
@@ -21,6 +21,7 @@ struct ScreenStru;
 	void	put_it 			(const char *, ...) __A(1);
 	void	say 			(const char *, ...) __A(1);
 	void	bitchsay		(const char *, ...) __A(1);
+	void	serversay		(int, int, const char *, ...) __A(3);
 	void	yell 			(const char *, ...) __A(1);
 	void    privileged_yell 	(const char *, ...) __A(1);
 	void	syserr			(int, const char *, ...) __A(2);

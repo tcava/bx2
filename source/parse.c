@@ -55,6 +55,7 @@
 #include "parse.h"
 #include "notify.h"
 #include "timer.h"
+#include "cset.h"
 
 #define STRING_CHANNEL 	'+'
 #define MULTI_CHANNEL 	'#'
@@ -1322,11 +1323,14 @@ static 	void 	p_snotice (const char *from, const char *to, const char *line)
 	    if (*line == '*' || *line == '#')
 	    {
 		if (do_hook(SERVER_NOTICE_LIST, "%s %s", f, line))
-			put_it("%s", line);
+			serversay(1, from_server, "%s", convert_output_format(fget_string_var(FORMAT_SERVER_NOTICE_FSET),
+				"%s %s %s", "FIXME"/*update_clock(GET_TIME)*/, f, line/*stripansicodes(line)*/));
 	    }
 	    else
 		if (do_hook(SERVER_NOTICE_LIST, "%s *** %s", f, line))
-			say("%s", line);
+			serversay(1, from_server, "%s", convert_output_format(fget_string_var(FORMAT_SERVER_NOTICE_FSET),
+				"%s %s %s", "FIXME"/*update_clock(GET_TIME)*/, f, line/*stripansicodes(line)*/));
+/* XXX: Need update_clock() and stripansicodes() */
 	}
 
 	pop_message_from(l);
