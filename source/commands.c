@@ -312,6 +312,7 @@ static	IrcCommand irc_command[] =
 	{ "STATS",	send_comm	},
 	{ "STUB",	stubcmd		}, /* alias.c */
 	{ "SUBPACKAGE",	subpackagecmd	},
+	{ "SV",		BX_show_version	},
 	{ "SWITCH",	switchcmd	}, /* if.c */
 #ifdef HAVE_TCL
 	{ "TCL",	tclcmd		}, /* tcl.c */
