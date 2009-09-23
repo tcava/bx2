@@ -13,7 +13,6 @@ BUILT_IN_COMMAND(BX_show_version)
 {
 const char *nick;
 char *version_buf = NULL;
-extern char tcl_versionstr[];
 
 #ifdef HAVE_UNAME
 struct utsname buf;
