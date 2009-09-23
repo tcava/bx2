@@ -7,12 +7,47 @@
 #include "vars.h"
 /* This should go in expr.h */
 extern char *alias_special_char(char **, char *, const char *, char *, int *);
+
+static unsigned char newline1[BIG_BUFFER_SIZE+1];
+
+#ifndef BITCHX_LITE
+/* Borrowed with permission from FLiER */
+char *stripansicodes(const unsigned char *line)
+{
+register unsigned char *tstr;
+register unsigned char *nstr;
+int  gotansi=0;
+
+	tstr=(char *)line;
+	nstr=newline1;
+	while (*tstr) 
+	{
+		if (*tstr==0x1B || *tstr == 0x9b) 
+			gotansi=1;
+		if (gotansi && isalpha(*tstr)) 
+			gotansi = 0;
+		else if (!gotansi) 
+		{
+			*nstr = *tstr;
+			nstr++;
+		}
+		tstr++;
+	}
+	*nstr = 0;
+	return (char *)newline1;
+}
+#else
+char *stripansicodes(const unsigned char *line)
+{
+	return line;
+}
+#endif
 #if 0
 /* 
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.3 2009/09/21 10:55:52 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.4 2009/09/23 05:47:52 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -1039,36 +1074,6 @@ struct {
 }
 #endif
 
-/* Borrowed with permission from FLiER */
-char *stripansicodes(const unsigned char *line)
-{
-register unsigned char *tstr;
-register unsigned char *nstr;
-int  gotansi=0;
-
-	tstr=(char *)line;
-	nstr=newline1;
-	while (*tstr) 
-	{
-		if (*tstr==0x1B || *tstr == 0x9b) 
-			gotansi=1;
-		if (gotansi && isalpha(*tstr)) 
-			gotansi = 0;
-		else if (!gotansi) 
-		{
-			*nstr = *tstr;
-			nstr++;
-		}
-		tstr++;
-	}
-	*nstr = 0;
-	return (char *)newline1;
-}
-#else
-char *stripansicodes(const unsigned char *line)
-{
-	return line;
-}
 char *mircansi(unsigned char *line)
 {
 	return line;
