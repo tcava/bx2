@@ -46,4 +46,6 @@ const   char *  current_loader          (void);
         int     current_line            (void);
 const   char *  current_package         (void);
 
+	void	BX_show_version		(const char *, char *, const char *);
+
 #endif /* __commands_h__ */
