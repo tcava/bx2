@@ -344,8 +344,20 @@ static void	p_topic (const char *from, const char *comm, const char **ArgList)
 
 	l = message_from(channel, LEVEL_TOPIC);
 	if (do_hook(TOPIC_LIST, "%s %s %s", from, channel, new_topic))
+	{
+#if 0
 		say("%s has changed the topic on channel %s to %s",
 			from, check_channel_type(channel), new_topic);
+#endif
+		if (*new_topic)
+		{
+			if (fget_string_var(FORMAT_TOPIC_CHANGE_HEADER_FSET))
+				put_it("%s",convert_output_format(fget_string_var(FORMAT_TOPIC_CHANGE_HEADER_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(channel), new_topic));
+			put_it("%s",convert_output_format(fget_string_var(FORMAT_TOPIC_CHANGE_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(channel), new_topic));
+		}
+		else
+			put_it("%s",convert_output_format(fget_string_var(FORMAT_TOPIC_UNSET_FSET), "%s %s %s", get_clock(), from, check_channel_type(channel)));
+	}
 	pop_message_from(l);
 }
 
@@ -728,9 +740,12 @@ static void	p_channel (const char *from, const char *comm, const char **ArgList)
 	l = message_from(channel, LEVEL_JOIN);
 	if (do_hook(JOIN_LIST, "%s %s %s %s", 
 			from, channel, FromUserHost, extra))
+#if 0
 		say("%s (%s) has joined channel %s%s", 
 			from, FromUserHost, 
 			check_channel_type(channel), extra);
+#endif
+		put_it("%s",convert_output_format(fget_string_var(FORMAT_JOIN_FSET), "%s %s %s %s %s",get_clock(),from,FromUserHost?FromUserHost:"UnKnown",check_channel_type(channel), extra));
 	pop_message_from(l);
 
 	/*
