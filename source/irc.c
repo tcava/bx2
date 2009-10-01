@@ -286,7 +286,7 @@ void	irc_exit (int really_quit, const char *format, ...)
 	char *	quit_message = NULL;
 	int	old_window_display = window_display;
 	int	value;
-	time_t	now;
+	time_t	bx_now;
 
 	/*
 	 * If we get called recursively, something is hosed.
@@ -339,10 +339,10 @@ void	irc_exit (int really_quit, const char *format, ...)
 	get_child_exit(-1);  /* In case some children died in the exit hook. */
 	clean_up_processes();
 
-	now = time(NULL);
+	bx_now = time(NULL);
 	put_it("%s", convert_output_format("$G Signon time  :    $0-", "%s", my_ctime(bx_start_time)));
-	put_it("%s", convert_output_format("$G Signoff time :    $0-", "%s", my_ctime(now)));
-	put_it("%s", convert_output_format("$G Total uptime :   $0-", "%s", convert_time(now - bx_start_time)));
+	put_it("%s", convert_output_format("$G Signoff time :    $0-", "%s", my_ctime(bx_now)));
+	put_it("%s", convert_output_format("$G Total uptime :   $0-", "%s", convert_time(bx_now - bx_start_time)));
 
 	/* Arrange to have the cursor on the input line after exit */
 	if (!dumb_mode)
