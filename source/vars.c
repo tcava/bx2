@@ -1022,6 +1022,11 @@ int 	get_int_var (int var)
 	return ((IrcVariable *)var_bucket->list[var].stuff)->data->integer;
 }
 
+void	set_int_var (int var, int value)
+{
+	((IrcVariable *)var_bucket->list[var].stuff)->data->integer = value;
+}
+
 char 	*make_string_var (const char *var_name)
 {
 	char *	(*dummy) (void);

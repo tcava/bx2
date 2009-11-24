@@ -448,6 +448,7 @@ extern	const char *	var_settings[];
 	int	do_boolean 		(char *, int *);
 	int	do_short_boolean 	(char *, short *);
 	int	get_int_var 		(int);
+	void	set_int_var		(int, int);
 	char *	get_string_var 		(int);
 	void	set_var_value		(int, const char *, int);
 	int	is_var_builtin		(const char *);
