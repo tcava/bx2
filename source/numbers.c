@@ -63,6 +63,7 @@ static 	int	number_of_bans = 0;
 
 /* XXX */
 char *		thing_ansi = DEFAULT_SHOW_NUMERICS_STR;
+void		print_funny_names(const char *);
 
 /*
  * banner: This returns in a static string of either "xxx" where
@@ -543,7 +544,7 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 		if (!(channel = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 		if (!(line = ArgList[2]))
-			{ line = empty_string; }
+			break;
 
 		if (channel_is_syncing(channel, from_server))
 		{
@@ -1097,7 +1098,6 @@ DISPLAY:
 	case 318:		/* #define RPL_ENDOFWHOIS       318 */
 	{
 		PasteArgs(ArgList, 0);
-//		display_msg(from, comm, ArgList);
 		if (fget_string_var(FORMAT_WHOIS_FOOTER_FSET))
 			put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_FOOTER_FSET), NULL));
 		break;
@@ -1302,6 +1302,8 @@ DISPLAY:
 	case 353:		/* #define RPL_NAMREPLY         353 */
 	{
 		static int last_width;
+		int user_count = 1;
+		const char *ptr;
 		char format[41];
 		const char	*type, *channel, *line;
 
@@ -1311,7 +1313,14 @@ DISPLAY:
 		if (!(channel = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 		if (!(line = ArgList[2]))
-			{ line = empty_string; }
+			break;
+
+		ptr = line;
+		while (*ptr++)
+		{
+			if (*ptr == ' ')
+				user_count++;
+		}
 
 		/* This is only for when the user joined the channel */
 		if (channel_is_syncing(channel, from_server))
@@ -1321,8 +1330,10 @@ DISPLAY:
 			l = message_from(channel, LEVEL_OTHER);
 			if (do_hook(NAMES_LIST, "%s %s", channel, line))
 			    if (get_int_var(SHOW_CHANNEL_NAMES_VAR))
-				say("Users on %s: %s",
-					check_channel_type(channel), line);
+			    {
+				put_it("%s", convert_output_format(fget_string_var(FORMAT_NAMES_FSET), "%s %s %d",get_clock(), check_channel_type(channel), user_count));
+				print_funny_names(line);
+			    }
 			break;
 		}
 
@@ -1718,4 +1729,50 @@ static	int 	norm = 0,
 			break;
 	}
 	return ret;
+}
+
+void print_funny_names(const char *input)
+{
+register char *t;
+int count = 0;
+char buffer[BIG_BUFFER_SIZE+1];
+char special = '\0';
+char *line = NULL;
+char *lp = NULL;
+int cols = get_int_var(NAMES_COLUMNS_VAR);
+	if (!cols)
+		cols = 1;
+	if (input && *input)
+	{	
+		*buffer = 0;
+		malloc_strcpy(&line, input);
+		lp = line;
+		t = next_arg(line, &line);
+		do {
+			if (!count && fget_string_var(FORMAT_NAMES_BANNER_FSET))
+				strcpy(buffer, convert_output_format(fget_string_var(FORMAT_NAMES_BANNER_FSET), NULL, NULL));
+			if (*t == '@' || *t == '+' || *t == '~' || *t == '-')
+			{
+				special = *t;
+				if (special == '+')
+					strcat(buffer, convert_output_format(fget_string_var(FORMAT_NAMES_VOICECOLOR_FSET),"%c %s", special, ++t));
+				else
+					strcat(buffer, convert_output_format(fget_string_var(FORMAT_NAMES_OPCOLOR_FSET),"%c %s", special, ++t));
+			}
+			else
+				strcat(buffer, convert_output_format(fget_string_var(FORMAT_NAMES_NICKCOLOR_FSET), "$ %s", t));
+			strcat(buffer, space);
+			if (count++ >= (cols - 1))
+			{
+				put_it("%s", buffer);
+				*buffer = 0;
+				count = 0;
+			}
+		} while ((t = next_arg(line, &line)));
+
+		if (buffer)
+			put_it("%s", buffer);
+
+		new_free(&lp);
+	}
 }
