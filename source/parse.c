@@ -345,10 +345,6 @@ static void	p_topic (const char *from, const char *comm, const char **ArgList)
 	l = message_from(channel, LEVEL_TOPIC);
 	if (do_hook(TOPIC_LIST, "%s %s %s", from, channel, new_topic))
 	{
-#if 0
-		say("%s has changed the topic on channel %s to %s",
-			from, check_channel_type(channel), new_topic);
-#endif
 		if (*new_topic)
 		{
 			if (fget_string_var(FORMAT_TOPIC_CHANGE_HEADER_FSET))
@@ -553,16 +549,30 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 		{
 		    if (away)
 		    {
-			time_t blah = time(NULL);
-			put_it("*%s* %s <%.16s>", from, message, ctime(&blah));
+			beep_em(get_int_var(BEEP_WHEN_AWAY_VAR));
+			set_int_var(MSGCOUNT_VAR, get_int_var(MSGCOUNT_VAR)+1);
 		    }
-		    else
-			put_it("*%s* %s", from, message);
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_MSG_FSET), "%s %s %s %s", get_clock(), from, FromUserHost, message));
 		}
 	    }
 
 	    else if (do_hook(hook_type, "%s %s %s", from, real_target, message))
-		put_it(hook_format, from, check_channel_type(real_target), message);
+	    {
+		switch (hook_type)
+		{
+			case PUBLIC_LIST:
+				put_it("%s", convert_output_format(fget_string_var(FORMAT_PUBLIC_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(real_target), message));
+				break;
+
+			case PUBLIC_OTHER_LIST:
+				put_it("%s", convert_output_format(fget_string_var(FORMAT_PUBLIC_OTHER_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(real_target), message));
+				break;
+
+			default:
+				put_it(hook_format, from, check_channel_type(real_target), message);
+				break;
+		}
+	    }
 	}
 
 	/* Clean up and go home. */
@@ -578,6 +588,7 @@ static void	p_quit (const char *from, const char *comm, const char **ArgList)
 	const char *	quit_message;
 	int		one_prints = 1;
 	const char *	chan;
+	char *		tmp = NULL;
 	int		l;
 
 	if (!(quit_message = ArgList[0]))
@@ -598,6 +609,11 @@ static void	p_quit (const char *from, const char *comm, const char **ArgList)
 
 	for (chan = walk_channels(1, from); chan; chan = walk_channels(0, from))
 	{
+	    if (tmp)
+		malloc_strcat2(&tmp, ",", chan);
+	    else
+		malloc_strcpy(&tmp, chan);
+
 	    if (check_ignore_channel(from, FromUserHost, 
 					chan, LEVEL_QUIT) == IGNORED)
 	    {
@@ -616,7 +632,7 @@ static void	p_quit (const char *from, const char *comm, const char **ArgList)
 	{
 		l = message_from(what_channel(from, from_server), LEVEL_QUIT);
 		if (do_hook(SIGNOFF_LIST, "%s %s", from, quit_message))
-			say("Signoff: %s (%s)", from, quit_message);
+			put_it("%s",convert_output_format(fget_string_var(FORMAT_CHANNEL_SIGNOFF_FSET), "%s %s %s %s %s",get_clock(), from, FromUserHost, tmp, quit_message));
 		pop_message_from(l);
 	}
 
@@ -629,6 +645,7 @@ static void	p_quit (const char *from, const char *comm, const char **ArgList)
 	 */
 	notify_mark(from_server, from, 0, 0);
 
+	new_free(&tmp);
 remove_quitter:
 	/* Send all data about this unperson to the memory hole. */
 	remove_from_channel(NULL, from, from_server);
@@ -740,11 +757,6 @@ static void	p_channel (const char *from, const char *comm, const char **ArgList)
 	l = message_from(channel, LEVEL_JOIN);
 	if (do_hook(JOIN_LIST, "%s %s %s %s", 
 			from, channel, FromUserHost, extra))
-#if 0
-		say("%s (%s) has joined channel %s%s", 
-			from, FromUserHost, 
-			check_channel_type(channel), extra);
-#endif
 		put_it("%s",convert_output_format(fget_string_var(FORMAT_JOIN_FSET), "%s %s %s %s %s",get_clock(),from,FromUserHost?FromUserHost:"UnKnown",check_channel_type(channel), extra));
 	pop_message_from(l);
 
@@ -963,6 +975,7 @@ static void	p_mode (const char *from, const char *comm, const char **ArgList)
 	const char	*target, *changes;
 	const char	*m_target;
 	const char	*type;
+	const char	*smode;
 	int		l;
 
 	while (ArgList[0] && !*ArgList[0])
@@ -995,10 +1008,16 @@ static void	p_mode (const char *from, const char *comm, const char **ArgList)
 	if (new_check_flooding(from, FromUserHost, target, changes, LEVEL_MODE))
 		goto do_update_mode;
 
+	smode = strchr(from, '.');
 	l = message_from(m_target, LEVEL_MODE);
 	if (do_hook(MODE_LIST, "%s %s %s", from, target, changes))
-	    say("Mode change \"%s\" %s %s by %s",
+	{
+		if (m_target)
+			put_it("%s",convert_output_format(fget_string_var(smode?FORMAT_SMODE_FSET:FORMAT_MODE_FSET), "%s %s %s %s %s",get_clock(), from, smode?"*":FromUserHost, target, changes));
+		else
+			say("Mode change \"%s\" %s %s by %s",
 					changes, type, target, from);
+	}
 	pop_message_from(l);
 
 do_update_mode:
@@ -1195,20 +1214,7 @@ static void	p_part (const char *from, const char *comm, const char **ArgList)
 			reason ? reason : star, LEVEL_PART))
 	{
 		l = message_from(channel, LEVEL_PART);
-		if (reason)		/* Dalnet part messages */
-		{
-			if (do_hook(PART_LIST, "%s %s %s %s", 
-				from, channel, FromUserHost, reason))
-			    say("%s has left channel %s because (%s)", 
-				from, check_channel_type(channel), reason);
-		}
-		else
-		{
-			if (do_hook(PART_LIST, "%s %s %s", 
-				from, channel, FromUserHost))
-			    say("%s has left channel %s", 
-				from, check_channel_type(channel));
-		}
+		put_it("%s",convert_output_format(fget_string_var(FORMAT_LEAVE_FSET), "%s %s %s %s %s", get_clock(), from, FromUserHost, check_channel_type(channel), reason?reason:empty_string));
 		pop_message_from(l);
 	}
 
