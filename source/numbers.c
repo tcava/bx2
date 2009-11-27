@@ -1233,7 +1233,8 @@ DISPLAY:
 		if (!(topic = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s Topic for %s: %s", banner(), channel, topic);
+/* XXX channel_topic() */
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_TOPIC_FSET), "%s %s %s", get_clock(), channel, topic));
 		break;
 	}
 
@@ -1249,9 +1250,9 @@ DISPLAY:
 		if (!(when_str = ArgList[2]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		howlong = time(NULL) - my_atol(when_str);
-		put_it("%s The topic was set by %s %ld sec ago",banner(), 
-				nick, howlong);
+		howlong = my_atol(when_str);
+/* XXX channel_topic() */
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_TOPIC_SETBY_FSET), "%s %s %s %l", get_clock(), channel, nick, howlong));
 		break;
 	}
 
@@ -1402,7 +1403,7 @@ DISPLAY:
 		if (!(channel = ArgList[0]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		if (!channel_is_syncing(channel, from_server))
+		if (!channel_is_syncing(channel, from_server) && get_int_var(SHOW_END_OF_MSGS_VAR))
 			display_msg(from, comm, ArgList);
 
 		break;
