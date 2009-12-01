@@ -215,6 +215,7 @@ static	IrcCommand irc_command[] =
 	{ "CONNECT",	send_comm	},
 	{ "CONTINUE",	continuecmd	},
 	{ "CTCP",	ctcp		},
+	{ "D",		describe	},
 	{ "DCC",	dcc_cmd		}, /* dcc.c */
 	{ "DEFER",	defercmd	},
 	{ "DEOP",	deop		},
@@ -236,6 +237,7 @@ static	IrcCommand irc_command[] =
 	{ "FSET",	fset_variable	},
 	{ "HOOK",	hookcmd		},
 	{ "HOSTNAME",	e_hostname	},
+	{ "I",		send_invite	},
 	{ "IF",		ifcmd		}, /* if.c */
 	{ "IGNORE",	ignore		}, /* ignore.c */
 	{ "INFO",	info		},
@@ -244,7 +246,9 @@ static	IrcCommand irc_command[] =
 	{ "INVITE",	send_invite	},
 	{ "IRCUSER",	set_username	},
 	{ "ISON",	isoncmd		},
+	{ "J",		e_channel	},
 	{ "JOIN",	e_channel	},
+	{ "K",		send_kick	},
 	{ "KICK",	send_kick	},
 	{ "KILL",	send_2comm	},
 	{ "KNOCK",	send_channel_com},
@@ -256,6 +260,7 @@ static	IrcCommand irc_command[] =
 	{ "LOCAL",	localcmd	}, /* alias.c */
 	{ "LOG",	logcmd		}, /* logfiles.c */
 	{ "LUSERS",	send_comm	},
+	{ "M",		e_privmsg	},
 	{ "MAP",	send_comm	},
 	{ "ME",		mecmd		},
 	{ "MESG",	extern_write	},
@@ -269,6 +274,7 @@ static	IrcCommand irc_command[] =
 	{ "NOTIFY",	notify		}, /* notify.c */
 	{ "ON",		oncmd		}, /* hook.c */
 	{ "OPER",	oper		},
+	{ "P",		pingcmd		},
 	{ "PACKAGE",	packagecmd	},
 	{ "PARSEKEY",	parsekeycmd	},
 	{ "PART",	send_2comm	},
@@ -280,6 +286,7 @@ static	IrcCommand irc_command[] =
 	{ "POP",	pop_cmd		},
 	{ "PRETEND",	pretend_cmd	},
 	{ "PUSH",	push_cmd	},
+	{ "Q",		query		},
 	{ "QUERY",	query		},
         { "QUEUE",      queuecmd        }, /* queue.c */
 	{ "QUIT",	e_quit		},
@@ -314,6 +321,7 @@ static	IrcCommand irc_command[] =
 	{ "SUBPACKAGE",	subpackagecmd	},
 	{ "SV",		BX_show_version	},
 	{ "SWITCH",	switchcmd	}, /* if.c */
+	{ "T",		e_topic		},
 #ifdef HAVE_TCL
 	{ "TCL",	tclcmd		}, /* tcl.c */
 #endif
@@ -333,6 +341,7 @@ static	IrcCommand irc_command[] =
 	{ "USLEEP",	usleepcmd	},
 	{ "USRIP",	usripcmd	},
 	{ "VERSION",	version		},
+	{ "W",		whocmd		},
 	{ "WAIT",	waitcmd		},
 	{ "WALLCHOPS",	send_2comm	},
 	{ "WALLOPS",	e_wallop	},
