@@ -47,7 +47,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.4 2009/09/23 05:47:52 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.5 2009/12/04 08:24:44 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -4831,8 +4831,10 @@ ChannelList *chan = NULL;
 	}
 	return chan;
 }
+#endif
 
-char *BX_make_channel (char *chan)
+//char *BX_make_channel (char *chan)
+char *make_channel (const char *chan)
 {
 static char buffer[IRCD_BUFFER_SIZE+1];
 	*buffer = 0;
@@ -4841,11 +4843,11 @@ static char buffer[IRCD_BUFFER_SIZE+1];
         if (*chan != '#' && *chan != '&' && *chan != '+' && *chan != '!')
 		snprintf(buffer, IRCD_BUFFER_SIZE-2, "#%s", chan);
 	else
-		strmcpy(buffer, chan, IRCD_BUFFER_SIZE-1);
+		strlcpy(buffer, chan, IRCD_BUFFER_SIZE-1);
 	return buffer;
 }
 
-
+#if 0
 extern int timed_server (void *, char *);
 void check_server_connect(int server)
 {

@@ -59,6 +59,7 @@
 #include "functions.h"
 #include "reg.h"
 #include "timer.h"
+#include "misc.h"
 
 static const char *onoff[] = { "OFF", "ON" };
 
@@ -4477,8 +4478,11 @@ Window *window_rejoin (Window *window, char **args)
 		/* Sanity check the channel for the user */
                 if (!is_channel(chan))
 		{
+			chan = make_channel(chan);
+#if 0
                         say("CHANNEL: %s is not a valid channel name", chan);
 			continue;
+#endif
 		}
 
 		/*

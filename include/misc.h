@@ -128,7 +128,8 @@ extern LastMsg last_sent_ctcp[2];
 	int		check_last_type (LastMsg *, int, char *, char *);
 	int		matchmcommand (char *, int);
 	char		*convert_time (time_t);
-	char		*BX_make_channel(char *);	
+//	char		*BX_make_channel(char *);	
+	char		*make_channel(const char *);
 
 
 	int		timer_unban (void *, char *);
