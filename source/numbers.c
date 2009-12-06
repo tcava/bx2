@@ -1771,7 +1771,7 @@ int cols = get_int_var(NAMES_COLUMNS_VAR);
 			}
 		} while ((t = next_arg(line, &line)));
 
-		if (buffer)
+		if (buffer && *buffer)
 			put_it("%s", buffer);
 
 		new_free(&lp);
