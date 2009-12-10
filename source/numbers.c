@@ -1063,8 +1063,7 @@ DISPLAY:
 	{
 		const char *nick, *idle_str, *startup_str;
 		int		idle;
-		const char *	unit;
-		char 	startup_ctime[128];
+		int		hours, minutes, seconds;
 
 		if (!(nick = ArgList[0]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
@@ -1072,26 +1071,20 @@ DISPLAY:
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 		if (!(startup_str = ArgList[2])) { /* No problem */; } 
 
-		*startup_ctime = 0;
-		if (startup_str)		/* Undernet/TS4 */
+		idle = atoi(idle_str);
+/* XXX */
+#if 0
+		if (ArgList[3])			/* Undernet */
 		{
-		    time_t	startup;
-
-		    if ((startup = atol(startup_str)) != 0)
-			snprintf(startup_ctime, 128, ", signed on at %s", 
-							my_ctime(startup));
 		}
-
-		if ((idle = atoi(idle_str)) > 59)
+		else				/* EFNet */
 		{
-			idle /= 60;
-			unit = "minute";
-		}
-		else
-			unit = "second";
-
-		put_it ("%s %s has been idle %d %ss%s",
-			banner(), nick, idle, unit, startup_ctime);
+#endif
+			hours = idle / 3600;
+			minutes = (idle - (hours * 3600)) / 60;
+			seconds = idle % 60;
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_IDLE_FSET),"%d %d %d %s",hours, minutes, seconds, startup_str ? startup_str : empty_string));
+//		}
 		break;
 	}
 
@@ -1166,8 +1159,9 @@ DISPLAY:
 		if (!(mode = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s Mode for channel %s is \"%s\"",
-				banner(), channel, mode);
+/* XXX funny_mode() */
+		if (!channel_is_syncing(channel, from_server))
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_MODE_CHANNEL_FSET), "%s %s %s %s %s", get_clock(), from, *FromUserHost ? FromUserHost:" ", channel, mode));
 		break;
 	}
 
@@ -1265,7 +1259,7 @@ DISPLAY:
 		if (!(host = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s %s is actually using %s", banner(), who, host);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_ACTUALLY_FSET),"%s %s", who, host));
 		break;
 	}
 
