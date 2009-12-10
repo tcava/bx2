@@ -959,7 +959,12 @@ static void	p_nick (const char *from, const char *comm, const char **ArgList)
 						LEVEL_NICK);
 
 		if (do_hook(NICKNAME_LIST, "%s %s", from, new_nick))
-			say("%s is now known as %s", from, new_nick);
+			put_it("%s",convert_output_format(
+				fget_string_var(its_me?FORMAT_NICKNAME_USER_FSET:
+				im_on_channel(what_channel(from, from_server), from_server)?
+				FORMAT_NICKNAME_FSET:
+				FORMAT_NICKNAME_OTHER_FSET),
+				"%s %s %s %s",get_clock(),from, "-", new_nick));
 
 		pop_message_from(l);
 	}
