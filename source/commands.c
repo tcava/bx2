@@ -2991,6 +2991,8 @@ struct target_type
 	const char *command;
 	const char *format;
 	int  mask;
+	char *output;
+	char *other_output;
 };
 
 
@@ -3045,6 +3047,13 @@ struct target_type target[4] =
 
 	if (!nick_list || !text)
 		return;
+
+	target[0].output = fget_string_var(FORMAT_SEND_MSG_FSET);
+	target[1].output = fget_string_var(FORMAT_SEND_PUBLIC_FSET);
+	target[1].other_output = fget_string_var(FORMAT_SEND_PUBLIC_OTHER_FSET);
+	target[2].output = fget_string_var(FORMAT_SEND_NOTICE_FSET);
+	target[3].output = fget_string_var(FORMAT_SEND_NOTICE_FSET);
+	target[3].other_output = fget_string_var(FORMAT_SEND_NOTICE_FSET);
 
 	old_from_server = from_server;
 	from_server = server;
@@ -3220,15 +3229,20 @@ struct target_type target[4] =
 	for (i = 0; i < 4; i++)
 	{
 		int	l;
+		int	is_current;
 
 		if (!target[i].message)
 			continue;
 
+		if (i == 1 || i == 3)
+			is_current = is_current_channel(target[i].nick_list, from_server);
+		else
+			is_current = 1;
+
 		l = message_from(target[i].nick_list, target[i].mask);
 		if (hook && do_hook(target[i].hook_type, "%s %s", 
 				    target[i].nick_list, target[i].message))
-		    put_it(target[i].format, target[i].nick_list, 
-				target[i].message);
+		    put_it("%s", convert_output_format(is_current ? target[i].output : target[i].other_output, "%s %s %s %s",get_clock(), target[i].nick_list, get_server_nickname(from_server), target[i].message));
 
 		send_to_server("%s %s :%s", 
 				target[i].command, 
