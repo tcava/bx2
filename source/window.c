@@ -244,7 +244,10 @@ Window	*new_window (Screen *screen)
 		new_w->status.line[i].count = 0;
 		new_w->status.line[i].result = NULL;
 	}
-	new_w->status.number = 1;
+	if (new_w->refnum == 1)
+		new_w->status.number = 2;
+	else
+		new_w->status.number = 1;
 	new_w->status.special = NULL;
 	rebuild_a_status(new_w);
 
@@ -1528,8 +1531,8 @@ void 	recalculate_windows (Screen *screen)
 		screen->window_list->top = 0;
 		screen->window_list->toplines_showing = 0;
 		screen->window_list->toplines_wanted = 0;
-		screen->window_list->display_lines = screen->li - 2;
-		screen->window_list->bottom = screen->li - 2;
+		screen->window_list->display_lines = screen->li - 1 - screen->window_list->status.number;
+		screen->window_list->bottom = screen->li - 1 - screen->window_list->status.number;
 		screen->window_list->my_columns = screen->co;
 		old_li = screen->li;
 		return;
