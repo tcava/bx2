@@ -51,6 +51,7 @@
 #include "log.h"
 #include "timer.h"
 #include "alias.h"
+#include "cset.h"
 
 /* XXXX - only debugging stuff for adm.  Remove later */
 static	FILE *	who_log = NULL;
@@ -805,7 +806,7 @@ do
 		if (new_w->who_stuff)
 			;			/* munch it */
 		else if (do_hook(WHO_LIST, "%s", buffer))
-			put_it(format, channel, nick, status, user, host, name);
+			put_it("%s",convert_output_format(fget_string_var(FORMAT_WHO_FSET), "%s %s %s %s %s %s %s", channel, nick, status, user, host, server, name));
 
 		return;
 	}
@@ -862,7 +863,11 @@ do
 
 		else if (do_hook(WHO_LIST, "%s", buffer))
 		    if (do_hook(current_numeric, "%s", buffer))
-			put_it(format, channel, nick, status, user, host, name);
+		    {
+			if (!get_int_var(SHOW_WHO_HOPCOUNT_VAR))
+				next_arg(name, &name);
+			put_it("%s",convert_output_format(fget_string_var(FORMAT_WHO_FSET), "%s %s %s %s %s %s %s", channel, nick, status, user, host, server, name));
+		    }
 	}
 
 }
@@ -940,7 +945,8 @@ void	who_end (int refnum, const char *from, const char *comm, const char **ArgLi
 			    call_lambda_command("WHO_END", new_w->who_end, buffer);
 			else
 			    if (do_hook(current_numeric, "%s", buffer))
-				put_it("%s %s", banner(), buffer);
+				if (get_int_var(SHOW_END_OF_MSGS_VAR))
+				    put_it("%s %s", banner(), buffer);
 		}
 
 		if (strchr(new_w->who_target, ',') && !strchr(target, ','))
