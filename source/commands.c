@@ -350,6 +350,7 @@ static	IrcCommand irc_command[] =
 	{ "WHO",	whocmd		}, /* who.c */
 	{ "WHOIS",	whois		},
 	{ "WHOWAS",	whois		},
+	{ "WI",		whois		},
 	{ "WINDOW",	windowcmd	}, /* window.c */
 	{ "XDEBUG",	xdebugcmd	}, /* debug.c */
 	{ "XECHO",	xechocmd	},
