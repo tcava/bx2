@@ -844,8 +844,12 @@ do
 
 			/* Then remove the hopcount and try again. */
 			copy = LOCAL_COPY(name);
+#if 0
 			new_next_arg(name, &name);
 			ok = ok && wild_match(new_w->who_real, name);
+#endif
+			new_next_arg(copy, &copy);
+			ok = ok && wild_match(new_w->who_real, copy);
 		}
 		if (new_w->who_mask & WHO_SERVER)
 			ok = ok && wild_match(new_w->who_server, server);
