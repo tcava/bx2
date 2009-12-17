@@ -75,6 +75,7 @@
 #include "extlang.h"
 #include "elf.h"
 #include "cset.h"
+#include "misc.h"
 
 /* used with input_move_cursor */
 #define RIGHT 1
@@ -129,10 +130,12 @@ static	void	flush 		(const char *, char *, const char *);
 static	void	hookcmd		(const char *, char *, const char *);
 static	void	info 		(const char *, char *, const char *);
 static	void	inputcmd 	(const char *, char *, const char *);
+static	void	leavecmd	(const char *, char *, const char *);
 static	void	license		(const char *, char *, const char *);
 static	void	mecmd 		(const char *, char *, const char *);
 static	void	oper 		(const char *, char *, const char *);
 static	void	packagecmd	(const char *, char *, const char *);
+static	void	partallcmd	(const char *, char *, const char *);
 static	void	pingcmd 	(const char *, char *, const char *);
 static  void    pop_cmd 	(const char *, char *, const char *);
 static	void	pretend_cmd	(const char *, char *, const char *);
@@ -252,7 +255,9 @@ static	IrcCommand irc_command[] =
 	{ "KICK",	send_kick	},
 	{ "KILL",	send_2comm	},
 	{ "KNOCK",	send_channel_com},
+	{ "L",		leavecmd	},
 	{ "LASTLOG",	lastlog		}, /* lastlog.c */
+	{ "LEAVE",	leavecmd	},
 	{ "LICENSE",	license		},
 	{ "LINKS",	send_comm	},
 	{ "LIST",	funny_stuff	},
@@ -278,6 +283,7 @@ static	IrcCommand irc_command[] =
 	{ "PACKAGE",	packagecmd	},
 	{ "PARSEKEY",	parsekeycmd	},
 	{ "PART",	send_2comm	},
+	{ "PARTALL",	partallcmd	},
 	{ "PAUSE",	e_pause		},
 #ifdef HAVE_PERL
 	{ "PERL",	perlcmd		}, /* perl.c */
@@ -3965,4 +3971,24 @@ BUILT_IN_COMMAND(set_username)
 		set_var_value(DEFAULT_USERNAME_VAR, blah, 0);
 		say("Username has been changed to '%s'",get_string_var(DEFAULT_USERNAME_VAR));
 	}
+}
+
+BUILT_IN_COMMAND(leavecmd)
+{
+	const char *arg;
+
+	arg = next_arg(args, &args);
+	if (!arg || *arg == '\0')
+		arg = get_echannel_by_refnum(0);
+	if (arg)
+	{
+		if (!is_channel(arg))
+			arg = make_channel(arg);
+		send_to_server("PART %s", arg);
+	}
+}
+
+BUILT_IN_COMMAND(partallcmd)
+{
+	send_to_server("JOIN 0");
 }
