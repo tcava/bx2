@@ -62,7 +62,6 @@ static void	add_user_end (int refnum, const char *from, const char *comm, const 
 static 	int	number_of_bans = 0;
 
 /* XXX */
-char *		thing_ansi = DEFAULT_SHOW_NUMERICS_STR;
 void		print_funny_names(const char *);
 
 /*

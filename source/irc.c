@@ -235,7 +235,6 @@ const char	empty_string[] = "",		/* just an empty string */
 		space[] = " ",			/* just a lonely space */
 		space_plus[] = " +",
 		space_minus[] = " -",
-		three_stars[] = "***",
 		on[] = "ON",
 /*		my_off[] = "OFF", */
 		zero[] = "0",

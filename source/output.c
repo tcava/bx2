@@ -401,7 +401,7 @@ int len;
 	{
 		va_list args;
 		va_start (args, format);
-		sprintf(putbuf, "%s \002%s\002: ", thing_ansi?thing_ansi:three_stars, BX_version);
+		sprintf(putbuf, "%s \002%s\002: ", banner(), BX_version);
 		len = strlen(putbuf);
 		vsnprintf(&(putbuf[len]), LARGE_BIG_BUFFER_SIZE, format, args);
 		va_end(args);
