@@ -53,6 +53,8 @@
 #include "ircaux.h"
 #include "alias.h"
 #include "clock.h"
+#include "misc.h"
+#include "cset.h"
 
 #ifdef Char
 #undef Char
@@ -774,6 +776,8 @@ int	make_status (Window *window, int must_redraw)
 		if (must_redraw || !window->status.line[status_line].result ||
 			strcmp(buffer, window->status.line[status_line].result))
 		{
+			char *output = NULL;
+
 			/*
 			 * Roll the new back onto the old
 			 */
@@ -785,7 +789,10 @@ int	make_status (Window *window, int must_redraw)
 			 */
 			output_screen = window->screen;
 			term_move_cursor(0, window->bottom + status_line);
-			output_with_count(buffer, 1, 1);
+			output = convert_output_format(fget_string_var((line==3)?FORMAT_STATUS3_FSET:(line==2)?FORMAT_STATUS2_FSET:(line==1)?FORMAT_STATUS1_FSET:FORMAT_STATUS_FSET), "%s", buffer);
+			if (!get_int_var(DISPLAY_ANSI_VAR))
+				output = stripansicodes(output);
+			output_with_count(output, 1, 1);
 			cursor_in_display(window);
 		}
 	}
