@@ -1171,9 +1171,7 @@ static void	p_kick (const char *from, const char *comm, const char **ArgList)
 
 		if (do_hook(KICK_LIST, "%s %s %s %s", victim, from, 
 					check_channel_type(channel), comment))
-			say("You have been kicked off channel %s by %s (%s)", 
-					check_channel_type(channel), from, 
-					comment);
+			put_it("%s",convert_output_format(fget_string_var(FORMAT_KICK_USER_FSET),"%s %s %s %s %s",get_clock(),from, check_channel_type(channel), victim, comment));
 
 		pop_message_from(l);
 		current_window = old_cw;
@@ -1199,8 +1197,7 @@ static void	p_kick (const char *from, const char *comm, const char **ArgList)
 	l = message_from(channel, LEVEL_KICK);
 	if (do_hook(KICK_LIST, "%s %s %s %s", 
 			victim, from, channel, comment))
-		say("%s has been kicked off channel %s by %s (%s)", 
-			victim, check_channel_type(channel), from, comment);
+		put_it("%s",convert_output_format(fget_string_var(FORMAT_KICK_FSET),"%s %s %s %s %s",get_clock(),from, check_channel_type(channel), victim, comment));
 	pop_message_from(l);
 
 do_remove_nick:
