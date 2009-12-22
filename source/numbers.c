@@ -248,6 +248,7 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 	 */
 	case 001:	/* #define RPL_WELCOME          001 */
 	{
+		bitchsay("For more information about \002BitchX\002 type \002/about\002");
 		server_is_registered(from_server, from, recipient);
 		set_server_motd(from_server, 1);
 		if (send_umode && *send_umode == '+')
