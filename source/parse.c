@@ -1020,8 +1020,21 @@ static void	p_mode (const char *from, const char *comm, const char **ArgList)
 		if (m_target)
 			put_it("%s",convert_output_format(fget_string_var(smode?FORMAT_SMODE_FSET:FORMAT_MODE_FSET), "%s %s %s %s %s",get_clock(), from, smode?"*":FromUserHost, target, changes));
 		else
+		{
+			if (!my_stricmp(from, target))
+			{
+				if (!my_stricmp(from, get_server_nickname(from_server)))
+					put_it("%s",convert_output_format(fget_string_var(FORMAT_USERMODE_FSET), "%s %s %s %s %s",get_clock(), from, "*", target, changes));
+				else
+					put_it("%s",convert_output_format(fget_string_var(FORMAT_USERMODE_FSET), "%s %s %s %s %s",get_clock(), smode?"*":FromUserHost, target, changes));
+			}
+			else
+				put_it("%s",convert_output_format(fget_string_var(FORMAT_MODE_FSET), "%s %s %s %s %s",get_clock(), from, smode?"*":FromUserHost, target, changes));
+		}
+#if 0
 			say("Mode change \"%s\" %s %s by %s",
 					changes, type, target, from);
+#endif
 	}
 	pop_message_from(l);
 
