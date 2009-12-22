@@ -1160,7 +1160,7 @@ DISPLAY:
 
 /* XXX funny_mode() */
 		if (!channel_is_syncing(channel, from_server))
-			put_it("%s", convert_output_format(fget_string_var(FORMAT_MODE_CHANNEL_FSET), "%s %s %s %s %s", get_clock(), from, *FromUserHost ? FromUserHost:" ", channel, mode));
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_MODE_CHANNEL_FSET), "%s %s %s %s %s", get_clock(), from, *FromUserHost ? FromUserHost:"ÿ", channel, mode));
 		break;
 	}
 
