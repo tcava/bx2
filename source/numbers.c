@@ -1350,7 +1350,12 @@ DISPLAY:
 
 		pop_message_from(l);
 		l = message_from(channel, LEVEL_OTHER);
-		if (*type == '=') 
+		if (fget_string_var(FORMAT_NAMES_FSET))
+		{
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_NAMES_FSET), "%s %s %d %d", get_clock(), check_channel_type(channel), user_count, user_count));
+			print_funny_names(line);
+		}
+		else if (*type == '=') 
 		{
 		    if (last_width && ((int)strlen(channel) > last_width))
 		    {
