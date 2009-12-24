@@ -2463,7 +2463,7 @@ BUILT_IN_COMMAND(send_invite)
 
 	    if (channel && nick)
 	    {
-		send_to_server("%s %s %s", command, nick, channel);
+		send_to_server("INVITE %s %s", nick, channel);
 		invites++;
 	    }
 	}
@@ -2472,7 +2472,7 @@ BUILT_IN_COMMAND(send_invite)
 	{
 	    if (strcmp(currchan, "*"))
 	    {
-		send_to_server("%s %s %s", command, nick, currchan);
+		send_to_server("INVITE %s %s", nick, currchan);
 		invites++;
 	    }
 	    else
