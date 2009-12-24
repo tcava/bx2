@@ -796,8 +796,7 @@ static void 	p_invite (const char *from, const char *comm, const char **ArgList)
 
 	l = message_from(from, LEVEL_INVITE);
 	if (do_hook(INVITE_LIST, "%s %s %s", from, invited_to, FromUserHost))
-		say("%s (%s) invites you to channel %s", 
-			from, FromUserHost, invited_to);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_INVITE_FSET), "%s %s %s",get_clock(), from, invited_to));
 	pop_message_from(l);
 }
 
