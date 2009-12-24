@@ -1274,7 +1274,7 @@ DISPLAY:
 
 		pop_message_from(l);
 		l = message_from(channel, LEVEL_OTHER);
-		put_it("%s Inviting %s to channel %s", banner(), nick, channel);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_INVITE_USER_FSET), "%s %s %s", get_clock(), nick, channel));
 		break;
 	}
 
