@@ -945,7 +945,7 @@ DISPLAY:
 		if (!(umode = ArgList[0]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s Your user mode is \"%s\"", banner(), umode);
+		put_it("%s Your user mode is [%s]", banner(), umode ? umode : space);
 		break;
 	}
 
