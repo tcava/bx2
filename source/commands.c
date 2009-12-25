@@ -158,6 +158,7 @@ static	void	usleepcmd	(const char *, char *, const char *);
 static  void	shift_cmd 	(const char *, char *, const char *);
 static	void	sleepcmd 	(const char *, char *, const char *);
 static	void	stackcmd	(const char *, char *, const char *);
+static	void	umodecmd	(const char *, char *, const char *);
 static  void	unshift_cmd 	(const char *, char *, const char *);
 static	void	version 	(const char *, char *, const char *);
 static 	void	waitcmd 	(const char *, char *, const char *);
@@ -336,6 +337,7 @@ static	IrcCommand irc_command[] =
 	{ "TOPIC",	e_topic		},
 	{ "TRACE",	send_comm	},
 	{ "TYPE",	typecmd		}, /* keys.c */
+	{ "UMODE",	umodecmd	},
 	{ "UNCLEAR",	e_clear		},
 	{ "UNLESS",	ifcmd		}, /* if.c */
 	{ "UNLOAD",	unloadcmd	}, /* alias.c */
@@ -3991,4 +3993,9 @@ BUILT_IN_COMMAND(leavecmd)
 BUILT_IN_COMMAND(partallcmd)
 {
 	send_to_server("JOIN 0");
+}
+
+BUILT_IN_COMMAND(umodecmd)
+{
+	send_to_server("MODE %s %s", get_server_nickname(from_server), (args && *args) ? args : empty_string);
 }
