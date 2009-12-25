@@ -240,6 +240,7 @@ static	IrcCommand irc_command[] =
 	{ "FOREACH",	foreach		}, /* if.c */
 	{ "FSET",	fset_variable	},
 	{ "HOOK",	hookcmd		},
+	{ "HOST",	userhostcmd	},
 	{ "HOSTNAME",	e_hostname	},
 	{ "I",		send_invite	},
 	{ "IF",		ifcmd		}, /* if.c */
