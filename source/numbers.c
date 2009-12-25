@@ -1290,7 +1290,7 @@ DISPLAY:
 		if (!(stuff = ArgList[2]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s Server %s: %s %s",banner(), itsname, version, stuff);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_SERVER_FSET), "Server %s %s %s", version, itsname, stuff));
 		break;
 	}
 
