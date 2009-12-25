@@ -641,11 +641,11 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 				from, number_of_bans, channel))
 #endif
 		{
-			put_it("%s Total number of %s on %s - %d",
+			put_it("%s Total Number of %s on %s [%d]",
 				banner(), 
-                                numeric == 347 ? "invites" :
-                               (numeric == 349 ? "exceptions" :
-                               (numeric == 368 ? "bans" : "wounds")),
+                                numeric == 347 ? "Invites" :
+                               (numeric == 349 ? "Exceptions" :
+                               (numeric == 368 ? "Bans" : "Wounds")),
                                 channel, number_of_bans);
 		}
 		goto END;
