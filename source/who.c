@@ -373,8 +373,7 @@ void 	whobase (int refnum, char *args, void (*line) (int, const char *, const ch
 {
 	char *		arg;
 	const char *	channel = NULL;
-	int		no_args = 1,
-			len;
+	int		len;
 	WhoEntry *	new_w, *old;
 
 	/* Maybe should output a warning? */
@@ -391,7 +390,6 @@ void 	whobase (int refnum, char *args, void (*line) (int, const char *, const ch
 	while ((arg = next_arg(args, &args)) != NULL)
 	{
 	    lower(arg);
-	    no_args = 0;
 
 	    if (*arg == '-' || *arg == '/')
 	    {
@@ -617,19 +615,27 @@ void 	whobase (int refnum, char *args, void (*line) (int, const char *, const ch
 	    }
 	}
 
-	if (no_args)
-	{
-		WHO_DEBUG("WHOBASE: No arguments");
-		say("No argument specified");
-		delete_who_item(new_w);
-		return;
-	}
-
 	if (!channel && (new_w->who_mask & WHO_OPS))
 	{
 		channel = "*.*";
 		WHO_DEBUG("WHOBASE: Fallback to WHO %s", channel);
 	}
+
+	if (!channel || !*channel)
+	{
+		channel = get_echannel_by_refnum(0);
+		if (!channel || !*channel)
+		{
+			WHO_DEBUG("WHOBASE: WHO, but not on channel");
+			say("You are not on a channel.  "
+			    "Use /WHO ** to see everybody.");
+			delete_who_item(new_w);
+			return;
+		}
+		else
+			WHO_DEBUG("WHOBASE: WHO -> WHO %s", channel);
+	}
+
 	new_w->who_target = malloc_strdup(channel);
 	WHO_DEBUG("WHOBASE: Target is [%s]", new_w->who_target);
 
