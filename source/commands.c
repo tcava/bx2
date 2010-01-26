@@ -361,6 +361,7 @@ static	IrcCommand irc_command[] =
 	{ "WHOWAS",	whois		},
 	{ "WI",		whois		},
 	{ "WINDOW",	windowcmd	}, /* window.c */
+	{ "WW",		whois		},
 	{ "XDEBUG",	xdebugcmd	}, /* debug.c */
 	{ "XECHO",	xechocmd	},
 	{ "XEVAL",	xevalcmd	},
@@ -2834,7 +2835,7 @@ BUILT_IN_COMMAND(whois)
 {
 	char *stuff = NULL;
 
-	if (!strcmp(command, "WHOWAS"))
+	if (!strcmp(command, "WHOWAS") || !strcmp(command, "WW"))
 	{
 		char *word_one = next_arg(args, &args);
 		if (!is_string_empty(args))
