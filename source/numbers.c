@@ -1055,7 +1055,9 @@ DISPLAY:
 		if (!(name = ArgList[4]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s %s was %s@%s (%s)",banner(), nick, user, host, name);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOWAS_HEADER_FSET),NULL));
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOWAS_NICK_FSET),"%s %s %s", nick, user, host));
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_NAME_FSET),"%s", name));
 		break;
 	}
 
@@ -1384,13 +1386,11 @@ DISPLAY:
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 		if (!(uplink = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
-		if (!(stuff = ArgList[2])) { stuff = empty_string; }
+// XXX: zero should also be passed to do_hook()
+		if (!(stuff = ArgList[2])) { stuff = zero; }
 
-		if (stuff)
-			put_it("%s %-20s %-20s %s", banner(),
-					itsname, uplink, stuff);
-		else
-			put_it("%s %-20s %s", banner(), itsname, uplink);
+		if (fget_string_var(FORMAT_LINKS_FSET))
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_LINKS_FSET), "%s %s %s", itsname, uplink, stuff));
 
 		break;
 	}
@@ -1483,7 +1483,8 @@ DISPLAY:
 	case 394:		/* #define RPL_ENDOFUSERS       394 */
 	{
 		PasteArgs(ArgList, 0);
-		display_msg(from, comm, ArgList);
+		if (get_int_var(SHOW_END_OF_MSGS_VAR))
+			display_msg(from, comm, ArgList);
 		break;
 	}
 
