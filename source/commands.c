@@ -360,6 +360,7 @@ static	IrcCommand irc_command[] =
 	{ "WHOIS",	whois		},
 	{ "WHOWAS",	whois		},
 	{ "WI",		whois		},
+	{ "WII",	whois		},
 	{ "WINDOW",	windowcmd	}, /* window.c */
 	{ "WW",		whois		},
 	{ "XDEBUG",	xdebugcmd	}, /* debug.c */
@@ -2849,9 +2850,29 @@ BUILT_IN_COMMAND(whois)
 		new_free(&stuff);
 	}
 	else /* whois command */
-		send_to_server("WHOIS %s", is_string_empty(args) ? 
-					get_server_nickname(from_server) : 
-					args);
+	{
+		const char *target;
+		int wii = !strcmp(command, "WII");
+
+		if (is_string_empty(args))
+		{
+			target = get_target_by_refnum(0);
+			if (target && !is_channel(target))
+				send_to_server("WHOIS %s %s", target, wii ? target : empty_string);
+			else
+				send_to_server("WHOIS %s", get_server_nickname(from_server));
+		}
+		else
+		{
+			if (wii)
+			{
+				while (target = next_arg(args, &args))
+					send_to_server("WHOIS %s %s", target, target);
+			}
+			else
+				send_to_server("WHOIS %s", args);
+		}
+	}
 }
 
 /*
