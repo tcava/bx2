@@ -205,6 +205,7 @@ typedef struct chan_flags_stru {
 	unsigned int got_exempt : 1;
 } chan_flags;
 
+#if 0
 /* ChannelList: structure for the list of channels you are current on */
 typedef	struct	channel_stru
 {
@@ -301,5 +302,6 @@ typedef	struct	channel_stru
 	int	mode_len;	
 
 }	ChannelList;
+#endif
 
 #endif
