@@ -410,11 +410,11 @@ void		BX_fset_string_var(enum FSET_TYPES, char *);
 void		fset_variable(const char *, char *, const char *);
 char		*make_fstring_var(const char *);
 char		**get_wset_format_var_address(WSet *, int);
-char		*get_cset(char *, ChannelList *, char *);
+//char		*get_cset(char *, ChannelList *, char *);
 void		delete_all_ext_fset(void);
 CSetList	*check_cset_queue(char *, int);
-void		do_logchannel(unsigned long, ChannelList *, char *, ...);
-void		check_channel_limit(ChannelList *chan);
+//void		do_logchannel(unsigned long, ChannelList *, char *, ...);
+//void		check_channel_limit(ChannelList *chan);
 
 void add_numeric_fset(char *name, int remove, char *args, int);
 char *find_numeric_fset(int numeric);
