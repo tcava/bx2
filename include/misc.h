@@ -6,6 +6,8 @@
 #ifndef _misc_h
 #define _misc_h
 
+#include "names.h"
+
 #define KICKLIST		0x01
 #define LEAVELIST		0x02
 #define JOINLIST		0x03
@@ -94,6 +96,7 @@ extern LastMsg last_sent_ctcp[2];
 	int	check_serverlag (void);
 	void	auto_away (unsigned long);
 //ChannelList *	BX_prepare_command (int *, char *, int);
+	Channel	*prepare_command (int *, char *, int);
 	int	rename_file (char *, char **);
 	void	putlog (int, ...);
 
