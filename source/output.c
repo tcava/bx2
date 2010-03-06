@@ -441,16 +441,13 @@ const char *ov_server(int server)
 /* XXX */
 void serversay(int save, int from_server, const char *format, ...)
 {
-/*
-	Window	*old_target_window = target_window;
-*/
+	Window	*old_to_window = to_window;
 	char 	servername[200];
 	int	len = 0;	
 	char	*out = NULL;
-/*
+
 	if (get_int_var(OV_VAR))
-		target_window = get_window_by_name("OPER_VIEW");
-*/
+		to_window = get_window_by_desc("OPER_VIEW");
         if (window_display && format)
         {
 		va_list args;
@@ -466,8 +463,8 @@ void serversay(int save, int from_server, const char *format, ...)
 		if (*out)
 			put_echo(out);
 	}
+	to_window = old_to_window;
 /*
-	target_window = old_target_window;
 	if (save && out)
 		add_last_type(&last_servermsg[0], MAX_LAST_MSG, NULL, NULL, NULL, out);
 */
