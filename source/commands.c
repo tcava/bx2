@@ -169,6 +169,7 @@ static	void	xtypecmd 	(const char *, char *, const char *);
 static	void	allocdumpcmd	(const char *, char *, const char *);
 static	void	about		(const char *, char *, const char *);
 static	void	set_username	(const char *, char *, const char *);
+static	void	do_unkey	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -340,6 +341,7 @@ static	IrcCommand irc_command[] =
 	{ "TYPE",	typecmd		}, /* keys.c */
 	{ "UMODE",	umodecmd	},
 	{ "UNCLEAR",	e_clear		},
+	{ "UNKEY",	do_unkey	},
 	{ "UNLESS",	ifcmd		}, /* if.c */
 	{ "UNLOAD",	unloadcmd	}, /* alias.c */
 	{ "UNSHIFT",	unshift_cmd	},
@@ -4021,4 +4023,19 @@ BUILT_IN_COMMAND(partallcmd)
 BUILT_IN_COMMAND(umodecmd)
 {
 	send_to_server("MODE %s %s", get_server_nickname(from_server), (args && *args) ? args : empty_string);
+}
+
+BUILT_IN_COMMAND(do_unkey)
+{
+	char	*channel = NULL;
+	int	server = from_server;
+	Channel	*chan;
+
+	if (args)
+		channel = next_arg(args, &args);
+	if (!(chan = prepare_command(&server, channel, NEED_OP)))
+		return;
+	if (chan->key)
+		send_to_server("MODE %s -k %s", chan->channel, chan->key);
+// XXX:	my_send_to_server(server, "MODE %s -k %s", chan->channel, chan->key);
 }
