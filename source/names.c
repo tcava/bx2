@@ -91,7 +91,7 @@ static int	traverse_all_channels (Channel **ptr, int server, int only_this_serve
  *
  */
 
-static Channel *find_channel (const char *channel, int server)
+Channel *find_channel (const char *channel, int server)
 {
 	Channel *ch = NULL;
 

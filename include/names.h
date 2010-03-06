@@ -10,6 +10,49 @@
 
 #include "alist.h"
 
+typedef struct nick_stru
+{
+	char 	*nick;		/* nickname of person on channel */
+	u_32int_t hash;		/* Hash of the nickname */
+	char	*userhost;	/* Their userhost, if we know it */
+	short	suspicious;	/* True if the nick might be truncated */
+	short	chanop;		/* True if they are a channel operator */
+	short	voice;		/* 1 if they are, 0 if theyre not, -1 if uk */
+	short	half_assed;	/* 1 if they are, 0 if theyre not, -1 if uk */
+}	Nick;
+
+typedef	struct	nick_list_stru
+{
+	Nick	**list;
+	int	max;
+	int	max_alloc;
+	alist_func func;
+	hash_type hash;
+}	NickList;
+
+/* ChannelList: structure for the list of channels you are current on */
+typedef	struct	channel_stru
+{
+struct	channel_stru *	next;		/* pointer to next channel */
+struct	channel_stru *	prev;		/* pointer to previous channel */
+	char *		channel;	/* channel name */
+	int		server;		/* The server the channel is "on" */
+	int		winref;		/* The window the channel is "on" */
+	int		curr_count;	/* Current channel precedence */
+	int		waiting;	/* Syncing, waiting for names/who */
+	NickList	nicks;		/* alist of nicks on channel */
+
+	char 		base_modes[54];	/* Just the modes w/o args */
+	int		limit;		/* max users for the channel */
+	char *		key;		/* key for this channel */
+	char *		modestr;	/* The whole mode string */
+
+	char		chop;		/* true if i'm a channel operator */
+	char		voice;		/* true if i'm a channel voice */
+	char		half_assed;	/* true if i'm a channel helper */
+	Timeval		join_time;	/* When we joined the channel */
+}	Channel;
+
 	void	add_channel		(Char *, int); 
 	void	remove_channel		(Char *, int);
 	void	add_to_channel		(Char *, Char *, int, int, int, int, int);
@@ -59,48 +102,6 @@
 	void	channel_server_delete	(int);
 	void	channel_check_windows	(void);
 	void    channels_swap_winrefs (int oldref, int newref);
-
-	typedef struct nick_stru
-	{
-		char 	*nick;		/* nickname of person on channel */
-		u_32int_t hash;		/* Hash of the nickname */
-		char	*userhost;	/* Their userhost, if we know it */
-		short	suspicious;	/* True if the nick might be truncated */
-		short	chanop;		/* True if they are a channel operator */
-		short	voice;		/* 1 if they are, 0 if theyre not, -1 if uk */
-		short	half_assed;	/* 1 if they are, 0 if theyre not, -1 if uk */
-	}	Nick;
-
-	typedef	struct	nick_list_stru
-	{
-		Nick	**list;
-		int	max;
-		int	max_alloc;
-		alist_func func;
-		hash_type hash;
-	}	NickList;
-
-	/* ChannelList: structure for the list of channels you are current on */
-	typedef	struct	channel_stru
-	{
-	struct	channel_stru *	next;		/* pointer to next channel */
-	struct	channel_stru *	prev;		/* pointer to previous channel */
-		char *		channel;	/* channel name */
-		int		server;		/* The server the channel is "on" */
-		int		winref;		/* The window the channel is "on" */
-		int		curr_count;	/* Current channel precedence */
-		int		waiting;	/* Syncing, waiting for names/who */
-		NickList	nicks;		/* alist of nicks on channel */
-
-		char 		base_modes[54];	/* Just the modes w/o args */
-		int		limit;		/* max users for the channel */
-		char *		key;		/* key for this channel */
-		char *		modestr;	/* The whole mode string */
-
-		char		chop;		/* true if i'm a channel operator */
-		char		voice;		/* true if i'm a channel voice */
-		char		half_assed;	/* true if i'm a channel helper */
-		Timeval		join_time;	/* When we joined the channel */
-	}	Channel;
+	Channel	*find_channel		(const char *, int);
 
 #endif /* _NAMES_H_ */
