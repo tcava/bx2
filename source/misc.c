@@ -47,7 +47,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.5 2009/12/04 08:24:44 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.6 2010/03/09 09:40:22 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -1743,12 +1743,14 @@ int are_you_opped(char *channel)
 {
 	return is_chanop(channel, get_server_nickname(from_server));
 }
+#endif
 
 void error_not_opped(char *channel)
 {
 	say("You're not opped on %s", channel);
 }
 
+#if 0
 int freadln(FILE *stream, char *lin)
 {
 	char *p;
@@ -4832,6 +4834,47 @@ ChannelList *chan = NULL;
 	return chan;
 }
 #endif
+
+Channel *prepare_command(int *active_server, char *channel, int need_op)
+{
+	int server = 0;
+	int l;
+	Channel *chan = NULL;
+
+	if (!channel) {
+		channel = (char *) get_echannel_by_refnum(0);
+
+		if (!channel) {
+			if (need_op != 3) {
+				if (current_window)
+					message_to(current_window->refnum);
+				bitchsay("You're not on a channel!");
+				message_to(0);
+			}
+			return NULL;
+		}
+	}
+	server = current_window->server;
+	*active_server = server;
+	if (!(chan = find_channel(channel, server)))
+	{
+		if (need_op != 3) {
+			if (current_window)
+				message_to(current_window->refnum);
+			bitchsay("You're not on the channel: %s", channel);
+			message_to(0);
+		}
+		return NULL;
+	}
+	if (need_op == NEED_OP && chan && !chan->chop && !chan->half_assed)
+	{
+		l = message_from(chan->channel, LEVEL_OTHER);
+		error_not_opped(chan->channel);
+		pop_message_from(l);
+		return NULL;
+	}
+	return chan;
+}
 
 //char *BX_make_channel (char *chan)
 char *make_channel (const char *chan)
