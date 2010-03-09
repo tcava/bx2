@@ -6642,4 +6642,7 @@ void	window_change_server (Window * win, int server)
     do_hook(WINDOW_SERVER_LIST, "%u %d %d", win->refnum, oldserver, server);
 }
 
-
+void	message_to(unsigned refnum)
+{
+	to_window = refnum ? get_window_by_refnum(refnum) : NULL;
+}
