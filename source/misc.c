@@ -5,6 +5,7 @@
 #include "misc.h"
 #include "window.h"
 #include "vars.h"
+#include "server.h"
 /* This should go in expr.h */
 extern char *alias_special_char(char **, char *, const char *, char *, int *);
 
@@ -47,7 +48,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.6 2010/03/09 09:40:22 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.7 2010/03/09 12:28:31 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -3939,21 +3940,23 @@ BUILT_IN_COMMAND(reset)
 
 
 extern char *channel_key (char *);
+#endif
 BUILT_IN_COMMAND(cycle)
 {
 	char *to = NULL;
 	int server = from_server;
-	ChannelList *chan;
+	Channel *chan;
 	
 	if (args && *args)
 		to = make_channel(next_arg(args, &args));
 		
 	if (!(chan = prepare_command(&server, to, NO_OP)))
 		return;
-	my_send_to_server(server, "PART %s\nJOIN %s%s%s", chan->channel, chan->channel, chan->key?space:empty_string, chan->key?chan->key:empty_string);
+	send_to_server("PART %s\nJOIN %s%s%s", chan->channel, chan->channel, chan->key?space:empty_string, chan->key?chan->key:empty_string);
+// XXX:	my_send_to_server(server, "PART %s\nJOIN %s%s%s", chan->channel, chan->channel, chan->key?space:empty_string, chan->key?chan->key:empty_string);
 }
 
-
+#if 0
 int do_newuser(char *command, char *args, char *subargs)
 {
 char *newusername = NULL;

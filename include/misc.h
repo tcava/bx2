@@ -171,6 +171,7 @@ extern LastMsg last_sent_ctcp[2];
 	void		BX_add_sockettimeout(int, time_t, void *);
 	int		BX_get_max_fd(void);
 	int		BX_set_socketwrite(int);
+	void		cycle(const char *, char *, const char *);
 	
 #ifdef GUI
 	void		scan_gui(fd_set *);
