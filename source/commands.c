@@ -221,6 +221,7 @@ static	IrcCommand irc_command[] =
 	{ "COMMENT",	commentcmd	},
 	{ "CONNECT",	send_comm	},
 	{ "CONTINUE",	continuecmd	},
+	{ "CYCLE",	cycle		},
 	{ "CTCP",	ctcp		},
 	{ "D",		describe	},
 	{ "DCC",	dcc_cmd		}, /* dcc.c */
