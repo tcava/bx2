@@ -170,6 +170,7 @@ static	void	allocdumpcmd	(const char *, char *, const char *);
 static	void	about		(const char *, char *, const char *);
 static	void	set_username	(const char *, char *, const char *);
 static	void	do_unkey	(const char *, char *, const char *);
+static	void	do_4op		(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -199,6 +200,7 @@ static	IrcCommand irc_command[] =
 {
 	{ "",		send_to_channel_first	},
 	{ "#",		commentcmd	},
+	{ "4OP",	do_4op		},
 	{ ":",		commentcmd	},
         { "ABORT",      abortcmd	},
 	{ "ABOUT",	about		},
@@ -4038,4 +4040,35 @@ BUILT_IN_COMMAND(do_unkey)
 	if (chan->key)
 		send_to_server("MODE %s -k %s", chan->channel, chan->key);
 // XXX:	my_send_to_server(server, "MODE %s -k %s", chan->channel, chan->key);
+}
+
+BUILT_IN_COMMAND(do_4op)
+{
+	char	*channel = NULL;
+	char	*nick = NULL;
+	int	server = from_server;
+	Channel	*chan;
+
+	if (args && *args)
+		channel = next_arg(args, &args);
+
+	if (channel)
+	{
+		if (is_channel(channel))
+			nick = args;
+		else
+		{
+			nick = channel;
+			channel = NULL;
+		}
+	}
+
+	if (!nick)
+		return;
+
+	if (!(chan = prepare_command(&server, channel, NEED_OP)))
+		return;
+
+	send_to_server("MODE %s +oooo %s %s %s %s", chan->channel, nick, nick, nick, nick);
+// XXX: my_send_to_server(server, "MODE %s +oooo %s %s %s %s", chan->channel, nick, nick, nick, nick);
 }
