@@ -2,6 +2,7 @@
 #include "ircaux.h"
 #include "cset.h"
 #include "server.h"
+#include "vars.h"
 
 #ifdef HAVE_UNAME
 #include <sys/utsname.h>
@@ -29,4 +30,33 @@ struct utsname buf;
 /* XXX	send_text(from_server, nick, version_buf, "PRIVMSG", 1, 0); */
 	send_text(from_server, nick, version_buf, "PRIVMSG", 1);
 	new_free(&version_buf);
+}
+
+BUILT_IN_COMMAND(tog_fprot)
+{
+static int here = 0;
+
+	
+	if (args && *args)
+	{
+		if (!my_stricmp(args, "ON"))
+			here = 0;
+		else if (!my_stricmp(args, "OFF"))
+			here = 1;
+		else
+			return;
+	}		
+
+	if (here)
+	{
+		set_int_var(CTCP_FLOOD_PROTECTION_VAR, 0);
+		set_int_var(FLOOD_PROTECTION_VAR, 0);
+		here = 0;
+	} else
+	{
+		set_int_var(CTCP_FLOOD_PROTECTION_VAR, 1);
+		set_int_var(FLOOD_PROTECTION_VAR, 1);
+		here = 1;
+	}
+	bitchsay("Toggled flood protection - [%s]", on_off(here));
 }

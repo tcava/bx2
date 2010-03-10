@@ -242,6 +242,7 @@ static	IrcCommand irc_command[] =
 	{ "FLUSH",	flush		},
         { "FOR",        forcmd		}, /* if.c */
 	{ "FOREACH",	foreach		}, /* if.c */
+	{ "FPROT",	tog_fprot	},
 	{ "FSET",	fset_variable	},
 	{ "HOOK",	hookcmd		},
 	{ "HOST",	userhostcmd	},
