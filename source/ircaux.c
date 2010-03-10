@@ -5639,3 +5639,10 @@ char * m_s3cat(char **one, const char *maybe, const char *definitely)
 		return malloc_strdup3((const char *) one, maybe, definitely);
 	return malloc_strcpy(one, definitely);
 }
+
+char * on_off(int var)
+{
+	if (var)
+		return "On";
+	return "Off";
+}

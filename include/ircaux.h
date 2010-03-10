@@ -7,7 +7,7 @@
  *
  * See the COPYRIGHT file, or do a HELP IRCII COPYRIGHT 
  *
- * @(#)$Id: ircaux.h,v 1.2 2009/09/09 06:05:37 fb Exp $
+ * @(#)$Id: ircaux.h,v 1.3 2010/03/10 00:11:52 fb Exp $
  */
 
 #ifndef _IRCAUX_H_
@@ -269,5 +269,7 @@ int	lookup_transform (const char *, int *);
 char *	valid_transforms (void);
 
 extern int 	num_code_points (const char *);
+
+char *	on_off (int);
 
 #endif /* _IRCAUX_H_ */
