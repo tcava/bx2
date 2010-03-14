@@ -1985,6 +1985,7 @@ jumpstart_get:
 			handle_invalid_savedir(x);
 			savedir_is_invalid++;
 			new_free(&realfilename);
+			unlock_dcc(dcc);
 			continue;
 		    }
 
@@ -2507,7 +2508,10 @@ char	*dcc_raw_listen (int family, unsigned short port)
 	lock_dcc(Client);
 	Client->want_port = port;
 	if (dcc_listen(Client))		/* Not a connect(). */
+	{
+		unlock_dcc(Client);
 		break;
+	}
 
 	get_time(&Client->starttime);
 	Client->flags |= DCC_ACTIVE;
