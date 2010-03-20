@@ -3172,7 +3172,7 @@ static Window *window_channel (Window *window, char **args)
 		return window;
 	}
 
-	if (!my_strnicmp(chans, "-i", 2))
+	if (!my_strnicmp(chans, "-invite", 2))
 	{
 		if (!(c = get_server_invite_channel(window->server)))
 		{
@@ -4462,7 +4462,7 @@ Window *window_rejoin (Window *window, char **args)
 	while (*channels && (chan = next_in_comma_list(channels, &channels)))
 	{
 		/* Handle /join -i, which joins last invited channel */
-		if (!my_strnicmp(chan, "-i", 2))
+		if (!my_strnicmp(chan, "-invite", 2))
                 {
                         if (!(chan = get_server_invite_channel(window->server)))
 			{
