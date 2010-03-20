@@ -689,7 +689,7 @@ void	update_input (void *which_screen, int update)
                          */
                         term_echo(do_echo);
 
-                        if (INPUT_BUFFER[START + last_input_screen->co - cols_used]) {
+			if (strlen(INPUT_BUFFER + START) > last_input_screen->co - cols_used) {
 				cols_used+=IND_RIGHT_LEN;
 				safe_puts(&INPUT_BUFFER[START],
 					  last_input_screen->co - cols_used, do_echo);
@@ -733,7 +733,7 @@ void	update_input (void *which_screen, int update)
 
 			term_echo(do_echo);
 
-                        if (INPUT_BUFFER[LOGICAL_CURSOR+max]) {
+			if (strlen(INPUT_BUFFER + LOGICAL_CURSOR) > max) {
                                 max -= IND_RIGHT_LEN;
                                 safe_puts(&(THIS_CHAR), max, do_echo);
                                 output_with_count(IND_RIGHT, 0, 1);
