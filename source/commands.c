@@ -902,7 +902,7 @@ BUILT_IN_COMMAND(xechocmd)
 	int	to_level = who_level;
 	const char *	to_from = who_from;
 
-	while (more && args && (*args == '-' || *args == '/'))
+	while (more && args && *args == '-')
 	{
 	    switch (toupper(args[1]))
 	    {
