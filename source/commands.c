@@ -340,6 +340,7 @@ static	IrcCommand irc_command[] =
 #endif
 	{ "TIME",	send_comm	},
 	{ "TIMER",	timercmd	},
+	{ "TOGGLE",	do_toggle	},
 	{ "TOPIC",	e_topic		},
 	{ "TRACE",	send_comm	},
 	{ "TYPE",	typecmd		}, /* keys.c */
