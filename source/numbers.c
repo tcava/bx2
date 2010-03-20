@@ -837,6 +837,17 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 		if (!(nick = ArgList[0]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
+		/*
+		 * This is a hack for BBC from inspircd.
+		 * A 439 numeric received before 001 that is sent to the
+		 * nickname we requested is NOT a rejection of that nickname,
+		 * it is an informational message from inspircd.
+		 */
+		if (numeric == 439 &&
+		    !is_server_registered(from_server) &&
+		    !strcmp(recipient, get_pending_nickname(from_server)))
+			break;
+
 		nickname_change_rejected(from_server, recipient);
 
 		if (!from)
