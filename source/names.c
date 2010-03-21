@@ -62,7 +62,7 @@ static	void	channel_hold_election (int winref);
 /*
  * This isnt strictly neccesary, its more of a cosmetic function.
  */
-static int	traverse_all_channels (Channel **ptr, int server, int only_this_server)
+int	traverse_all_channels (Channel **ptr, int server, int only_this_server)
 {
 	if (!*ptr)
 		*ptr = channel_list;

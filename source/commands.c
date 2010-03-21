@@ -171,6 +171,7 @@ static	void	about		(const char *, char *, const char *);
 static	void	set_username	(const char *, char *, const char *);
 static	void	do_unkey	(const char *, char *, const char *);
 static	void	do_4op		(const char *, char *, const char *);
+static	void	do_mynames	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -279,6 +280,7 @@ static	IrcCommand irc_command[] =
 	{ "MODE",	send_channel_com},
 	{ "MOTD",	send_comm	},
 	{ "MSG",	e_privmsg	},
+	{ "N",		do_mynames	},
 	{ "NAMES",	funny_stuff	},
 	{ "NICK",	e_nick		},
 	{ "NOTE",	send_comm	},
@@ -4074,4 +4076,34 @@ BUILT_IN_COMMAND(do_4op)
 
 	send_to_server("MODE %s +oooo %s %s %s %s", chan->channel, nick, nick, nick, nick);
 // XXX: my_send_to_server(server, "MODE %s +oooo %s %s %s %s", chan->channel, nick, nick, nick, nick);
+}
+
+BUILT_IN_COMMAND(do_mynames)
+{
+	char	*channel = NULL;
+	int	server = from_server;
+	int	all = 0;
+	Channel	*chan = NULL;
+
+	if (args)
+	{
+		if (*args == '-' && tolower(*(args+1)) == 'a')
+			all = 1;
+		else
+			channel = next_arg(args, &args);
+	}
+	if (all)
+	{
+		while (traverse_all_channels(&chan, server, 1))
+			send_to_server("NAMES %s", chan->channel);
+// XXX:			my_send_to_server(server, "NAMES %s", chan->channel);
+	}
+	else
+	{
+		if (!(chan = prepare_command(&server, channel, NO_OP)))
+			return;
+
+		send_to_server("NAMES %s", chan->channel);
+// XXX:		my_send_to_server(server, "NAMES %s", chan->channel);
+	}
 }

@@ -103,5 +103,6 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	void	channel_check_windows	(void);
 	void    channels_swap_winrefs (int oldref, int newref);
 	Channel	*find_channel		(const char *, int);
+	int	traverse_all_channels	(Channel **, int, int);
 
 #endif /* _NAMES_H_ */
