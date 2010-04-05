@@ -1383,7 +1383,7 @@ BUILT_IN_COMMAND(info)
 		say("Versions 2.2pre8 through 2.8.2 by Matthew Green");
 		say("\tCopyright 1992-1995 Matthew Green");
 		say("All EPIC versions by EPIC Software Labs");
-		say("\tCopyright 1993-2007 EPIC Software Labs");
+		say("\tCopyright 1993-2010 EPIC Software Labs");
 		say(" ");
 		say("	    Contact the EPIC project (%s)", EMAIL_CONTACT);
 		say("	    for problems with this or any other EPIC client");
@@ -1484,7 +1484,7 @@ BUILT_IN_COMMAND(license)
 	yell("Copyright (c) 1991, 1992 Troy Rollo.");
  	yell("Copyright (c) 1992-1996 Matthew Green.");
 	yell("Copyright © 1994 Jake Khuon.");
-	yell("Coypright © 1993, 2007 EPIC Software Labs.");
+	yell("Coypright © 1993, 2010 EPIC Software Labs.");
 	yell("All rights reserved");
 	yell(" ");
 	yell("Redistribution and use in source and binary forms, with or");
@@ -2234,7 +2234,8 @@ BUILT_IN_COMMAND(pingcmd)
 	char buffer[64];
 
 	get_time(&t);
-	snprintf(buffer, 63, "%s PING %ld %ld", args, t.tv_sec, t.tv_usec);
+	snprintf(buffer, 63, "%s PING %ld %ld", args,
+				(long)t.tv_sec, (long)t.tv_usec);
 	ctcp(NULL, buffer, empty_string);
 }
 
