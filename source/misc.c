@@ -48,7 +48,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.7 2010/03/09 12:28:31 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.8 2010/04/16 23:26:23 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -904,6 +904,7 @@ int t = 0;
 			break;
 	}
 }
+#endif
 
 char *clear_server_flags (char *userhost)
 {
@@ -914,6 +915,7 @@ register char *uh = userhost;
 }
 
 
+#if 0
 #ifndef BITCHX_LITE
 
 static unsigned char newline1[BIG_BUFFER_SIZE+1];
@@ -1767,9 +1769,11 @@ int freadln(FILE *stream, char *lin)
 		return 0;
 	return 1;
 }
+#endif
 
 char *randreason(char *filename)
 {
+#if 0
 	int count, min, i;
 	FILE *bleah;
 	char *f = NULL;
@@ -1803,6 +1807,7 @@ char *randreason(char *filename)
 	new_free(&f);
 	if (*buffer)
 		return buffer;
+#endif
 	return NULL;
 }
 
@@ -1821,6 +1826,7 @@ char *get_reason(char *nick, char *file)
 	return (stripansicodes(convert_output_format(temp, "%s %s", nick? nick: "error", get_server_nickname(from_server) )));
 }
 
+#if 0
 char *get_realname(char *nick)
 {
 	char *temp;
@@ -3102,6 +3108,7 @@ BUILT_IN_COMMAND(nslookup)
 	put_it("This command is disabled in this client");
 #endif
 }
+#endif
 
 
 char *rights(char *string, int num)
@@ -3143,9 +3150,9 @@ char *cluster (char *hostname)
 			
 			if (ident_len <= 9) {
 				/* copy ident@ */
-				strmcpy(result, hostname, ident_len + 1);
+				strlcpy(result, hostname, ident_len + 1);
 			} else {
-				strmcpy(result, hostname, 8);
+				strlcpy(result, hostname, 8);
 				result[8] = '*';
 				result[9] = '@';
 				result[10] = '\0';
@@ -3216,6 +3223,7 @@ char *cluster (char *hostname)
 
 
 
+#if 0
 struct _sock_manager
 {
 	int init;
