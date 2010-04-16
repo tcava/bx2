@@ -227,11 +227,15 @@ static	IrcCommand irc_command[] =
 	{ "D",		describe	},
 	{ "DCC",	dcc_cmd		}, /* dcc.c */
 	{ "DEFER",	defercmd	},
-	{ "DEOP",	deop		},
+	{ "DEHOP",	dodeop		},
+	{ "DEOP",	dodeop		},
+	{ "DEOPER",	deop		},
 	{ "DESCRIBE",	describe	},
+	{ "DEVOICE",	dodeop		},
 	{ "DIE",	send_comm	},
 	{ "DISCONNECT",	disconnectcmd	}, /* server.c */
         { "DO",         docmd           }, /* if.c */
+	{ "DOP",	dodeop		},
         { "DUMP",       dumpcmd		}, /* alias.c */
 	{ "ECHO",	echocmd		},
 	{ "ENCRYPT",	encrypt_cmd	}, /* crypt.c */
@@ -246,6 +250,7 @@ static	IrcCommand irc_command[] =
 	{ "FPROT",	tog_fprot	},
 	{ "FSET",	fset_variable	},
 	{ "HOOK",	hookcmd		},
+	{ "HOP",	doop		},
 	{ "HOST",	userhostcmd	},
 	{ "HOSTNAME",	e_hostname	},
 	{ "I",		send_invite	},
@@ -280,6 +285,7 @@ static	IrcCommand irc_command[] =
 	{ "MODE",	send_channel_com},
 	{ "MOTD",	send_comm	},
 	{ "MSG",	e_privmsg	},
+	{ "MULT",	multkick	},
 	{ "N",		do_mynames	},
 	{ "NAMES",	funny_stuff	},
 	{ "NICK",	e_nick		},
@@ -287,6 +293,7 @@ static	IrcCommand irc_command[] =
 	{ "NOTICE",	e_privmsg	},
 	{ "NOTIFY",	notify		}, /* notify.c */
 	{ "ON",		oncmd		}, /* hook.c */
+	{ "OP",		doop		},
 	{ "OPER",	oper		},
 	{ "P",		pingcmd		},
 	{ "PACKAGE",	packagecmd	},
@@ -353,12 +360,14 @@ static	IrcCommand irc_command[] =
 	{ "UNLOAD",	unloadcmd	}, /* alias.c */
 	{ "UNSHIFT",	unshift_cmd	},
 	{ "UNTIL",	whilecmd	},
+	{ "UNVOICE",	dodeop		},
 	{ "UPING",	send_comm	},
 	{ "USERHOST",	userhostcmd	},
 	{ "USERIP",	useripcmd	},
 	{ "USLEEP",	usleepcmd	},
 	{ "USRIP",	usripcmd	},
 	{ "VERSION",	version		},
+	{ "VOICE",	doop		},
 	{ "W",		whocmd		},
 	{ "WAIT",	waitcmd		},
 	{ "WALLCHOPS",	send_2comm	},

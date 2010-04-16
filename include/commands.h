@@ -49,5 +49,8 @@ const   char *  current_package         (void);
 	void	BX_show_version		(const char *, char *, const char *);
 	void	tog_fprot		(const char *, char *, const char *);
 	void	do_toggle		(const char *, char *, const char *);
+	void	dodeop			(const char *, char *, const char *);
+	void	doop			(const char *, char *, const char *);
+	void	multkick		(const char *, char *, const char *);
 
 #endif /* __commands_h__ */
