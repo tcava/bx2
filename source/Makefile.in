@@ -11,7 +11,7 @@ LDFLAGS	= @LDFLAGS@
 DEFS	= @DEFS@
 RM	= rm -f
 
-OBJECTS = alias.o alist.o array.o art.o clock.o commands.o commands2.o compat.o crypt.o crypto.o \
+OBJECTS = alias.o alist.o array.o art.o banlist.o clock.o commands.o commands2.o compat.o crypt.o crypto.o \
         ctcp.o dcc.o debug.o elf.o exec.o files.o flood.o fset.o functions.o gailib.o \
 	glob.o hook.o if.o ignore.o input.o irc.o ircaux.o ircsig.o keys.o \
 	lastlog.o levels.o list.o log.o logfiles.o mail.o misc.o names.o network.o \
