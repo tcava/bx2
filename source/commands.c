@@ -172,6 +172,7 @@ static	void	set_username	(const char *, char *, const char *);
 static	void	do_unkey	(const char *, char *, const char *);
 static	void	do_4op		(const char *, char *, const char *);
 static	void	do_mynames	(const char *, char *, const char *);
+static	void	do_msay		(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -284,6 +285,7 @@ static	IrcCommand irc_command[] =
 	{ "MESG",	extern_write	},
 	{ "MODE",	send_channel_com},
 	{ "MOTD",	send_comm	},
+	{ "MSAY",	do_msay		},
 	{ "MSG",	e_privmsg	},
 	{ "MULT",	multkick	},
 	{ "N",		do_mynames	},
@@ -4121,4 +4123,26 @@ BUILT_IN_COMMAND(do_mynames)
 		send_to_server("NAMES %s", chan->channel);
 // XXX:		my_send_to_server(server, "NAMES %s", chan->channel);
 	}
+}
+
+BUILT_IN_COMMAND(do_msay)
+{
+	char	*channels = NULL;
+	int	i = get_window_server(0);
+	Channel	*chan = NULL;
+
+	if (i != NOSERV)
+	{
+		while (traverse_all_channels(&chan, i, 1))
+		{
+			malloc_strcat(&channels, chan->channel);
+			if (chan->next)
+				malloc_strcat(&channels, ",");
+		}
+		if (channels)
+			send_text(i, channels, args, NULL, 1);
+		new_free(&channels);
+	}
+	else
+		bitchsay("No server for this window");
 }
