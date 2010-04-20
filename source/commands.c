@@ -173,6 +173,7 @@ static	void	do_unkey	(const char *, char *, const char *);
 static	void	do_4op		(const char *, char *, const char *);
 static	void	do_mynames	(const char *, char *, const char *);
 static	void	do_msay		(const char *, char *, const char *);
+static	void	do_mtopic	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -287,6 +288,7 @@ static	IrcCommand irc_command[] =
 	{ "MOTD",	send_comm	},
 	{ "MSAY",	do_msay		},
 	{ "MSG",	e_privmsg	},
+	{ "MTOPIC",	do_mtopic	},
 	{ "MULT",	multkick	},
 	{ "N",		do_mynames	},
 	{ "NAMES",	funny_stuff	},
@@ -4142,6 +4144,27 @@ BUILT_IN_COMMAND(do_msay)
 		if (channels)
 			send_text(i, channels, args, NULL, 1);
 		new_free(&channels);
+	}
+	else
+		bitchsay("No server for this window");
+}
+
+BUILT_IN_COMMAND(do_mtopic)
+{
+	Channel	*chan = NULL;
+
+	if (from_server != NOSERV)
+	{
+		int count = 0;
+		while (traverse_all_channels(&chan, from_server, 1))
+		{
+			if (!chan->chop && !chan->half_assed)
+				continue;
+			send_to_server("TOPIC %s :%s", chan->channel, args ? args : empty_string);
+			count++;
+		}
+		if (!count)
+			bitchsay("You're not an op on any channels");
 	}
 	else
 		bitchsay("No server for this window");
