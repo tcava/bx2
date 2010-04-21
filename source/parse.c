@@ -70,6 +70,25 @@ static	void	strip_modes (const char *, const char *, const char *);
 /* User and host information from server 2.7 */
 const char	*FromUserHost = empty_string;
 
+long		oper_kills = 0,
+		nick_collisions = 0,
+		serv_fakes = 0,
+		serv_unauth = 0,
+		serv_split = 0,
+		serv_rejoin = 0,
+		serv_squits = 0,
+		serv_connects = 0,
+		client_connects = 0,
+		serv_rehash = 0,
+		client_exits = 0,
+		serv_klines = 0,
+		client_floods = 0,
+		client_invalid = 0,
+		stats_req = 0,
+		client_bot = 0,
+		client_bot_alarm = 0,
+		oper_requests = 0;
+		
 /*
  * is_channel: determines if the argument is a channel.  If it's a number,
  * begins with MULTI_CHANNEL and has no '*', or STRING_CHANNEL, then its a

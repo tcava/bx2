@@ -300,6 +300,7 @@ static	IrcCommand irc_command[] =
 	{ "ON",		oncmd		}, /* hook.c */
 	{ "OP",		doop		},
 	{ "OPER",	oper		},
+	{ "OSTAT",	serv_stat	},
 	{ "P",		pingcmd		},
 	{ "PACKAGE",	packagecmd	},
 	{ "PARSEKEY",	parsekeycmd	},
