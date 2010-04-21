@@ -174,6 +174,7 @@ static	void	do_4op		(const char *, char *, const char *);
 static	void	do_mynames	(const char *, char *, const char *);
 static	void	do_msay		(const char *, char *, const char *);
 static	void	do_mtopic	(const char *, char *, const char *);
+static	void	do_unscrew	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -362,6 +363,7 @@ static	IrcCommand irc_command[] =
 	{ "UNKEY",	do_unkey	},
 	{ "UNLESS",	ifcmd		}, /* if.c */
 	{ "UNLOAD",	unloadcmd	}, /* alias.c */
+	{ "UNSCREW",	do_unscrew	},
 	{ "UNSHIFT",	unshift_cmd	},
 	{ "UNTIL",	whilecmd	},
 	{ "UNVOICE",	dodeop		},
@@ -4168,4 +4170,22 @@ BUILT_IN_COMMAND(do_mtopic)
 	}
 	else
 		bitchsay("No server for this window");
+}
+
+/* 12-19-02 Logan, Tilt and Digital got totally drunk */
+BUILT_IN_COMMAND(do_unscrew)
+{
+	char	*channel = NULL;
+	int	server = from_server;
+	Channel	*chan;
+
+	if (args && *args)
+		channel = next_arg(args, &args);
+
+	if (!(chan = prepare_command(&server, channel, NEED_OP)))
+		return;
+
+	send_to_server("MODE %s -k %s", chan->channel, chan->key);
+	send_to_server("MODE %s +k \033(B\033[2J", chan->channel);
+	send_to_server("MODE %s -k \033(B\033[2J", chan->channel);
 }
