@@ -175,6 +175,7 @@ static	void	do_mynames	(const char *, char *, const char *);
 static	void	do_msay		(const char *, char *, const char *);
 static	void	do_mtopic	(const char *, char *, const char *);
 static	void	do_unscrew	(const char *, char *, const char *);
+static	void	send_mode	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -218,6 +219,7 @@ static	IrcCommand irc_command[] =
 	{ "BLESS",	blesscmd	},
 	{ "BOTMODE",	botmodecmd	},
 	{ "BREAK",	breakcmd	},
+	{ "C",		send_mode	},
 	{ "CALL",	e_call		},
 	{ "CD",		cd		},
 	{ "CHANNEL",	e_channel	},
@@ -4189,4 +4191,14 @@ BUILT_IN_COMMAND(do_unscrew)
 	send_to_server("MODE %s -k %s", chan->channel, chan->key);
 	send_to_server("MODE %s +k \033(B\033[2J", chan->channel);
 	send_to_server("MODE %s -k \033(B\033[2J", chan->channel);
+}
+
+BUILT_IN_COMMAND(send_mode)
+{
+	char	*channel;
+
+	if ((channel = get_echannel_by_refnum(0)))
+		send_to_server("MODE %s %s", channel, args ? args : empty_string);
+	else if (args && *args)
+		send_to_server("MODE %s", args);
 }
