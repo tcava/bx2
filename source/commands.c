@@ -370,7 +370,7 @@ static	IrcCommand irc_command[] =
 	{ "UNSHIFT",	unshift_cmd	},
 	{ "UNTIL",	whilecmd	},
 	{ "UNVOICE",	dodeop		},
-	{ "UPING",	send_comm	},
+	{ "UPING",	pingcmd		},
 	{ "USERHOST",	userhostcmd	},
 	{ "USERIP",	useripcmd	},
 	{ "USLEEP",	usleepcmd	},
@@ -4195,7 +4195,7 @@ BUILT_IN_COMMAND(do_unscrew)
 
 BUILT_IN_COMMAND(send_mode)
 {
-	char	*channel;
+	const char *channel;
 
 	if ((channel = get_echannel_by_refnum(0)))
 		send_to_server("MODE %s %s", channel, args ? args : empty_string);
