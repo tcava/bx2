@@ -53,5 +53,6 @@ const   char *  current_package         (void);
 	void	doop			(const char *, char *, const char *);
 	void	multkick		(const char *, char *, const char *);
 	void	serv_stat		(const char *, char *, const char *);
+	void	jnw			(const char *, char *, const char *);
 
 #endif /* __commands_h__ */

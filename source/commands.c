@@ -268,6 +268,7 @@ static	IrcCommand irc_command[] =
 	{ "IRCUSER",	set_username	},
 	{ "ISON",	isoncmd		},
 	{ "J",		e_channel	},
+	{ "JNW",	jnw		},
 	{ "JOIN",	e_channel	},
 	{ "K",		send_kick	},
 	{ "KICK",	send_kick	},

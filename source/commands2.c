@@ -4,6 +4,8 @@
 #include "server.h"
 #include "vars.h"
 #include "hook.h"
+#include "misc.h"
+#include "window.h"
 
 #ifdef HAVE_UNAME
 #include <sys/utsname.h>
@@ -319,4 +321,39 @@ put_it("%s", convert_output_format("%g: %CS%cerv Squits     %K[%W$[-4]0%K]    %C
 
 #endif
 
+}
+
+BUILT_IN_COMMAND(jnw)
+{
+	char	*channel;
+	int	hidden = 0;
+
+	if ((channel = next_arg(args, &args)))
+	{
+		Window	*tmp;
+
+		if (*channel == '-' && !my_stricmp(channel, "-hide"))
+		{
+			if (!(channel = next_arg(args, &args)))
+				return;
+			hidden = 1;
+		}
+		if ((tmp = new_window(current_window->screen)))
+		{
+			int	server = from_server;
+
+			from_server = tmp->server;
+			if (!is_channel(channel))
+				channel = make_channel(channel);
+			if (channel)
+			{
+				add_waiting_channel(tmp, channel);
+				send_to_server("JOIN %s%s%s", channel, args?space:empty_string, args?args:empty_string);
+			}
+			from_server = server;
+			if (hidden)
+				hide_window(tmp);
+			update_all_windows();
+		}
+	}
 }

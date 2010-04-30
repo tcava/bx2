@@ -293,6 +293,7 @@ const	char	*get_echannel_by_refnum		(unsigned);
 
 	int    is_window_waiting_for_channel (unsigned, const char *);
 	void   move_waiting_channel (unsigned oldref, unsigned newref);
+	int    add_waiting_channel (Window *, const char *);
 	int    get_winref_by_bound_channel (const char *channel, int server);
 	const char *   get_bound_channel_by_refnum (unsigned refnum);
 

@@ -154,7 +154,6 @@ static	int	change_line 			(Window *, const unsigned char *);
 static	int	add_to_display 			(Window *, const unsigned char *, intmax_t);
 static	Display *new_display_line 		(Display *prev, Window *w);
 static 	int	count_fixed_windows 		(Screen *s);
-static	int	add_waiting_channel 		(Window *, const char *);
 static 	void   	destroy_window_waiting_channels	(int);
 static 	int	flush_scrollback_after		(Window *);
 static 	int	flush_scrollback		(Window *);
@@ -2246,7 +2245,7 @@ static void    destroy_window_waiting_channels (int refnum)
 	}
 }
 
-static	int	add_waiting_channel (Window *win, const char *chan)
+int	add_waiting_channel (Window *win, const char *chan)
 {
 	Window *w = NULL;
 	WNickList *tmp;
