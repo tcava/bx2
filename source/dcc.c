@@ -4420,3 +4420,15 @@ char *	dccctl (char *input)
 
 	RETURN_MSTR(retval);
 }
+
+BUILT_IN_COMMAND(nochat)
+{
+	char *	tmp = NULL;
+
+	if (args && *args)
+	{
+		malloc_sprintf(&tmp, "CLOSE CHAT %s", args);
+		dcc_cmd("DCC", tmp, NULL);
+		new_free(&tmp);
+	}
+}

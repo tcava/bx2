@@ -297,6 +297,7 @@ static	IrcCommand irc_command[] =
 	{ "N",		do_mynames	},
 	{ "NAMES",	funny_stuff	},
 	{ "NICK",	e_nick		},
+	{ "NOCHAT",	nochat		},
 	{ "NOTE",	send_comm	},
 	{ "NOTICE",	e_privmsg	},
 	{ "NOTIFY",	notify		}, /* notify.c */
