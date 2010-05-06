@@ -1646,7 +1646,7 @@ BUILT_IN_COMMAND(dcc_cmd)
 	}
 
 	l = message_from(NULL, LEVEL_DCC);
-	say("Unknown DCC command: %s", cmd);
+	put_it("%s", convert_output_format("$G Unknown %RDCC%n command: $0", "%s", cmd));
 	pop_message_from(l);
 }
 
