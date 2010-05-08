@@ -6,6 +6,7 @@
 #include "window.h"
 #include "vars.h"
 #include "server.h"
+#include "clock.h"
 /* This should go in expr.h */
 extern char *alias_special_char(char **, char *, const char *, char *, int *);
 
@@ -48,7 +49,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.8 2010/04/16 23:26:23 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.9 2010/05/08 13:18:38 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -126,7 +127,6 @@ int serv_action = 0;
 #ifndef WANT_CHELP
 int in_chelp = 0;
 #endif
-#if 0
 
 LastMsg last_msg[MAX_LAST_MSG+1] = { { NULL } };
 LastMsg last_dcc[MAX_LAST_MSG+1] = { { NULL } };
@@ -143,7 +143,6 @@ LastMsg last_ctcp[2] = {{ NULL }};
 LastMsg last_sent_ctcp[2] = {{ NULL }};
 LastMsg last_sent_dcc[MAX_LAST_MSG+1] = {{ NULL }};
 
-#endif
 extern int in_cparse;
 #if 0
 
@@ -4724,9 +4723,6 @@ int arg_flags;
 	return malloc_strdup(buffer);
 }
 
-/* XXX */
-#if 0
-
 void add_last_type (LastMsg *array, int size, char *from, char *uh, char *to, char *str)
 {
 int i;
@@ -4743,7 +4739,7 @@ int i;
 	malloc_strcpy(&array->from, from);
 	malloc_strcpy(&array->to, to);
 	malloc_strcpy(&array->uh, uh);
-	malloc_strcpy(&array->time, update_clock(GET_TIME));
+	malloc_strcpy(&array->time, get_clock());
 }
 
 int check_last_type(LastMsg *array, int size, char *from, char *uh)
@@ -4757,6 +4753,7 @@ int i;
 	return 0;
 }
 
+#if 0
 int matchmcommand(char *origline,int count)
 {
     int  startnum=0;

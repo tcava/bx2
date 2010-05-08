@@ -51,6 +51,7 @@
 #include "commands.h"
 #include "server.h"
 #include "levels.h"
+#include "misc.h"
 
 /* make this buffer *much* bigger than needed */
 #define OBNOXIOUS_BUFFER_SIZE BIG_BUFFER_SIZE * 10
@@ -438,7 +439,6 @@ const char *ov_server(int server)
 	return(d);
 }
 
-/* XXX */
 void serversay(int save, int from_server, const char *format, ...)
 {
 	Window	*old_to_window = to_window;
@@ -464,8 +464,6 @@ void serversay(int save, int from_server, const char *format, ...)
 			put_echo(out);
 	}
 	to_window = old_to_window;
-/*
 	if (save && out)
 		add_last_type(&last_servermsg[0], MAX_LAST_MSG, NULL, NULL, NULL, out);
-*/
 }
