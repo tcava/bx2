@@ -131,6 +131,7 @@ static	int		dccs_rejected = 0;
 static	int		dcc_refnum = 0;
 static	int		dcc_updates_status = 1;
 static	char *		default_dcc_port = NULL;
+static	char *		last_chat_req = NULL;
 
 #define DCC_SUBCOMMAND(x)  static void x (int argc, char **argv, const char *subargs)
 static	void		dcc_chat 		(char *);
@@ -2870,6 +2871,8 @@ void	register_dcc_offer (const char *user, char *type, char *description, char *
 	 * identical for $0-4, and SEND adds filename/size in $5-6 
 	 */
 	lock_dcc(dcc);
+	if ((dcc->flags & DCC_TYPES) == DCC_CHAT)
+		malloc_strcpy(&last_chat_req, user);
 	if ((dcc->flags & DCC_TYPES) == DCC_FILEREAD)
 	{
 		if (do_hook(DCC_REQUEST_LIST, "%s %s %s %s %s %s "INTMAX_FORMAT,
@@ -2962,6 +2965,9 @@ display_it:
 	else
 		say("DCC %s (%s) request received from %s!%s [%s (%s)]", 
 			type, description, user, FromUserHost, p_addr, port);
+
+	if ((dcc->flags & DCC_TYPES) == DCC_CHAT)
+		bitchsay("Type /chat to answer or /nochat to close");
     }
     while (0);
 
@@ -4426,8 +4432,12 @@ BUILT_IN_COMMAND(nochat)
 	char *	tmp = NULL;
 
 	if (args && *args)
-	{
 		malloc_sprintf(&tmp, "CLOSE CHAT %s", args);
+	else if (last_chat_req)
+		malloc_sprintf(&tmp, "CLOSE CHAT %s", last_chat_req);
+
+	if (tmp)
+	{
 		dcc_cmd("DCC", tmp, NULL);
 		new_free(&tmp);
 	}
