@@ -52,6 +52,7 @@
 #include "reg.h"
 #include "alias.h"
 #include "timer.h"
+#include "cset.h"
 
 #define DCC_BLOCK_SIZE (1<<11)
 
@@ -2958,13 +2959,23 @@ display_it:
 
 	/* Thanks, Tychy! (lherron@imageek.york.cuny.edu) */
 	if ((dcc->flags & DCC_TYPES) == DCC_FILEREAD)
-		say("DCC %s (%s "INTMAX_FORMAT") request received "
-				"from %s!%s [%s (%s)]",
-			type, description, dcc->filesize, user, 
-			FromUserHost, p_addr, port);
+	{
+		char	buf[40];
+
+		sprintf(buf, "%2.4g", _GMKv(dcc->filesize));
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_DCC_REQUEST_FSET),
+			"%s %s \"%s\" %s %s %s %d %s %s",
+			get_clock(), dcc_types[dtype], description,
+			user, FromUserHost,
+			p_addr, realport,
+			_GMKs(dcc->filesize), buf));
+	}
 	else
-		say("DCC %s (%s) request received from %s!%s [%s (%s)]", 
-			type, description, user, FromUserHost, p_addr, port);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_DCC_REQUEST_FSET),
+			"%s %s %s %s %s %s %d",
+			get_clock(), dcc_types[dtype],
+			description, user, FromUserHost,
+			p_addr, realport));
 
 	if ((dcc->flags & DCC_TYPES) == DCC_CHAT)
 		bitchsay("Type /chat to answer or /nochat to close");

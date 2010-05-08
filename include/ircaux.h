@@ -7,7 +7,7 @@
  *
  * See the COPYRIGHT file, or do a HELP IRCII COPYRIGHT 
  *
- * @(#)$Id: ircaux.h,v 1.3 2010/03/10 00:11:52 fb Exp $
+ * @(#)$Id: ircaux.h,v 1.4 2010/05/08 09:30:50 fb Exp $
  */
 
 #ifndef _IRCAUX_H_
@@ -271,5 +271,22 @@ char *	valid_transforms (void);
 extern int 	num_code_points (const char *);
 
 char *	on_off (int);
+
+#define	_1KB	((double) 1000)
+#define _1MEG	(_1KB * _1KB)
+#define _1GIG	(_1KB * _1KB * _1KB)
+#define _1TER	(_1KB * _1KB * _1KB * _1KB)
+#define _1ETA	(_1KB * _1KB * _1KB * _1KB * _1KB)
+
+#define	_GMKs(x)	( ((double)x > _1ETA) ? "eb" : \
+			(((double)x > _1TER) ? "tb" : (((double)x > _1GIG) ? "gb" : \
+			(((double)x > _1MEG) ? "mb" : (((double)x > _1KB)? "kb" : "bytes")))))
+
+#define	_GMKv(x)	(((double)x > _1ETA) ? \
+			((double)x/_1ETA) : (((double)x > _1TER) ? \
+			((double)x/_1TER) : (((double)x > _1GIG) ? \
+			((double)x/_1GIG) : (((double)x > _1MEG) ? \
+			((double)x/_1MEG) : (((double)x > _1KB) ? \
+			((double)x/_1KB): (double)x)))) )
 
 #endif /* _IRCAUX_H_ */
