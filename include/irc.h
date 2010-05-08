@@ -122,6 +122,7 @@ extern		char	realname[REALNAME_LEN + 1];
 extern	const	char	ridiculous_version_name[];
 extern	const unsigned long commit_id;
 extern		char *	send_umode;
+extern		char *	auto_str;
 extern	const	char *	unknown_userhost;
 extern	const	char 	useful_info[];
 extern		char	username[NAME_LEN + 1];

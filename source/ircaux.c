@@ -5646,3 +5646,45 @@ char * on_off(int var)
 		return "On";
 	return "Off";
 }
+
+int check_auto_reply(const char *str)
+{
+char *p = NULL;
+char *pat;
+	if (!str || !*str || !get_int_var(AUTO_RESPONSE_VAR))
+		return 0;
+	p = alloca(strlen(auto_str)+1);
+	strcpy(p, auto_str);
+	if (p && *p)
+	{
+		while ((pat = next_arg(p, &p)))
+		{
+			switch(get_int_var(NICK_COMPLETION_TYPE_VAR))
+			{
+				case 3:
+					if (!my_stricmp(str, pat))
+						goto found_auto;
+					continue;
+				case 2:
+					if (wild_match(pat, str))
+						goto found_auto;
+					continue;
+				case 1:
+					if (stristr(str, pat))
+						goto found_auto;
+					continue;
+				default:
+				case 0:
+					if (!my_strnicmp(str, pat, strlen(pat)))
+						goto found_auto;
+					continue;
+			}
+		}
+	}
+	return 0;
+found_auto:
+#ifdef GUI
+	gui_activity(COLOR_HIGHLIGHT);
+#endif
+	return 1;
+}

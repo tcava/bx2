@@ -7,7 +7,7 @@
  *
  * See the COPYRIGHT file, or do a HELP IRCII COPYRIGHT 
  *
- * @(#)$Id: ircaux.h,v 1.4 2010/05/08 09:30:50 fb Exp $
+ * @(#)$Id: ircaux.h,v 1.5 2010/05/08 10:40:20 fb Exp $
  */
 
 #ifndef _IRCAUX_H_
@@ -271,6 +271,7 @@ char *	valid_transforms (void);
 extern int 	num_code_points (const char *);
 
 char *	on_off (int);
+int	check_auto_reply (const char *);
 
 #define	_1KB	((double) 1000)
 #define _1MEG	(_1KB * _1KB)

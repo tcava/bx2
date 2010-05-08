@@ -56,6 +56,7 @@
 #include "notify.h"
 #include "timer.h"
 #include "cset.h"
+#include "misc.h"
 
 #define STRING_CHANNEL 	'+'
 #define MULTI_CHANNEL 	'#'
@@ -1503,15 +1504,17 @@ static void 	p_notice (const char *from, const char *comm, const char **ArgList)
 
 	if (do_hook(GENERAL_NOTICE_LIST, "%s %s %s", from,real_target, message))
 	{
+	    char *	stripped = stripansicodes(message);
+
 	    if (hook_type == NOTICE_LIST)
 	    {
 		if (do_hook(hook_type, "%s %s", from, message))
-			put_it("-%s- %s", from, message);
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_NOTICE_FSET), "%s %s %s %s", get_clock(), from, FromUserHost, stripped));
 	    }
 	    else
 	    {
 		if (do_hook(hook_type, "%s %s %s", from, real_target, message))
-			put_it("-%s:%s- %s", from, real_target, message);
+			put_it("%s", convert_output_format(fget_string_var(check_auto_reply(message)?FORMAT_PUBLIC_NOTICE_AR_FSET:FORMAT_PUBLIC_NOTICE_FSET), "%s %s %s %s %s", get_clock(), from, FromUserHost, real_target, stripped));
 	    }
 	}
 
