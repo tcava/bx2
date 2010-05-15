@@ -2214,7 +2214,12 @@ BUILT_IN_COMMAND(mecmd)
 
 			l = message_from(target, LEVEL_ACTION);
 			if (do_hook(SEND_ACTION_LIST, "%s %s", target, args))
-				put_it("* %s %s", get_server_nickname(from_server), args);
+			{
+				if (strchr("&#", *target))
+					put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_ACTION_FSET), "%s %s %s %s", get_clock(), get_server_nickname(from_server), target, args));
+				else
+					put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_ACTION_OTHER_FSET), "%s %s %s %s", get_clock(), get_server_nickname(from_server), target, args));
+			}
 			pop_message_from(l);
 		}
 		else
