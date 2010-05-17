@@ -56,6 +56,7 @@
 #include "ifcmd.h"
 #include "flood.h"
 #include "words.h"
+#include "cset.h"
 
 #include <pwd.h>
 #ifdef HAVE_UNAME
@@ -261,6 +262,7 @@ CTCP_HANDLER(do_atmosphere)
 {
 	int	l;
 	int	flag, fflag;
+	int	ac_reply;
 
 	if (!cmd || !*cmd)
 		return NULL;
@@ -274,22 +276,33 @@ CTCP_HANDLER(do_atmosphere)
 	if (flag == IGNORED || fflag == 1)
 		return NULL;
 
+	if ((ac_reply = check_auto_reply(cmd)))
+// XXX		addtabkey(from, "msg", 1);
+		;
+
 	if (is_channel(to))
 	{
+		int	r = 0;
+
 		l = message_from(to, LEVEL_ACTION);
 		if (do_hook(ACTION_LIST, "%s %s %s", from, to, cmd))
 		{
+			char	*s = fget_string_var((ac_reply && r) ? FORMAT_ACTION_USER_AR_FSET : ac_reply ? FORMAT_ACTION_OTHER_AR_FSET : r ? FORMAT_ACTION_USER_FSET : FORMAT_ACTION_OTHER_FSET);
+
 			if (is_current_channel(to, from_server))
-				put_it("* %s %s", from, cmd);
+			{
+				s = fget_string_var((ac_reply && r) ? FORMAT_ACTION_USER_AR_FSET : ac_reply ? FORMAT_ACTION_AR_FSET : r ? FORMAT_ACTION_USER_FSET : FORMAT_ACTION_CHANNEL_FSET);
+				put_it("%s", convert_output_format(s, "%s %s %s %s %s", get_clock(), from, FromUserHost, to, cmd));
+			}
 			else
-				put_it("* %s:%s %s", from, to, cmd);
+				put_it("%s", convert_output_format(s, "%s %s %s %s %s", get_clock(), from, FromUserHost, to, cmd));
 		}
 	}
 	else
 	{
 		l = message_from(from, LEVEL_ACTION);
 		if (do_hook(ACTION_LIST, "%s %s %s", from, to, cmd))
-			put_it("*> %s %s", from, cmd);
+			put_it("%s", convert_output_format(fget_string_var(ac_reply ? FORMAT_ACTION_AR_FSET : FORMAT_ACTION_FSET), "%s %s %s %s %s", get_clock(), from, FromUserHost, to, cmd));
 	}
 
 	pop_message_from(l);
