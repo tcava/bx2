@@ -84,6 +84,7 @@ static	void	set_mangle_display	(void *);
 static	void	update_all_status_wrapper (void *);
 static	void	set_wserv_type		(void *);
 static	void	set_indent		(void *);
+static	void	set_autoresponse	(void *);
 
 
 /* BIV stands for "built in variable" */
@@ -287,7 +288,7 @@ void 	init_variables_stage1 (void)
 	VAR(AUTO_RECONNECT,		BOOL, NULL)
 	VAR(AUTO_REJOIN,		INT,  NULL)
 	VAR(AUTO_RESPONSE,		BOOL, NULL)
-	VAR(AUTO_RESPONSE_STR,		STR,  NULL)
+	VAR(AUTO_RESPONSE_STR,		STR,  set_autoresponse)
 	VAR(AUTO_UNBAN,			INT,  NULL)
 	VAR(AUTO_UNMARK_AWAY,		BOOL, NULL)
 	VAR(AUTO_WHOWAS,		BOOL, NULL)
@@ -1282,6 +1283,13 @@ void    set_indent (void *stuff)
                 window->indent = indent;
 }
 
+void	set_autoresponse (void *stuff)
+{
+	VARIABLE *v = (VARIABLE *)stuff;
+
+	if (v->string)
+		malloc_strcpy(&auto_str, v->string);
+}
 
 /***************************************************************************/
 /* XXX Apparantly this is dead code. */

@@ -1390,6 +1390,9 @@ int 	main (int argc, char *argv[])
 
 	display_bitchx(-1);
 
+	set_var_value(AUTO_RESPONSE_STR_VAR, nickname, 0);
+	bitchsay("Auto Response is set to - %s", auto_str);
+
 	set_input(empty_string);
 
 	if (dont_connect)
