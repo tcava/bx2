@@ -759,10 +759,17 @@ static	time_t	last_ctcp_parsed = 0;
 			    if (do_hook(CTCP_LIST, "%s %s %s %s", from, to, 
 						ctcp_command, ctcp_argument))
 			    {
-				    say("Unknown CTCP %s from %s to %s: %s%s",
-					ctcp_command, from, to, 
-					*ctcp_argument ? ": " : empty_string, 
-					ctcp_argument);
+				if (allow_ctcp_reply && get_int_var(CTCP_VERBOSE_VAR))
+				{
+#ifdef WANT_USERLIST
+				    if (lookup_userlevelc("*", FromUserHost, "*", NULL))
+					put_it("%s", convert_output_format(fget_string_var(get_int_var(CLOAK_VAR)? FORMAT_CTCP_CLOAK_UNKNOWN_USER_FSET:FORMAT_CTCP_UNKNOWN_USER_FSET),
+					    "%s %s %s %s %s %s", get_clock(), from, FromUserHost, to, ctcp_command, *ctcp_argument? ctcp_argument : empty_string));
+				    else
+#endif
+					put_it("%s", convert_output_format(fget_string_var(get_int_var(CLOAK_VAR)? FORMAT_CTCP_CLOAK_UNKNOWN_FSET:FORMAT_CTCP_UNKNOWN_FSET),
+					    "%s %s %s %s %s %s", get_clock(), from, FromUserHost, to, ctcp_command, *ctcp_argument? ctcp_argument : empty_string));
+				}
 			    }
 			time(&last_ctcp_parsed);
 			allow_ctcp_reply = 0;
@@ -816,16 +823,14 @@ static	time_t	last_ctcp_parsed = 0;
 		    if (do_hook(CTCP_LIST, "%s %s %s %s", 
 				from, to, ctcp_command, ctcp_argument))
 		    {
-			    if (is_me(from_server, to))
-				say("CTCP %s from %s%s%s", 
-					ctcp_command, from, 
-					*ctcp_argument ? ": " : empty_string, 
-					ctcp_argument);
-			    else
-				say("CTCP %s from %s to %s%s%s",
-					ctcp_command, from, to, 
-					*ctcp_argument ? ": " : empty_string, 
-					ctcp_argument);
+			if (get_int_var(CTCP_VERBOSE_VAR))
+#ifdef WANT_USERLIST
+			    put_it("%s", convert_output_format(fget_string_var((!lookup_userlevelc("*",FromUserHost, "*", NULL))? get_int_var(CLOAK_VAR)?FORMAT_CTCP_CLOAK_FSET:FORMAT_CTCP_FSET:get_int_var(CLOAK_VAR)?FORMAT_CTCP_CLOAK_USER_FSET:FORMAT_CTCP_USER_FSET),
+				"%s %s %s %s %s %s", get_clock(), from, FromUserHost, to, ctcp_command, *ctcp_argument? ctcp_argument : empty_string));
+#else
+			    put_it("%s", convert_output_format(fget_string_var((get_int_var(CLOAK_VAR)?FORMAT_CTCP_CLOAK_FSET:FORMAT_CTCP_FSET)),
+				"%s %s %s %s %s %s", get_clock(), from, FromUserHost, to, ctcp_command, *ctcp_argument? ctcp_argument : empty_string));
+#endif
 		    }
 		}
 		new_free(&ptr);
