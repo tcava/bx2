@@ -319,6 +319,7 @@ static	IrcCommand irc_command[] =
 	{ "PRETEND",	pretend_cmd	},
 	{ "PUSH",	push_cmd	},
 	{ "Q",		query		},
+	{ "QME",	mecmd		},
 	{ "QUERY",	query		},
         { "QUEUE",      queuecmd        }, /* queue.c */
 	{ "QUIT",	e_quit		},
@@ -2207,7 +2208,29 @@ BUILT_IN_COMMAND(mecmd)
 		const char	*target;
 		int	l;
 
-		if ((target = get_target_by_refnum(0)) != NULL)
+		if (!strcmp(command, "ME"))
+			target = get_echannel_by_refnum(0);
+		else
+		if (!strcmp(command, "QME"))
+		{
+			target = get_equery_by_refnum(0);
+			if (!target)
+			{
+				Window *win = NULL;
+				WNickList *nick;
+				while (!target && traverse_all_windows(&win))
+				{
+					for (nick = win->nicks; nick; nick = nick->next)
+						if (nick->counter == win->query_counter)
+						{
+							target = nick->nick;
+							break;
+						}
+				}
+			}
+		}
+
+		if (target)
 		{
 			send_ctcp(CTCP_PRIVMSG, target, CTCP_ACTION, 
 					"%s", args);
@@ -2222,11 +2245,7 @@ BUILT_IN_COMMAND(mecmd)
 			}
 			pop_message_from(l);
 		}
-		else
-			say("No target, neither channel nor query");
 	}
-	else
-		say("Usage: /ME <action description>");
 }
 
 static 	void	oper_password_received (char *data, char *line)
