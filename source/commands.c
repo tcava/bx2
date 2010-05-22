@@ -578,10 +578,11 @@ BUILT_IN_COMMAND(ctcp)
 				send_ctcp(type, to, tag, "%s", args);
 			else
 				send_ctcp(type, to, tag, NULL);
+
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_CTCP_FSET),
+				"%s %s %s %s", get_clock(), to, stag ? stag : "VERSION", args ? args : empty_string));
 		}
 	}
-	else
-		say("Usage: /CTCP <[=]nick|channel|*> [<request>]");
 }
 
 struct defer {
