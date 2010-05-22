@@ -584,6 +584,8 @@ BUILT_IN_COMMAND(ctcp)
 				"%s %s %s %s", get_clock(), to, stag ? stag : "VERSION", args ? args : empty_string));
 		}
 	}
+	else
+		say("Usage: /%s <[=]nick|channel|*> [<request>]", command);
 }
 
 struct defer {
@@ -2247,7 +2249,11 @@ BUILT_IN_COMMAND(mecmd)
 			}
 			pop_message_from(l);
 		}
+		else
+			say("No target");
 	}
+	else
+		say("Usage: /ME <action description>");
 }
 
 static 	void	oper_password_received (char *data, char *line)
