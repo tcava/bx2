@@ -329,6 +329,7 @@ static	IrcCommand irc_command[] =
 	{ "REDIRECT",	redirect	},
 	{ "REHASH",	send_comm	},
 	{ "REPEAT",	repeatcmd	},
+	{ "REQUEST",	ctcp		},
 	{ "RESTART",	send_comm	},
 	{ "RETURN",	returncmd	},
 	{ "RPING",	send_comm	},
