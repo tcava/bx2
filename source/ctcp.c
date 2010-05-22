@@ -958,8 +958,7 @@ char *	do_notice_ctcp (const char *from, const char *to, char *str)
 		{
 		    if (do_hook(CTCP_REPLY_LIST, "%s %s %s %s", 
 					from, to, ctcp_command, ctcp_argument))
-			say("CTCP %s reply from %s: %s", 
-					ctcp_command, from, ctcp_argument);
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_CTCP_REPLY_FSET), "%s %s %s %s %s", get_clock(), from, FromUserHost, ctcp_command, ctcp_argument));
 		}
 		if (!(ctcp_cmd[i].flag & CTCP_NOLIMIT))
 			allow_ctcp_reply = 0;
