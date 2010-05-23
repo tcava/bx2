@@ -357,3 +357,59 @@ BUILT_IN_COMMAND(jnw)
 		}
 	}
 }
+
+BUILT_IN_COMMAND(send_kline)
+{
+	char 	*dur,
+		*target = NULL,
+		*t;
+	time_t	t_time = DEFAULT_TKLINE_TIME;
+	int	tkline = 0;
+
+	if (*command == 'U')
+	{
+		while ((target = next_arg(args, &args)))
+		{
+			while ((t = next_in_comma_list(target, &target)))
+			{
+				if (!t || !*t) break;
+				send_to_server("%s %s", command, t);
+			}
+		}
+		return;
+	}
+	dur = next_arg(args, &args);
+
+	if (*command == 'D')
+		target = dur;
+	else if (*command == 'K' || *command == 'T')
+	{
+		if (*command == 'T') /* timed kline */
+			command++, tkline++;
+		if (dur && is_number(dur))
+		{
+			int l;
+			if ((l = my_atol(dur)))
+				t_time = l;
+			target = next_arg(args, &args);
+		}
+		else
+			target = dur;
+	}
+	while (args && *args == ':') 
+		args++;
+	if (!args || !*args)
+	{
+		bitchsay("Specify a reason for your %s", command);
+		return;
+	}
+	bitchsay("Sending %s for %s : %s", command, target, args);
+	while ((t = next_in_comma_list(target, &target)))
+	{
+		if (!t || !*t) break;
+		if (tkline)
+			send_to_server("%s %u %s :%s", command, t_time, t, args);
+		else
+			send_to_server("%s %s :%s", command, t, args);
+	}
+}

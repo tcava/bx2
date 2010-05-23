@@ -239,6 +239,7 @@ static	IrcCommand irc_command[] =
 	{ "DEVOICE",	dodeop		},
 	{ "DIE",	send_comm	},
 	{ "DISCONNECT",	disconnectcmd	}, /* server.c */
+	{ "DLINE",	send_kline	},
         { "DO",         docmd           }, /* if.c */
 	{ "DOP",	dodeop		},
         { "DUMP",       dumpcmd		}, /* alias.c */
@@ -273,6 +274,7 @@ static	IrcCommand irc_command[] =
 	{ "K",		send_kick	},
 	{ "KICK",	send_kick	},
 	{ "KILL",	send_2comm	},
+	{ "KLINE",	send_kline	},
 	{ "KNOCK",	send_channel_com},
 	{ "L",		leavecmd	},
 	{ "LASTLOG",	lastlog		}, /* lastlog.c */
@@ -362,6 +364,7 @@ static	IrcCommand irc_command[] =
 #endif
 	{ "TIME",	send_comm	},
 	{ "TIMER",	timercmd	},
+	{ "TKLINE",	send_kline	},
 	{ "TOGGLE",	do_toggle	},
 	{ "TOPIC",	e_topic		},
 	{ "TRACE",	send_comm	},
@@ -369,6 +372,7 @@ static	IrcCommand irc_command[] =
 	{ "UMODE",	umodecmd	},
 	{ "UNCLEAR",	e_clear		},
 	{ "UNKEY",	do_unkey	},
+	{ "UNKLINE",	send_kline	},
 	{ "UNLESS",	ifcmd		}, /* if.c */
 	{ "UNLOAD",	unloadcmd	}, /* alias.c */
 	{ "UNSCREW",	do_unscrew	},

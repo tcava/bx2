@@ -55,5 +55,6 @@ const   char *  current_package         (void);
 	BUILT_IN_COMMAND(serv_stat);
 	BUILT_IN_COMMAND(jnw);
 	BUILT_IN_COMMAND(reset);
+	BUILT_IN_COMMAND(send_kline);
 
 #endif /* __commands_h__ */
