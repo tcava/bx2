@@ -245,6 +245,8 @@ CTCP_HANDLER(do_crypto)
 
 CTCP_HANDLER(do_utc)
 {
+	if (get_int_var(CLOAK_VAR))
+		return malloc_strdup(empty_string);
 	if (!cmd || !*cmd)
 		return malloc_strdup(empty_string);
 
@@ -354,6 +356,8 @@ CTCP_HANDLER(do_clientinfo)
 {
 	int	i;
 
+	if (get_int_var(CLOAK_VAR))
+		return NULL;
 	if (cmd && *cmd)
 	{
 		for (i = 0; i < NUMBER_OF_CTCPS; i++)
@@ -404,6 +408,8 @@ CTCP_HANDLER(do_version)
 	const char	*the_unix,
 			*the_version;
 
+	if (get_int_var(CLOAK_VAR))
+		return NULL;
 	if (uname(&un) < 0)
 	{
 		the_version = empty_string;
@@ -433,6 +439,8 @@ CTCP_HANDLER(do_version)
 /* do_time: does the CTCP TIME command --- done by Veggen */
 CTCP_HANDLER(do_time)
 {
+	if (get_int_var(CLOAK_VAR))
+		return NULL;
 	send_ctcp(CTCP_NOTICE, from, CTCP_TIME, 
 			"%s", my_ctime(time(NULL)));
 	return NULL;
@@ -443,6 +451,8 @@ CTCP_HANDLER(do_userinfo)
 {
 	char *tmp;
 
+	if (get_int_var(CLOAK_VAR))
+		return NULL;
 	send_ctcp(CTCP_NOTICE, from, CTCP_USERINFO, "%s", 
 		(tmp = get_string_var(USER_INFORMATION_VAR)) ? tmp : "<No User Information>");
 	return NULL;
@@ -454,6 +464,8 @@ CTCP_HANDLER(do_userinfo)
  */
 CTCP_HANDLER(do_echo)
 {
+	if (get_int_var(CLOAK_VAR))
+		return NULL;
 	if (!is_channel(to))
 		send_ctcp(CTCP_NOTICE, from, ctcp->id, "%s", cmd);
 	return NULL;
@@ -461,6 +473,8 @@ CTCP_HANDLER(do_echo)
 
 CTCP_HANDLER(do_ping)
 {
+	if (get_int_var(CLOAK_VAR) == 2)
+		return NULL;
 	send_ctcp(CTCP_NOTICE, from, CTCP_PING, "%s", cmd ? cmd : empty_string);
 	return NULL;
 }
@@ -480,6 +494,8 @@ CTCP_HANDLER(do_finger)
 	char	userbuff[NAME_LEN + 1];
 	char	gecosbuff[NAME_LEN + 1];
 
+	if (get_int_var(CLOAK_VAR))
+		return NULL;
 	if ((my_host = get_server_userhost(from_server)) &&
 			strchr(my_host, '@'))
 		my_host = strchr(my_host, '@') + 1;
