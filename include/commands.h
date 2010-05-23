@@ -46,14 +46,14 @@ const   char *  current_loader          (void);
         int     current_line            (void);
 const   char *  current_package         (void);
 
-	void	BX_show_version		(const char *, char *, const char *);
-	void	tog_fprot		(const char *, char *, const char *);
-	void	do_toggle		(const char *, char *, const char *);
-	void	dodeop			(const char *, char *, const char *);
-	void	doop			(const char *, char *, const char *);
-	void	multkick		(const char *, char *, const char *);
-	void	serv_stat		(const char *, char *, const char *);
-	void	jnw			(const char *, char *, const char *);
+	BUILT_IN_COMMAND(BX_show_version);
+	BUILT_IN_COMMAND(tog_fprot);
+	BUILT_IN_COMMAND(do_toggle);
+	BUILT_IN_COMMAND(dodeop);
+	BUILT_IN_COMMAND(doop);
+	BUILT_IN_COMMAND(multkick);
+	BUILT_IN_COMMAND(serv_stat);
+	BUILT_IN_COMMAND(jnw);
 	BUILT_IN_COMMAND(reset);
 
 #endif /* __commands_h__ */
