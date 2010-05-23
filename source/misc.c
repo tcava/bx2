@@ -49,7 +49,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.9 2010/05/08 13:18:38 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.10 2010/05/23 05:07:21 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -3939,15 +3939,13 @@ void userhost_ignore (UserhostItem *stuff, char *nick1, char *args)
 	say("Now ignoring ALL except CRAP and PUBLIC from %s", ignorebuf);
 	return;
 }
+#endif
 
 BUILT_IN_COMMAND(reset)
 {
 	refresh_screen(0, NULL);
 }
 
-
-extern char *channel_key (char *);
-#endif
 BUILT_IN_COMMAND(cycle)
 {
 	char *to = NULL;

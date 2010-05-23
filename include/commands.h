@@ -54,5 +54,6 @@ const   char *  current_package         (void);
 	void	multkick		(const char *, char *, const char *);
 	void	serv_stat		(const char *, char *, const char *);
 	void	jnw			(const char *, char *, const char *);
+	BUILT_IN_COMMAND(reset);
 
 #endif /* __commands_h__ */
