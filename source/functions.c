@@ -466,6 +466,7 @@ static BuiltInFunctions	built_in_functions[] =
 	{ "BEFORE",             function_before 	},
 	{ "BEFOREW",            function_beforew 	},
 	{ "BINDCTL",		function_bindctl	},
+	{ "BITCHX",		function_epic		},
 	{ "BUILTIN_EXPANDO",	function_builtin	},
 	{ "CEIL",		function_ceil	 	},
 	{ "CENTER",		function_center 	},
