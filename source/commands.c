@@ -176,6 +176,7 @@ static	void	do_msay		(const char *, char *, const char *);
 static	void	do_mtopic	(const char *, char *, const char *);
 static	void	do_unscrew	(const char *, char *, const char *);
 static	void	send_mode	(const char *, char *, const char *);
+static	void	datecmd		(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -230,6 +231,7 @@ static	IrcCommand irc_command[] =
 	{ "CYCLE",	cycle		},
 	{ "CTCP",	ctcp		},
 	{ "D",		describe	},
+	{ "DATE",	datecmd		},
 	{ "DCC",	dcc_cmd		}, /* dcc.c */
 	{ "DEFER",	defercmd	},
 	{ "DEHOP",	dodeop		},
@@ -4240,4 +4242,9 @@ BUILT_IN_COMMAND(send_mode)
 		send_to_server("MODE %s %s", channel, args ? args : empty_string);
 	else if (args && *args)
 		send_to_server("MODE %s", args);
+}
+
+BUILT_IN_COMMAND(datecmd)
+{
+	send_comm("TIME", args, subargs);
 }
