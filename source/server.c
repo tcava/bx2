@@ -57,6 +57,8 @@
 #include "newio.h"
 #include "translat.h"
 #include "reg.h"
+#include "cset.h"
+#include "misc.h"
 
 /************************ SERVERLIST STUFF ***************************/
 
@@ -1873,13 +1875,14 @@ void	close_server (int refnum, const char *message)
  * (when we do connect, then we send out the AWAY command.)
  * All this saves a lot of headaches and crashes.
  */
-void	set_server_away (int refnum, const char *message)
+void	set_server_away (int refnum, const char *message, int silent)
 {
 	Server *s;
 
 	if (!(s = get_server(refnum)))
 	{
-		say("You are not connected to a server.");
+		if (!silent)
+			say("You are not connected to a server.");
 		return;
 	}
 
@@ -1888,7 +1891,25 @@ void	set_server_away (int refnum, const char *message)
 		if (!s->away || strcmp(s->away, message))
 			malloc_strcpy(&s->away, message);
 		if (is_server_registered(refnum))
-			send_to_aserver(refnum, "AWAY :%s", message);
+		{
+			if (!silent && fget_string_var(FORMAT_AWAY_FSET))
+			{
+				char buffer[BIG_BUFFER_SIZE + 1];
+				if (get_int_var(SEND_AWAY_MSG_VAR))
+				{
+					Channel *chan = NULL;
+					while (traverse_all_channels(&chan, refnum, 1))
+						send_to_aserver(refnum, "PRIVMSG %s :ACTION %s", chan->channel,
+							stripansicodes(convert_output_format(fget_string_var(FORMAT_AWAY_FSET), "%s [\002BX\002-MsgLog %s] %s", get_clock(), get_int_var(MSGLOG_VAR) ? "On" : "Off", message)));
+				}
+				send_to_aserver(refnum, "AWAY :%s", stripansicodes(convert_output_format(fget_string_var(FORMAT_AWAY_FSET), "%s [\002BX\002-MsgLog %s] %s", get_clock(), get_int_var(MSGLOG_VAR) ? "On" : "Off", message)));
+				strlcpy(buffer, convert_output_format(fget_string_var(FORMAT_SEND_ACTION_FSET), "%s %s $C ", get_clock(), get_server_nickname(refnum)), BIG_BUFFER_SIZE);
+				strlcat(buffer, convert_output_format(fget_string_var(FORMAT_AWAY_FSET), "%s [\002BX\002-MsgLog %s] %s", get_clock(), get_int_var(MSGLOG_VAR) ? "On" : "Off", message), BIG_BUFFER_SIZE);
+				put_it("%s", buffer);
+			}
+			else
+				send_to_aserver(refnum, "AWAY :%s", stripansicodes(convert_output_format(message, NULL)));
+		}
 	}
 	else
 	{
@@ -2271,7 +2292,7 @@ void  server_is_registered (int refnum, const char *itsname, const char *ourname
 	}
 
 	if (get_server_away(refnum))
-		set_server_away(from_server, get_server_away(from_server));
+		set_server_away(from_server, get_server_away(from_server), 0);
 
 	update_all_status();
 	do_hook(CONNECT_LIST, "%s %d %s", get_server_name(refnum), 
@@ -3455,7 +3476,7 @@ char 	*serverctl 	(char *input)
 		GET_FUNC_ARG(listc, input);
 		len = strlen(listc);
 		if (!my_strnicmp(listc, "AWAY", len)) {
-			set_server_away(refnum, input);
+			set_server_away(refnum, input, 0);
 			RETURN_INT(1);
 		} else if (!my_strnicmp(listc, "MAXCACHESIZE", len)) {
 			int	size;

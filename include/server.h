@@ -225,7 +225,7 @@ extern	const char *server_states[13];
 
 	void	do_server			(int);
 
-	void	set_server_away			(int, const char *);
+	void	set_server_away			(int, const char *, int);
 const	char *	get_server_away			(int);
 
 const	char *	get_possible_umodes		(int);

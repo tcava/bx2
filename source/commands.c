@@ -257,6 +257,7 @@ static	IrcCommand irc_command[] =
 	{ "FOREACH",	foreach		}, /* if.c */
 	{ "FPROT",	tog_fprot	},
 	{ "FSET",	fset_variable	},
+	{ "GONE",	away		},
 	{ "HOOK",	hookcmd		},
 	{ "HOP",	doop		},
 	{ "HOST",	userhostcmd	},
@@ -435,6 +436,7 @@ BUILT_IN_COMMAND(away)
 	char	*arg = NULL;
 	int	flag = AWAY_ONE;
 	int	i;
+	int	silent = 0;
 
 	if (*args)
 	{
@@ -460,20 +462,21 @@ BUILT_IN_COMMAND(away)
 				args = arg;
 			else
 			{
-				say("AWAY: %s unknown flag", args);
+				say("%s: %s unknown flag", command, args);
 				return;
 			}
 		}
 	}
-
+	if (!strcmp(command, "GONE"))
+		silent = 1;
 	if (flag == AWAY_ALL)
 	{
 		for (i = 0; i < server_list_size(); i++)
 		    if (is_server_valid(i))
-			set_server_away(i, args);
+			set_server_away(i, args, silent);
 	}
 	else
-		set_server_away(from_server, args);
+		set_server_away(from_server, args, silent);
 
 	update_all_status();
 }
