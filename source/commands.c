@@ -215,6 +215,7 @@ static	IrcCommand irc_command[] =
 	{ "ALLOCDUMP",	allocdumpcmd	},
 	{ "ASSIGN",	assigncmd	}, /* alias.c */
 	{ "AWAY",	away		},
+	{ "AWAYLOG",	awaylog		},
 	{ "BEEP",	beepcmd		},
 	{ "BIND",	bindcmd		}, /* keys.c */
 	{ "BLESS",	blesscmd	},

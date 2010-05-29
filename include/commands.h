@@ -56,5 +56,6 @@ const   char *  current_package         (void);
 	BUILT_IN_COMMAND(jnw);
 	BUILT_IN_COMMAND(reset);
 	BUILT_IN_COMMAND(send_kline);
+	BUILT_IN_COMMAND(awaylog);
 
 #endif /* __commands_h__ */

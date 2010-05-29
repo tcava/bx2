@@ -28,6 +28,7 @@ extern	Mask *	old_server_lastlog_mask;
 	void	set_lastlog_mask 		(void *);
 	void	set_lastlog_size 		(void *);
 	void	set_notify_mask 		(void *);
+	void	set_msglog_level		(void *);
 	void	trim_lastlog			(struct WindowStru *);
 	void	set_current_window_mask 	(void *);
 	intmax_t add_to_lastlog 	(struct WindowStru *, const char *);

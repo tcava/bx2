@@ -83,6 +83,21 @@ static	Mask	notify_mask;
 	Mask *	new_server_lastlog_mask = NULL;
 	Mask *	old_server_lastlog_mask = NULL;
 	Mask 	current_window_mask;
+static	Mask	msglog_level;
+
+void	set_msglog_level (void *stuff)
+{
+	VARIABLE *v;
+	const char *str;
+	char *rejects = NULL;
+
+	v = (VARIABLE *)stuff;
+	str = v->string;
+
+	if (str_to_mask(&msglog_level, str, &rejects))
+		standard_level_warning("/SET MSGLOG_LEVEL", &rejects);
+	malloc_strcpy(&v->string, mask_to_str(&msglog_level));
+}
 
 /*
  * set_lastlog_mask: called whenever a "SET LASTLOG_LEVEL" is done.  It
@@ -1296,3 +1311,13 @@ void	lastlog_swap_winrefs (unsigned oldref, unsigned newref)
 	}
 }
 
+BUILT_IN_COMMAND(awaylog)
+{
+	if (args && *args)
+	{
+		set_var_value(MSGLOG_LEVEL_VAR, args, 0);
+		put_it("%s", convert_output_format("$G Away logging set to: $0-", "%s", get_string_var(MSGLOG_LEVEL_VAR)));
+	}
+	else
+		put_it("%s", convert_output_format("$G Away logging currently: $0-", "%s", get_string_var(MSGLOG_LEVEL_VAR)));
+}
