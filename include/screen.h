@@ -110,6 +110,7 @@ const	unsigned char *all_off			(void);
 	void    add_to_window_scrollback (Window *, const unsigned char *, intmax_t);
 
 	unsigned char *prepare_display2	(const unsigned char *, int, int, char, int);
+	unsigned char **split_up_line (const unsigned char *, int);
 
 /* Dont do any word-wrapping, just truncate each line at its place. */
 #define PREPARE_NOWRAP	0x01

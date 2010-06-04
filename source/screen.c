@@ -3320,3 +3320,8 @@ void    edit_char (unsigned char key)
         }
 }
 
+unsigned char **split_up_line (const unsigned char *str, int max_cols)
+{
+	int nl = 0;
+	return prepare_display(-1, str, max_cols, &nl, 0);
+}
