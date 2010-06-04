@@ -45,6 +45,10 @@
 #include "functions.h"
 #include "reg.h"
 #include "alias.h"
+#include "hook.h"
+#include "cset.h"
+#include "clock.h"
+#include "misc.h"
 
 typedef struct	lastlog_stru
 {
@@ -84,6 +88,8 @@ static	Mask	notify_mask;
 	Mask *	old_server_lastlog_mask = NULL;
 	Mask 	current_window_mask;
 static	Mask	msglog_level;
+
+static	FILE *	logptr = NULL;
 
 void	set_msglog_level (void *stuff)
 {
@@ -1320,4 +1326,124 @@ BUILT_IN_COMMAND(awaylog)
 	}
 	else
 		put_it("%s", convert_output_format("$G Away logging currently: $0-", "%s", get_string_var(MSGLOG_LEVEL_VAR)));
+}
+
+int logmsg(unsigned long log_type, char *from, int flag, char *format, ...)
+{
+#ifdef PUBLIC_ACCESS
+	return 0;
+#else
+	const char *timestr;
+	time_t t;
+	char *filename = NULL;
+	Filename expand;
+	const char *type = NULL;
+	unsigned char **my_lines;
+	char msglog_buffer[BIG_BUFFER_SIZE+1];			
+	
+	
+	if (!get_string_var(MSGLOG_FILE_VAR) || !get_string_var(CTOOLZ_DIR_VAR))
+		return 0;
+
+	t = time(NULL);
+	timestr = get_clock();
+
+
+	if (format)
+	{
+		va_list ap;
+		va_start(ap, format);
+		vsnprintf(msglog_buffer, BIG_BUFFER_SIZE, format, ap);
+		va_end(ap);
+	}
+
+
+	switch (flag)
+	{
+	case 0:
+		if (!(type = level_to_str(log_type)))
+			type = "Unknown";
+		if (mask_isset(&msglog_level, log_type) && format)
+		{
+			char *format;
+			
+			if (!do_hook(MSGLOG_LIST, "%s %s %s %s", timestr, type, from, msglog_buffer))
+				break;
+			if (!logptr)
+				return 0;
+			if (!(format = fget_string_var(FORMAT_MSGLOG_FSET)))
+				format = "[$[10]0] [$1] - $2-";
+			my_lines = split_up_line(stripansicodes(convert_output_format(format, "%s %s %s %s", type, timestr, from, msglog_buffer)), 80);
+			for ( ; *my_lines; my_lines++)
+			{
+				char *local_copy;
+				if (!*my_lines || !**my_lines) break;
+				local_copy = alloca(strlen(*my_lines) + 1);
+				strcpy(local_copy, *my_lines);
+
+				if (local_copy[strlen(local_copy)-1] == ALL_OFF)
+					local_copy[strlen(local_copy)-1] = 0;
+				if (logfile_line_mangler)
+				{
+					/* XXX: What should argument 2 (logical) be? */
+					char *strval = new_normalize_string(local_copy, 1, logfile_line_mangler);
+					if (*strval)
+						fprintf(logptr, "%s\n", strval);
+					new_free(&strval);
+				}
+				else if (*local_copy)
+					fprintf(logptr, "%s\n", local_copy);
+			}
+			fflush(logptr);
+		}
+		break;
+	case 1:
+		malloc_sprintf(&filename, "%s/%s", get_string_var(CTOOLZ_DIR_VAR), get_string_var(MSGLOG_FILE_VAR));
+		normalize_filename(filename, expand);
+		new_free(&filename);
+		if (!do_hook(MSGLOG_LIST, "%s %s %s %s", timestr, "On", expand, empty_string))
+			return 1;
+		if (logptr)
+			return 1;
+		if (!(logptr = fopen(expand, get_int_var(APPEND_LOG_VAR)?"at":"wt")))
+		{
+			set_int_var(MSGLOG_VAR, 0);
+			return 0;
+		} 
+
+		fprintf(logptr, "MsgLog started [%s]\n", my_ctime(t));
+		fflush(logptr);
+		if (format)
+		{
+			int i;
+
+			i = logmsg(LEVEL_CURRENT, from, 0, "%s", msglog_buffer);
+			return i;
+		}
+		bitchsay("Now logging messages to: %s", expand);
+		break;
+	case 2:
+		if (!do_hook(MSGLOG_LIST, "%s %s %s %s", timestr, "Off", empty_string, empty_string))
+			return 1;
+		if (!logptr)
+			return 1;
+		fprintf(logptr, "MsgLog ended [%s]\n", my_ctime(t));
+		fclose(logptr);
+		logptr = NULL;
+		break;
+	case 3:
+		return logptr ? 1 : 0;
+		break;
+	case 4:
+		if (!logptr)
+			return 1;
+		fprintf(logptr, "[TimeStamp %s]\n", my_ctime(t));
+		fflush(logptr);
+		break;
+	default:
+		bitchsay("Bad Flag passed to logmsg");
+		return 0;
+	}
+	return 1;
+#endif
 }

@@ -572,7 +572,8 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 			beep_em(get_int_var(BEEP_WHEN_AWAY_VAR));
 			set_int_var(MSGCOUNT_VAR, get_int_var(MSGCOUNT_VAR)+1);
 		    }
-			put_it("%s", convert_output_format(fget_string_var(FORMAT_MSG_FSET), "%s %s %s %s", get_clock(), from, FromUserHost, message));
+		    put_it("%s", convert_output_format(fget_string_var(FORMAT_MSG_FSET), "%s %s %s %s", get_clock(), from, FromUserHost, message));
+		    logmsg(LEVEL_MSG, from, 0, "%s %s", FromUserHost, message);
 		}
 	    }
 
@@ -582,10 +583,12 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 		{
 			case PUBLIC_LIST:
 				put_it("%s", convert_output_format(fget_string_var(FORMAT_PUBLIC_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(real_target), message));
+				logmsg(LEVEL_PUBLIC, from, 0, "%s %s", real_target, message);
 				break;
 
 			case PUBLIC_OTHER_LIST:
 				put_it("%s", convert_output_format(fget_string_var(FORMAT_PUBLIC_OTHER_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(real_target), message));
+				logmsg(LEVEL_PUBLIC, from, 0, "%s %s", real_target, message);
 				break;
 
 			default:
