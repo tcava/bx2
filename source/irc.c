@@ -304,6 +304,10 @@ void	irc_exit (int really_quit, const char *format, ...)
 	if (really_quit == 0)	/* Don't clean up if we're crashing */
 		goto die_now;
 
+	/* XXX: Should this be done even when crashing? */
+	if (get_int_var(MSGLOG_VAR))
+		log_toggle(0);
+
 	close_all_dcc(); /* Need to do this before we close the server */
 
 	if (format)

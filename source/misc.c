@@ -49,7 +49,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.10 2010/05/23 05:07:21 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.11 2010/06/04 10:43:53 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -1727,20 +1727,22 @@ BUILT_IN_COMMAND(ChanWallOp)
 	new_free(&chops);
 	new_free(&exclude);
 }
+#endif
 
-void log_toggle(int flag, ChannelList *chan)
+void log_toggle(int flag)
 {
 	char *logfile;
 
-	if (((logfile = get_string_var(MSGLOGFILE_VAR)) == NULL) || !get_string_var(CTOOLZ_DIR_VAR))
+	if (((logfile = get_string_var(MSGLOG_FILE_VAR)) == NULL) || !get_string_var(CTOOLZ_DIR_VAR))
 	{
-		bitchsay("You must set the MSGLOGFILE and CTOOLZ_DIR variables first!");
+		bitchsay("You must set the MSGLOG_FILE and CTOOLZ_DIR variables first!");
 		set_int_var(MSGLOG_VAR, 0);
 		return;
 	}
-	logmsg(LOG_CURRENT, NULL, flag ? 1 : 2, NULL);
+	logmsg(LEVEL_CURRENT, NULL, flag ? 1 : 2, NULL);
 }
 
+#if 0
 int are_you_opped(char *channel)
 {
 	return is_chanop(channel, get_server_nickname(from_server));

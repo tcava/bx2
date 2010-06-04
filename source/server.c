@@ -1890,6 +1890,8 @@ void	set_server_away (int refnum, const char *message, int silent)
 	{
 		if (!s->away || strcmp(s->away, message))
 			malloc_strcpy(&s->away, message);
+		if (get_int_var(MSGLOG_VAR))
+			log_toggle(1);
 		if (is_server_registered(refnum))
 		{
 			if (!silent && fget_string_var(FORMAT_AWAY_FSET))

@@ -108,7 +108,7 @@ extern LastMsg last_sent_ctcp[2];
 	char	*clear_server_flags (char *);
 	char	*ban_it (char *, char *, char *, char *);
 
-//	void	log_toggle (int, ChannelList *);
+	void	log_toggle (int);
 
 	char	*cluster (char *);
 	int	caps_fucknut (register unsigned char *);
