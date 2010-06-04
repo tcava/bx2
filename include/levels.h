@@ -42,6 +42,8 @@ extern int	LEVEL_USER8;
 extern int	LEVEL_USER9;
 extern int	LEVEL_USER10;
 extern int	LEVEL_ALL;
+extern int	LEVEL_CURRENT;
+extern int	LEVEL_SEND_MSG;
 
 /*-
  * Copyright (c) 1982, 1986, 1989, 1991, 1993
