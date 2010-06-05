@@ -183,6 +183,7 @@ Hookables hook_function_templates[] =
 	{ "MODE_STRIPPED",	NULL,	3,	0,	0,	NULL, 0 },
 	{ "MSG",		NULL,	2,	0,	0,	NULL, 0 },
 	{ "MSG_GROUP",		NULL,	3,	0,	0,	NULL, 0 },
+	{ "MSGLOG",		NULL,	4,	0,	0,	NULL, 0 },
 	{ "NAMES",		NULL,	2,	0,	0,	NULL, 0 },
 	{ "NEW_NICKNAME",	NULL,	2,	0,	HF_NORECURSE,	NULL, 0 },
 	{ "NICKNAME",		NULL,	2,	0,	0,	NULL, 0 },
