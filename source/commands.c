@@ -225,6 +225,9 @@ static	IrcCommand irc_command[] =
 	{ "CALL",	e_call		},
 	{ "CD",		cd		},
 	{ "CHANNEL",	e_channel	},
+#ifdef WANT_CHAN_NICK_SERV
+	{ "CHANSERV",	send_comm	},
+#endif
 	{ "CLEAR",	e_clear		},
 	{ "COMMENT",	commentcmd	},
 	{ "CONNECT",	send_comm	},
@@ -259,6 +262,11 @@ static	IrcCommand irc_command[] =
 	{ "FPROT",	tog_fprot	},
 	{ "FSET",	fset_variable	},
 	{ "GONE",	away		},
+	{ "HASH",	send_comm	},
+#ifdef WANT_CHAN_NICK_SERV
+	{ "HELPOP",	send_comm	},
+	{ "HELPSERV",	send_comm	},
+#endif
 	{ "HOOK",	hookcmd		},
 	{ "HOP",	doop		},
 	{ "HOST",	userhostcmd	},
@@ -270,6 +278,9 @@ static	IrcCommand irc_command[] =
 	{ "INPUT",	inputcmd	},
 	{ "INPUT_CHAR",	inputcmd	},
 	{ "INVITE",	send_invite	},
+#ifdef WANT_CHAN_NICK_SERV
+	{ "IRCIIHELP",	send_comm	},
+#endif
 	{ "IRCUSER",	set_username	},
 	{ "ISON",	isoncmd		},
 	{ "J",		e_channel	},
@@ -293,6 +304,9 @@ static	IrcCommand irc_command[] =
 	{ "M",		e_privmsg	},
 	{ "MAP",	send_comm	},
 	{ "ME",		mecmd		},
+#ifdef WANT_CHAN_NICK_SERV
+	{ "MEMOSERV",	send_comm	},
+#endif
 	{ "MESG",	extern_write	},
 	{ "MODE",	send_channel_com},
 	{ "MOTD",	send_comm	},
@@ -303,6 +317,9 @@ static	IrcCommand irc_command[] =
 	{ "N",		do_mynames	},
 	{ "NAMES",	funny_stuff	},
 	{ "NICK",	e_nick		},
+#ifdef WANT_CHAN_NICK_SERV
+	{ "NICKSERV",	send_comm	},
+#endif
 	{ "NOCHAT",	nochat		},
 	{ "NOTE",	send_comm	},
 	{ "NOTICE",	e_privmsg	},
@@ -310,6 +327,9 @@ static	IrcCommand irc_command[] =
 	{ "ON",		oncmd		}, /* hook.c */
 	{ "OP",		doop		},
 	{ "OPER",	oper		},
+#ifdef WANT_CHAN_NICK_SERV
+	{ "OPERSERV",	send_comm	},
+#endif
 	{ "OSTAT",	serv_stat	},
 	{ "P",		pingcmd		},
 	{ "PACKAGE",	packagecmd	},
@@ -3906,7 +3926,7 @@ static	unsigned 	level = 0;
 		else if (get_int_var(DISPATCH_UNKNOWN_COMMANDS_VAR))
 			send_to_server("%s %s", cmd, args);
 		else if (do_hook(UNKNOWN_COMMAND_LIST, "%s%s %s", cmdchar_used >= 2 ? "//" : "", cmd, args))
-			say("Unknown command: %s", cmd);
+			bitchsay("Unknown command: %s", cmd);
 
 		if (alias || builtin) {
 			current_command = prevcmd;

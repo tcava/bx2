@@ -697,5 +697,7 @@
 
 #undef ALLOC_DEBUG
 
+#undef WANT_CHAN_NICK_SERV
+
 #endif /* _CONFIG_H_ */
 
