@@ -215,7 +215,7 @@
 
 
 /* And here is the port number for default client connections.  */
-#define IRC_PORT 8080
+#define IRC_PORT 6667
 
 /*
  * If you want to have a file containing the list of irc servers to 
