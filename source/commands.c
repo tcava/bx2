@@ -228,6 +228,7 @@ static	IrcCommand irc_command[] =
 #ifdef WANT_CHAN_NICK_SERV
 	{ "CHANSERV",	send_comm	},
 #endif
+	{ "CHATOPS",	e_wallop	},
 	{ "CLEAR",	e_clear		},
 	{ "COMMENT",	commentcmd	},
 	{ "CONNECT",	send_comm	},
@@ -299,6 +300,7 @@ static	IrcCommand irc_command[] =
 	{ "LIST",	funny_stuff	},
 	{ "LOAD",	load		},
 	{ "LOCAL",	localcmd	}, /* alias.c */
+	{ "LOCOPS",	e_wallop	},
 	{ "LOG",	logcmd		}, /* logfiles.c */
 	{ "LUSERS",	send_comm	},
 	{ "M",		e_privmsg	},
@@ -330,6 +332,7 @@ static	IrcCommand irc_command[] =
 #ifdef WANT_CHAN_NICK_SERV
 	{ "OPERSERV",	send_comm	},
 #endif
+	{ "OPERWALL",	e_wallop	},
 	{ "OSTAT",	serv_stat	},
 	{ "P",		pingcmd		},
 	{ "PACKAGE",	packagecmd	},
@@ -381,6 +384,7 @@ static	IrcCommand irc_command[] =
 	{ "STUB",	stubcmd		}, /* alias.c */
 	{ "SUBPACKAGE",	subpackagecmd	},
 	{ "SV",		BX_show_version	},
+	{ "SWALLOP",	e_wallop	},
 	{ "SWITCH",	switchcmd	}, /* if.c */
 	{ "T",		e_topic		},
 #ifdef HAVE_TCL
@@ -923,10 +927,18 @@ BUILT_IN_COMMAND(e_topic)
 BUILT_IN_COMMAND(e_wallop)
 {
 	int l;
+	const char *p;
 
-	l = message_from(NULL, LEVEL_WALLOP);
-	send_to_server("WALLOPS :%s", args);
-	pop_message_from(l);
+	if (args && *args)
+	{
+		l = message_from(NULL, LEVEL_WALLOP);
+		if (!strcmp(command, "SWALLOP"))
+			command = "SWALLOPS";
+		send_to_server("%s :%s", command, args);
+		if ((p = get_umode(from_server)) && strchr(p, 'w'))
+			put_it("!! %s", args);
+		pop_message_from(l);
+	}
 }
 
 /* Super simple, fast /ECHO */
