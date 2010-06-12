@@ -383,6 +383,7 @@ static	IrcCommand irc_command[] =
 	{ "STATS",	send_comm	},
 	{ "STUB",	stubcmd		}, /* alias.c */
 	{ "SUBPACKAGE",	subpackagecmd	},
+	{ "SUMMON",	send_comm	},
 	{ "SV",		BX_show_version	},
 	{ "SWALLOP",	e_wallop	},
 	{ "SWITCH",	switchcmd	}, /* if.c */
@@ -410,6 +411,7 @@ static	IrcCommand irc_command[] =
 	{ "UPING",	pingcmd		},
 	{ "USERHOST",	userhostcmd	},
 	{ "USERIP",	useripcmd	},
+	{ "USERS",	send_comm	},
 	{ "USLEEP",	usleepcmd	},
 	{ "USRIP",	usripcmd	},
 	{ "VERSION",	version		},
