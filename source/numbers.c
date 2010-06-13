@@ -1486,7 +1486,7 @@ DISPLAY:
 		if (!(stuff = ArgList[1]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
-		put_it("%s %s: %s", banner(), nick, stuff);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_NONICK_FSET), "%s %s %s %s", get_clock(), nick, from, stuff));
 		break;
 	}
 
