@@ -177,6 +177,7 @@ static	void	do_mtopic	(const char *, char *, const char *);
 static	void	do_unscrew	(const char *, char *, const char *);
 static	void	send_mode	(const char *, char *, const char *);
 static	void	datecmd		(const char *, char *, const char *);
+static	void	vercmd		(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -414,6 +415,7 @@ static	IrcCommand irc_command[] =
 	{ "USERS",	send_comm	},
 	{ "USLEEP",	usleepcmd	},
 	{ "USRIP",	usripcmd	},
+	{ "VER",	vercmd		},
 	{ "VERSION",	version		},
 	{ "VOICE",	doop		},
 	{ "W",		whocmd		},
@@ -4285,4 +4287,25 @@ BUILT_IN_COMMAND(send_mode)
 BUILT_IN_COMMAND(datecmd)
 {
 	send_comm("TIME", args, subargs);
+}
+
+BUILT_IN_COMMAND(vercmd)
+{
+	const char	*to;
+	int		type;
+
+	if ((to = next_arg(args, &args)) == NULL || !strcmp(to, "*"))
+	{
+		if ((to = get_echannel_by_refnum(0)) == NULL)
+			if ((to = get_equery_by_refnum(0)) == NULL)
+				to = zero;
+	}
+
+	if ((type = in_ctcp()) && get_server_doing_notice(from_server))
+		say("You may not use the CTCP command from an ON CTCP_REPLY!");
+	else
+	{
+		send_ctcp(type, to, CTCP_VERSION, NULL);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_CTCP_FSET), "%s %s %s", get_clock(), to, "VERSION"));
+	}
 }
