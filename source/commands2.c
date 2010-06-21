@@ -332,7 +332,7 @@ BUILT_IN_COMMAND(jnw)
 	{
 		Window	*tmp;
 
-		if (*channel == '-' && !my_stricmp(channel, "-hide"))
+		if (channel[0] == '-' && channel[1] != '\0' && !my_strnicmp(channel, "-hide", strlen(channel)))
 		{
 			if (!(channel = next_arg(args, &args)))
 				return;
