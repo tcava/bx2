@@ -1204,7 +1204,8 @@ void	do_server (int fd)
 						s->next_addr->ai_next)
 			        cnt++;
 		            say("DNS lookup for server %d [%s] returned (%d) "
-					"addresses", i, s->info->host, cnt);
+					"address%s", i, s->info->host, cnt,
+					cnt == 1 ? empty_string : "es");
 
 		            s->next_addr = s->addrs;
 		            s->addr_counter = 0;
