@@ -816,6 +816,7 @@ static void 	p_invite (const char *from, const char *comm, const char **ArgList)
 
 	set_server_invite_channel(from_server, invited_to);
 	set_server_recv_nick(from_server, from);
+	add_last_type(&last_invite_channel[0], 1, from, FromUserHost, invited_to, ArgList[2] ? ArgList[2] : empty_string);
 
 	l = message_from(from, LEVEL_INVITE);
 	if (do_hook(INVITE_LIST, "%s %s %s", from, invited_to, FromUserHost))
