@@ -529,13 +529,13 @@ BUILT_IN_COMMAND(cd)
 	if ((arg = new_next_arg(args, &args)) != NULL)
 	{
 		if (normalize_filename(arg, dir))
-			say("CD: %s contains an invalid directory", dir);
+			bitchsay("CD: %s contains an invalid directory", dir);
 		else if (chdir(dir))
-			say("CD: %s", strerror(errno));
+			bitchsay("CD: %s", strerror(errno));
 	}
 
 	getcwd(dir, sizeof(dir));
-	say("Current directory: %s", dir);
+	bitchsay("Current directory: %s", dir);
 }
 
 /* clear: the CLEAR command.  Figure it out */
@@ -608,7 +608,10 @@ BUILT_IN_COMMAND(ctcp)
 		if ((stag = next_arg(args, &args)) != NULL)
 			tag = get_ctcp_val(upper(stag));
 		else
+		{
+			stag = "VERSION";
 			tag = CTCP_VERSION;
+		}
 
 		if ((type = in_ctcp()) && get_server_doing_notice(from_server))
 			say("You may not use the CTCP command from an ON CTCP_REPLY!");
@@ -620,7 +623,8 @@ BUILT_IN_COMMAND(ctcp)
 				send_ctcp(type, to, tag, NULL);
 
 			put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_CTCP_FSET),
-				"%s %s %s %s", get_clock(), to, stag ? stag : "VERSION", args ? args : empty_string));
+				"%s %s %s %s", get_clock(), to, stag, args ? args : empty_string));
+			add_last_type(&last_sent_ctcp[0], 1, NULL, NULL, to, stag);
 		}
 	}
 	else
@@ -915,13 +919,26 @@ BUILT_IN_COMMAND(e_topic)
 
 	if (is_channel(arg))
 	{
-		if ((args && *args) || clear_topic)
+		if (args && *args)
+		{
 			send_to_server("TOPIC %s :%s", arg, args);
+			add_last_type(&last_sent_topic[0], 1, NULL, NULL, arg, args);
+		}
+		else if (clear_topic)
+			send_to_server("TOPIC %s :", arg);
 		else
 			send_to_server("TOPIC %s", arg);
 	}
 	else if (channel)
-		send_to_server("TOPIC %s :%s", channel, args_copy);
+	{
+		if (clear_topic)
+			send_to_server("TOPIC %s :", channel);
+		else
+		{
+			send_to_server("TOPIC %s :%s", channel, args_copy);
+			add_last_type(&last_sent_topic[0], 1, NULL, NULL, channel, args_copy);
+		}
+	}
 	else
 		say("You are not on a channel in this window.");
 }
@@ -941,6 +958,7 @@ BUILT_IN_COMMAND(e_wallop)
 		send_to_server("%s :%s", command, args);
 		if ((p = get_umode(from_server)) && strchr(p, 'w'))
 			put_it("!! %s", args);
+		add_last_type(&last_sent_wall[0], 1, get_server_nickname(from_server), NULL, "*", args);
 		pop_message_from(l);
 	}
 }
@@ -4307,5 +4325,6 @@ BUILT_IN_COMMAND(vercmd)
 	{
 		send_ctcp(type, to, CTCP_VERSION, NULL);
 		put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_CTCP_FSET), "%s %s %s", get_clock(), to, "VERSION"));
+		add_last_type(&last_sent_ctcp[0], 1, NULL, NULL, to, "VERSION");
 	}
 }
