@@ -3321,6 +3321,7 @@ struct target_type target[4] =
 		dcc_chat_transmit(current_nick + 1, line, text, command, hook);
 		from_server = old_server;
 		set_server_sent_nick(from_server, current_nick);
+		add_last_type(&last_sent_dcc[0], MAX_LAST_MSG, NULL, NULL, current_nick + 1, text);
 		new_free(&line);
 	    }
 	    else if (*current_nick == '-' && strchr(current_nick + 1, '/'))
@@ -3412,6 +3413,11 @@ struct target_type target[4] =
 				target[i].command, 
 				target[i].nick_list, 
 				target[i].message);
+
+		if (i == 0)
+			add_last_type(&last_sent_msg[0], MAX_LAST_MSG, NULL, NULL, target[i].nick_list, target[i].message);
+		else if (i == 2 || i == 3)
+			add_last_type(&last_sent_notice[0], MAX_LAST_MSG, target[i].nick_list, NULL, get_server_nickname(from_server), target[i].message);
 
 		new_free(&target[i].nick_list);
 		target[i].message = NULL;
