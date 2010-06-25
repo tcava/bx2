@@ -53,6 +53,7 @@
 #include "alias.h"
 #include "timer.h"
 #include "cset.h"
+#include "misc.h"
 
 #define DCC_BLOCK_SIZE (1<<11)
 
@@ -1553,8 +1554,7 @@ const	char 		*text_display, 	/* What to tell the user we sent */
 	{
 		lock_dcc(dcc);
 		if (do_hook(list, "%s %s", dcc->user, text_display))
-			put_it("=> %c%s%c %s", 
-				thing, dcc->user, thing, text_display);
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_DCC_CHAT_FSET), "%c %s %s", thing, user, text_display ? text_display : text));
 		unlock_dcc(dcc);
 	}
 
@@ -3235,13 +3235,9 @@ static	void	process_dcc_chat_data (DCC_list *Client)
 		FromUserHost = unknown_userhost;
 	if (do_hook(DCC_CHAT_LIST, "%s %s", Client->user, tmp))
 	{
-		if (get_server_away(NOSERV))
-		{
-			strlcat(tmp, "<", sizeof tmp);
-			strlcat(tmp, my_ctime(time(NULL)), sizeof tmp);
-			strlcat(tmp, ">", sizeof tmp);
-		}
-		put_it("=%s= %s", Client->user, tmp);
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_DCC_CHAT_FSET),
+			"%s %s %s %s", get_clock(), Client->user, FromUserHost, tmp));
+		add_last_type(&last_dcc[0], MAX_LAST_MSG, Client->user, NULL, FromUserHost, tmp);
 	}
 	FromUserHost = OFUH;
 	unlock_dcc(Client);
