@@ -178,6 +178,7 @@ static	void	do_unscrew	(const char *, char *, const char *);
 static	void	send_mode	(const char *, char *, const char *);
 static	void	datecmd		(const char *, char *, const char *);
 static	void	vercmd		(const char *, char *, const char *);
+static	void	do_oops		(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -328,6 +329,7 @@ static	IrcCommand irc_command[] =
 	{ "NOTICE",	e_privmsg	},
 	{ "NOTIFY",	notify		}, /* notify.c */
 	{ "ON",		oncmd		}, /* hook.c */
+	{ "OOPS",	do_oops		},
 	{ "OP",		doop		},
 	{ "OPER",	oper		},
 #ifdef WANT_CHAN_NICK_SERV
@@ -4332,5 +4334,20 @@ BUILT_IN_COMMAND(vercmd)
 		send_ctcp(type, to, CTCP_VERSION, NULL);
 		put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_CTCP_FSET), "%s %s %s", get_clock(), to, "VERSION"));
 		add_last_type(&last_sent_ctcp[0], 1, NULL, NULL, to, "VERSION");
+	}
+}
+
+BUILT_IN_COMMAND(do_oops)
+{
+	const char	*to = next_arg(args, &args);
+	const char	*sent_nick = get_server_sent_nick(from_server);
+	const char	*sent_body = get_server_sent_body(from_server);
+
+	if (sent_nick && sent_body && to && *to)
+	{
+		send_to_server("PRIVMSG %s :Oops, that /msg wasn't for you", sent_nick);
+		send_to_server("PRIVMSG %s :%s", to, sent_body);
+		if (window_display && do_hook(SEND_MSG_LIST, "%s %s", to, sent_body))
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_MSG_FSET), "%s %s %s %s", get_clock(), to, get_server_nickname(from_server), sent_body));
 	}
 }
