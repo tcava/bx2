@@ -179,6 +179,7 @@ static	void	send_mode	(const char *, char *, const char *);
 static	void	datecmd		(const char *, char *, const char *);
 static	void	vercmd		(const char *, char *, const char *);
 static	void	do_oops		(const char *, char *, const char *);
+static	void	do_forward	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -212,6 +213,7 @@ static	IrcCommand irc_command[] =
 	{ ":",		commentcmd	},
         { "ABORT",      abortcmd	},
 	{ "ABOUT",	about		},
+	{ "ADDFORWARD",	do_forward	},
 	{ "ADMIN",	send_comm	},
 	{ "ALIAS",	aliascmd	}, /* alias.c */
 	{ "ALLOCDUMP",	allocdumpcmd	},
@@ -262,6 +264,7 @@ static	IrcCommand irc_command[] =
 	{ "FLUSH",	flush		},
         { "FOR",        forcmd		}, /* if.c */
 	{ "FOREACH",	foreach		}, /* if.c */
+	{ "FORWARD",	do_forward	},
 	{ "FPROT",	tog_fprot	},
 	{ "FSET",	fset_variable	},
 	{ "GONE",	away		},
@@ -403,6 +406,7 @@ static	IrcCommand irc_command[] =
 	{ "TYPE",	typecmd		}, /* keys.c */
 	{ "UMODE",	umodecmd	},
 	{ "UNCLEAR",	e_clear		},
+	{ "UNFORWARD",	do_forward	},
 	{ "UNKEY",	do_unkey	},
 	{ "UNKLINE",	send_kline	},
 	{ "UNLESS",	ifcmd		}, /* if.c */
@@ -3199,6 +3203,7 @@ void 	send_text (int server, const char *nick_list, const char *text, const char
 	int	old_window_display = window_display;
 	int	old_from_server;
 static	int	recursion = 0;
+	int	forwarded = 0;
 
 	/*
 	 * XXXX - Heaven help us.
@@ -3400,6 +3405,12 @@ struct target_type target[4] =
 
 		if (!target[i].message)
 			continue;
+
+		if (!forwarded && forwardnick)
+		{
+			send_to_server("NOTICE %s :-> *%s* %s", forwardnick, target[i].nick_list, target[i].message);
+			forwarded = 1;
+		}
 
 		if (i == 1 || i == 3)
 			is_current = is_current_channel(target[i].nick_list, from_server);
@@ -4349,5 +4360,30 @@ BUILT_IN_COMMAND(do_oops)
 		send_to_server("PRIVMSG %s :%s", to, sent_body);
 		if (window_display && do_hook(SEND_MSG_LIST, "%s %s", to, sent_body))
 			put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_MSG_FSET), "%s %s %s %s", get_clock(), to, get_server_nickname(from_server), sent_body));
+	}
+}
+
+BUILT_IN_COMMAND(do_forward)
+{
+	if (!strcmp(command, "UNFORWARD"))
+	{
+		if (forwardnick)
+		{
+			bitchsay("No longer forwarding messages to %s", forwardnick);
+			send_to_server("NOTICE %s :%s is no longer forwarding to you",
+				forwardnick, get_server_nickname(from_server));
+			new_free(&forwardnick);
+		}
+	}
+	else if (args && *args)
+	{
+		const char *to = next_arg(args, &args);
+		if (to && *to)
+		{
+			malloc_strcpy(&forwardnick, to);
+			send_to_server("NOTICE %s :%s is now forwarding messages to you",
+				forwardnick, get_server_nickname(from_server));
+			bitchsay("Now forwarding messages to %s", forwardnick);
+		}
 	}
 }

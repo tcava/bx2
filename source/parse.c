@@ -565,6 +565,9 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 	    {
 		const char *away = get_server_away(NOSERV);
 
+		if (forwardnick)
+			send_to_server("NOTICE %s :*%s* %s", forwardnick, from, message);
+
 		if (do_hook(hook_type, "%s %s", from, message))
 		{
 		    if (away)
