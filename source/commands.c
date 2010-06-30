@@ -220,6 +220,7 @@ static	IrcCommand irc_command[] =
 	{ "ASSIGN",	assigncmd	}, /* alias.c */
 	{ "AWAY",	away		},
 	{ "AWAYLOG",	awaylog		},
+	{ "AWAYMSG",	away		},
 	{ "BEEP",	beepcmd		},
 	{ "BIND",	bindcmd		}, /* keys.c */
 	{ "BLESS",	blesscmd	},
@@ -472,6 +473,22 @@ BUILT_IN_COMMAND(away)
 	int	flag = AWAY_ONE;
 	int	i;
 	int	silent = 0;
+
+	if (!strcmp(command, "AWAYMSG"))
+	{
+		extern char *awaymsg;
+		if (args && *args)
+		{
+			malloc_strcpy(&awaymsg, args);
+			bitchsay("Your auto-away msg has been set to \"%s\"", awaymsg);
+		}
+		else
+		{
+			new_free(&awaymsg);
+			bitchsay("Your auto-away msg has been unset");
+		}
+		return;
+	}
 
 	if (*args)
 	{
