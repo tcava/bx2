@@ -103,13 +103,18 @@ static		int	hour = -1;
 	if ((time_val.tm_min != min) || (time_val.tm_hour != hour))
 	{
 		int	old_server = from_server;
+		time_t	idlet = (tv.tv_sec - idle_time.tv_sec) / 60;
 
 		hour = time_val.tm_hour;
 		min = time_val.tm_min;
 
 		from_server = primary_server;
 		do_hook(TIMER_LIST, "%02d:%02d", hour, min);
-		do_hook(IDLE_LIST, "%ld", (tv.tv_sec - idle_time.tv_sec) / 60);
+		if (do_hook(IDLE_LIST, "%lu", (unsigned long)idlet))
+		{
+			if (get_int_var(AUTO_AWAY_TIME_VAR) && idlet >= get_int_var(AUTO_AWAY_TIME_VAR) / 60)
+				auto_away(idlet);
+		}
 		from_server = old_server;
 	}
 }
