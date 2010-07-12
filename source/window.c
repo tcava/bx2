@@ -6645,3 +6645,18 @@ void	message_to(unsigned refnum)
 {
 	to_window = refnum ? get_window_by_refnum(refnum) : NULL;
 }
+
+/* For JOIN_NEW_WINDOW .... */
+void win_create(int var, int test)
+{
+	if (get_int_var(var) && (test || get_target_by_refnum(0)))
+	{
+		char *args = NULL;
+		if (var == JOIN_NEW_WINDOW_VAR)
+			args = LOCAL_COPY(SAFE(get_string_var(JOIN_NEW_WINDOW_TYPE_VAR)));
+		else if (var == QUERY_NEW_WINDOW_VAR)
+			args = LOCAL_COPY(SAFE(get_string_var(QUERY_NEW_WINDOW_TYPE_VAR)));
+		if (args && *args)
+			windowcmd("WINDOW", args, empty_string);
+	}
+}

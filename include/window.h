@@ -302,4 +302,6 @@ const	char	*get_echannel_by_refnum		(unsigned);
 	int	window_is_scrolled_back		(Window *);
 	void 	window_change_server		(Window *, int);
 
+	void	win_create			(int, int);
+
 #endif /* __window_h__ */
