@@ -167,8 +167,8 @@ void *	really_new_malloc (size_t size, const char *fn, int line)
 {
 	char	*ptr;
 
-	if (!(ptr = (char *)malloc(size + sizeof(MO))))
-		panic(1, "Malloc() failed from [%s/%d], giving up!", fn, line);
+	if (!(ptr = (char *)calloc(1, size + sizeof(MO))))
+		panic(1, "calloc() failed from [%s/%d], giving up!", fn, line);
 
 	/* Store the size of the allocation in the buffer. */
 	ptr += sizeof(MO);
