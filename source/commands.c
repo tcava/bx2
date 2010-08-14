@@ -76,6 +76,7 @@
 #include "elf.h"
 #include "cset.h"
 #include "misc.h"
+#include "list.h"
 
 /* used with input_move_cursor */
 #define RIGHT 1
@@ -180,6 +181,7 @@ static	void	datecmd		(const char *, char *, const char *);
 static	void	vercmd		(const char *, char *, const char *);
 static	void	do_oops		(const char *, char *, const char *);
 static	void	do_forward	(const char *, char *, const char *);
+static	void	auto_join	(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -215,6 +217,8 @@ static	IrcCommand irc_command[] =
 	{ "ABOUT",	about		},
 	{ "ADDFORWARD",	do_forward	},
 	{ "ADMIN",	send_comm	},
+	{ "AJOIN",	auto_join	},
+	{ "AJOINLIST",	auto_join	},
 	{ "ALIAS",	aliascmd	}, /* alias.c */
 	{ "ALLOCDUMP",	allocdumpcmd	},
 	{ "ASSIGN",	assigncmd	}, /* alias.c */
@@ -406,6 +410,7 @@ static	IrcCommand irc_command[] =
 	{ "TRACE",	send_comm	},
 	{ "TYPE",	typecmd		}, /* keys.c */
 	{ "UMODE",	umodecmd	},
+	{ "UNAJOIN",	auto_join	},
 	{ "UNCLEAR",	e_clear		},
 	{ "UNFORWARD",	do_forward	},
 	{ "UNKEY",	do_unkey	},
@@ -4401,6 +4406,103 @@ BUILT_IN_COMMAND(do_forward)
 			send_to_server("NOTICE %s :%s is now forwarding messages to you",
 				forwardnick, get_server_nickname(from_server));
 			bitchsay("Now forwarding messages to %s", forwardnick);
+		}
+	}
+}
+
+AJoinList *ajoin_list = NULL;
+
+AJoinList *add_to_ajoin_list(char *channel, char *args, int type)
+{
+/* type == 1, then we have a real autojoin entry.
+ * type == 0, then it's just a channel to join.
+ */
+AJoinList *new = NULL;
+
+	if (!(new = (AJoinList *)list_lookup((List **) &ajoin_list, channel, 0, !REMOVE_FROM_LIST)))
+	{
+		char *key, *group;
+		key = next_arg(args, &args);
+
+		new = (AJoinList *) new_malloc(sizeof(AJoinList));
+		new->name = malloc_strdup(channel);
+		if(key && *key == '-')
+		{
+			group = next_arg(args, &args);
+
+			if(group)
+				new->group = malloc_strdup(group);
+			key = next_arg(args, &args);
+		}
+		if (key && *key)
+			new->key = malloc_strdup(key);
+		new->ajoin_list = type;
+		new->server = -1;
+		add_to_list((List **)&ajoin_list, (List *)new);
+	}
+	return new;
+}
+
+BUILT_IN_COMMAND(auto_join)
+{
+	AJoinList *new = NULL;
+	char *channel = NULL;
+	extern int run_level, do_ignore_ajoin;
+
+	if (!strcmp(command, "AJOINLIST"))
+	{
+		int count = 0;
+		for (new = ajoin_list; new; new = new->next)
+		{
+			if (!new->ajoin_list) continue;
+			if (!count)
+				put_it("AJoin List");
+			put_it("%20s server/group: %s%s%s", new->name, new->group?new->group:"<none>",
+				new->key?" key: ":empty_string, new->key?new->key:empty_string);
+			count++;
+		}
+		if (count)
+			put_it("End of AJoin List");
+		return;
+	}
+	if (!args || !*args)
+		return;
+
+	/* If the user used the ignore ajoin switch and
+	 * we aren't in interactive mode, abort.
+	 */
+	if (do_ignore_ajoin && run_level != 2)
+		return;
+
+	channel = next_arg(args, &args);
+	if (!strcmp(command, "UNAJOIN"))
+	{
+		if (channel && (new = (AJoinList *)remove_from_list((List **)&ajoin_list, make_channel(channel))))
+		{
+			if (new->ajoin_list)
+			{
+				bitchsay("Removing Auto-Join channel %s", new->name);
+				new_free(&new->name);
+				new_free(&new->key);
+				new_free((char **)&new);
+			}
+			else
+				add_to_list((List **)&ajoin_list, (List *)new);
+		}
+		return;
+	}
+
+	if (!channel || !(new = add_to_ajoin_list(make_channel(channel), args, 1)))
+		return;
+
+	if (is_server_registered(from_server))
+	{
+		bitchsay("Auto-Joining %s%s%s", new->name, new->key?space:empty_string, new->key?new->key:empty_string);
+// XXX		if (!new->group || is_server_valid(new->group, from_server))
+		if (!new->group || is_server_valid(from_server))
+		{
+			win_create(JOIN_NEW_WINDOW_VAR, 0);
+			send_to_server("JOIN %s %s", new->name, new->key? new->key:empty_string);
 		}
 	}
 }
