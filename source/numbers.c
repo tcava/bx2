@@ -269,6 +269,8 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 	{
 		const char 	*server = NULL, 
 				*version = NULL;
+		AJoinList	*tmp = NULL;
+		extern AJoinList *ajoin_list;
 
 		if (!(server = ArgList[0]))
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
@@ -276,6 +278,20 @@ void 	numbered_command (const char *from, const char *comm, char const **ArgList
 			{ rfc1459_odd(from, comm, ArgList); goto END; }
 
 		set_server_version_string(from_server, version);
+
+		for (tmp = ajoin_list; tmp; tmp = tmp->next)
+		{
+// XXX			if (!tmp->group || is_server_valid(tmp->group, from_server))
+			if (!tmp->group || is_server_valid(from_server))
+			{
+// XXX: Do we get channels in the right window?
+				if (!is_window_waiting_for_channel(current_window->refnum, tmp->name))
+				{
+					add_waiting_channel(current_window, tmp->name);
+					send_to_server("JOIN %s%s%s", tmp->name, tmp->key ? space : empty_string, tmp->key ? tmp->key : empty_string);
+				}
+			}
+		}
 		break;
 	}
 
