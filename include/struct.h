@@ -304,4 +304,15 @@ typedef	struct	channel_stru
 }	ChannelList;
 #endif
 
+typedef struct _ajoin_list
+{
+	struct	_ajoin_list *next;
+	char	*name;
+	char	*key;
+	char	*group;
+	int	server;
+	int	window;
+	int	ajoin_list;
+} AJoinList;
+
 #endif
