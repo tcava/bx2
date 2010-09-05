@@ -53,6 +53,14 @@ static __inline__ int	list_match (List *item1, const char *str)
 	return wild_match(item1->name, str);
 }
 
+static __inline__ int	list_wildstrcmp (List *item1, const char *str)
+{
+	if (wild_match(item1->name, str) || wild_match(str, item1->name))
+		return 0;
+	else
+		return 1;
+}
+
 /*
  * add_to_list: This will add an element to a list.  The requirements for the
  * list are that the first element in each list structure be a pointer to the
@@ -145,6 +153,35 @@ List	*remove_from_list (List **list, const char *name)
 	}
 
 	return ((List *) 0);
+}
+
+List	*remove_from_list_ext (List **list, const char *name, int (*cmp_func)(List *, const char *))
+{
+	List	*tmp,
+		*last = NULL;
+
+	if (!cmp_func)
+		cmp_func = list_strcmp;
+
+	for (tmp = *list; tmp; tmp = tmp->next)
+	{
+		if (cmp_func(tmp, name) == 0)
+		{
+			if (last)
+				last->next = tmp->next;
+			else
+				*list = tmp->next;
+			return (tmp);
+		}
+		last = tmp;
+	}
+
+	return ((List *) 0);
+}
+
+List	*removewild_from_list (List **list, const char *name)
+{
+	return remove_from_list_ext(list, name, list_wildstrcmp);
 }
 
 /*

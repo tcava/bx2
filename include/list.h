@@ -19,6 +19,8 @@ void	add_to_list 		(List **, List *);
 void	add_to_list_ext		(List **, List *, int (*)(List *, List *));
 List	*find_in_list 		(List **, const char *, int);
 List	*remove_from_list 	(List **, const char *);
+List	*remove_from_list_ext	(List **, const char *, int (*)(List *, const char *));
+List	*removewild_from_list	(List **, const char *);
 List	*list_lookup 		(List **, const char *, int, int);
 List *  remove_item_from_list	(List **list, List *item);
 
