@@ -117,6 +117,7 @@ extern		char *	my_path;
 extern		char	nickname[NICKNAME_LEN + 1];
 /* extern	const	char	my_off[]; */
 extern	const	char	on[];
+extern	const	char	off[];
 extern	const	char	one[];
 extern		char	realname[REALNAME_LEN + 1];
 extern	const	char	ridiculous_version_name[];
