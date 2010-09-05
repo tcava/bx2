@@ -49,7 +49,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.12 2010/07/02 21:29:24 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.13 2010/09/05 21:39:28 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -1206,18 +1206,20 @@ char *BX_random_str(int min, int max)
 #endif
 
 
-void auto_away(unsigned long idle_mins)
+void check_auto_away(time_t idlet)
 {
 	int i;
 	char *msg = NULL;
+	int auto_away_time = get_int_var(AUTO_AWAY_TIME_VAR);
+	int idle_mins = auto_away_time / 60;
 	
-	if (!get_int_var(AUTO_AWAY_VAR))
+	if (!auto_away_time || !get_int_var(AUTO_AWAY_VAR) || idlet < auto_away_time)
 		return;
 
 	if (awaymsg)
-		malloc_sprintf(&msg, "%s: [%lu mins]", convert_output_format(awaymsg, NULL), idle_mins);
+		malloc_sprintf(&msg, "%s: [%d mins]", convert_output_format(awaymsg, NULL), idle_mins);
 	else
-		malloc_sprintf(&msg, "Auto-Away after %lu mins", idle_mins);
+		malloc_sprintf(&msg, "Auto-Away after %d mins", idle_mins);
 
 	for (i = 0; i < server_list_size(); i++)
 		if (is_server_registered(i) && !get_server_away(i))
