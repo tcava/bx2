@@ -49,7 +49,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.13 2010/09/05 21:39:28 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.14 2011/02/01 13:02:57 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -1746,12 +1746,10 @@ void log_toggle(int flag)
 	logmsg(LEVEL_CURRENT, NULL, flag ? 1 : 2, NULL);
 }
 
-#if 0
 int are_you_opped(char *channel)
 {
 	return is_chanop(channel, get_server_nickname(from_server));
 }
-#endif
 
 void error_not_opped(char *channel)
 {
