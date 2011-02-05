@@ -73,6 +73,7 @@ STATUS_FUNCTION(status_nickname);
 STATUS_FUNCTION(status_query_nick);
 STATUS_FUNCTION(status_right_justify);
 STATUS_FUNCTION(status_chanop);
+STATUS_FUNCTION(status_halfop);
 STATUS_FUNCTION(status_ssl);
 STATUS_FUNCTION(status_channel);
 STATUS_FUNCTION(status_server);
@@ -150,6 +151,7 @@ struct status_formats status_expandos[] = {
 { 0, 'D', status_dcc, 	        NULL, 			NULL },
 { 0, 'E', status_activity,	NULL,			NULL },
 { 0, 'F', status_notify_windows,&notify_format,		&STATUS_NOTIFY_VAR },
+{ 0, 'G', status_halfop,	NULL,			NULL },
 { 0, 'H', status_hold,		NULL,			NULL },
 { 0, 'I', status_insert_mode,   NULL,			NULL },
 { 0, 'K', status_scrollback,	NULL,			NULL },
@@ -1154,11 +1156,23 @@ STATUS_FUNCTION(status_chanop)
 		return empty_string;
 	
 	if (get_channel_oper(chan, window->server) &&
-		(text = get_string_var(STATUS_CHANOP_VAR)))
+		(text = get_wset_string_var(window->wset, STATUS_CHANOP_WSET)))
 			return text;
 
+	return empty_string;
+}
+
+STATUS_FUNCTION(status_halfop)
+{
+	char	*text;
+	const char *chan;
+
+	if (window->server == NOSERV ||
+           (!(chan = get_echannel_by_refnum(window->refnum))))
+		return empty_string;
+	
 	if (get_channel_halfop(chan, window->server) &&
-		(text = get_string_var(STATUS_HALFOP_VAR)))
+		(text = get_wset_string_var(window->wset, STATUS_HALFOP_WSET)))
 			return text;
 
 	return empty_string;
