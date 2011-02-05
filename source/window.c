@@ -215,6 +215,8 @@ Window	*new_window (Screen *screen)
 	new_w->nicks = NULL;
 	new_w->query_counter = 0;
 
+	create_wsets_for_window(new_w);
+
 	/* Internal flags */
 	new_w->top = 0;			/* Filled in later */
 	new_w->bottom = 0;		/* Filled in later */
@@ -581,6 +583,8 @@ delete_window_contents:
 			window->nicks = next;
 		}
 	}
+
+	remove_wsets_for_window(window);
 
 	destroy_window_waiting_channels(window->refnum);
 
