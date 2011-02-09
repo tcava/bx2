@@ -216,6 +216,7 @@ static	IrcCommand irc_command[] =
         { "ABORT",      abortcmd	},
 	{ "ABOUT",	about		},
 	{ "ADDFORWARD",	do_forward	},
+	{ "ADDWORD",	add_ban_word	},
 	{ "ADMIN",	send_comm	},
 	{ "AJOIN",	auto_join	},
 	{ "AJOINLIST",	auto_join	},
@@ -225,6 +226,7 @@ static	IrcCommand irc_command[] =
 	{ "AWAY",	away		},
 	{ "AWAYLOG",	awaylog		},
 	{ "AWAYMSG",	away		},
+	{ "BANWORDS",	add_ban_word	},
 	{ "BEEP",	beepcmd		},
 	{ "BIND",	bindcmd		}, /* keys.c */
 	{ "BLESS",	blesscmd	},
@@ -242,6 +244,7 @@ static	IrcCommand irc_command[] =
 	{ "COMMENT",	commentcmd	},
 	{ "CONNECT",	send_comm	},
 	{ "CONTINUE",	continuecmd	},
+	{ "CSET",	cset_variable	},
 	{ "CYCLE",	cycle		},
 	{ "CTCP",	ctcp		},
 	{ "D",		describe	},
@@ -386,6 +389,7 @@ static	IrcCommand irc_command[] =
 	{ "SETENV",	setenvcmd	},
 	{ "SHIFT",	shift_cmd	},
 	{ "SHOOK",	shookcmd	},
+	{ "SHOWWORDKICK",	show_word_kick	},
 	{ "SILENCE",	send_comm	},
 	{ "SLEEP",	sleepcmd	},
 	{ "SQUERY",	send_2comm	},
@@ -411,6 +415,7 @@ static	IrcCommand irc_command[] =
 	{ "TYPE",	typecmd		}, /* keys.c */
 	{ "UMODE",	umodecmd	},
 	{ "UNAJOIN",	auto_join	},
+	{ "UNBANWORD",	add_ban_word	},
 	{ "UNCLEAR",	e_clear		},
 	{ "UNFORWARD",	do_forward	},
 	{ "UNKEY",	do_unkey	},
@@ -421,6 +426,7 @@ static	IrcCommand irc_command[] =
 	{ "UNSHIFT",	unshift_cmd	},
 	{ "UNTIL",	whilecmd	},
 	{ "UNVOICE",	dodeop		},
+	{ "UNWORDKICK",	add_ban_word	},
 	{ "UPING",	pingcmd		},
 	{ "USERHOST",	userhostcmd	},
 	{ "USERIP",	useripcmd	},
@@ -442,6 +448,8 @@ static	IrcCommand irc_command[] =
 	{ "WI",		whois		},
 	{ "WII",	whois		},
 	{ "WINDOW",	windowcmd	}, /* window.c */
+	{ "WORDLIST",	show_word_kick	},
+	{ "WSET",	wset_variable	},
 	{ "WW",		whois		},
 	{ "XDEBUG",	xdebugcmd	}, /* debug.c */
 	{ "XECHO",	xechocmd	},
