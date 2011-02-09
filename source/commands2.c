@@ -6,6 +6,7 @@
 #include "hook.h"
 #include "misc.h"
 #include "window.h"
+#include "list.h"
 
 #ifdef HAVE_UNAME
 #include <sys/utsname.h>
@@ -412,4 +413,82 @@ BUILT_IN_COMMAND(send_kline)
 		else
 			send_to_server("%s %s :%s", command, t, args);
 	}
+}
+
+WordKickList *ban_words = NULL;
+
+BUILT_IN_COMMAND(add_ban_word)
+{
+char *word = NULL;
+char *chan = NULL;
+WordKickList *new;
+
+	
+	if (args && *args)
+	{
+		chan = next_arg(args, &args);
+		if ((!is_channel(chan) && (chan && *chan != '*')) || !args || !*args)
+			return;
+		if (!strcmp(command, "ADDWORD") || !strcmp(command, "BANWORDS"))
+		{
+			new = (WordKickList *)find_in_list((List **)&ban_words, args, 0);
+			if (!ban_words || !new || (new && !wild_match(new->channel, chan)))
+			{
+				new = (WordKickList *) new_malloc(sizeof(WordKickList));
+				malloc_strcpy(&new->channel, chan);
+				malloc_strcpy(&new->string, args);
+				add_to_list((List **)&ban_words, (List *)new);
+				bitchsay("Added %s to %s Banned Word List", new->string, new->channel);
+			} else bitchsay("[%s] is already in the list for channel %s", args, chan);
+		}
+		else
+		{
+			int count = 0;
+			malloc_strcpy(&word, args);
+			while ((new = (WordKickList *) removewild_from_list((List **)&ban_words, word)))
+			{
+				bitchsay("Removed %s Banned Word [%s]", new->channel, new->string);
+				new_free(&new->channel);
+				new_free(&new->string);
+				new_free((char **)&new);
+				count++;
+			}
+			if (!count)
+				bitchsay("Banned Word %s not found.", word);
+			new_free(&word);
+		}
+	}
+}
+
+BUILT_IN_COMMAND(show_word_kick)
+{
+WordKickList *new;
+
+	
+	if (ban_words) 
+	{
+		put_it("%14s %40s", "Channel", "Banned Word(s)");
+		for (new = ban_words; new; new = new->next)
+			put_it("%-14s %40s", new->channel, new->string);
+	} else
+		bitchsay("No Banned Words on list");
+}
+
+void save_banwords(FILE *outfile)
+{
+	int count = 0;
+	WordKickList *new;
+
+	
+	if (ban_words)
+	{
+		fprintf(outfile, "# %s Banned Words\n", BX_version);
+		for (new = ban_words; new; new = new->next)
+		{
+			fprintf(outfile, "BANWORD %s %s\n", new->channel, new->string);
+			count++;
+		}
+	}
+	if (count && do_hook(SAVEFILE_LIST,"BanWords %d", count))
+		bitchsay("Saved %d Banned Words List", count);
 }
