@@ -111,7 +111,7 @@ extern LastMsg last_sent_ctcp[2];
 	void	log_toggle (int);
 
 	char	*cluster (char *);
-	int	caps_fucknut (register unsigned char *);
+	int	caps_fucknut (unsigned char *);
 
 	void    do_reconnect (char *);
 
@@ -139,7 +139,7 @@ extern LastMsg last_sent_ctcp[2];
 	void		check_server_connect (int);
 	char		*country(const char *);
 	int		do_newuser (char *, char *, char *);
-	int		char_fucknut (register unsigned char *, char, int);
+	int		char_fucknut (unsigned char *, char, int);
 //	BanList		*ban_is_on_channel(register char *, register ChannelList *);
 //	BanList		*eban_is_on_channel(register char *, register ChannelList *);
 	void		check_orig_nick(char *);

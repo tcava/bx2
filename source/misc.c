@@ -49,7 +49,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.14 2011/02/01 13:02:57 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.15 2011/02/09 10:59:00 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -4344,7 +4344,9 @@ int	count = 0,
 
 }
 
-int caps_fucknut (register unsigned char *crap)
+#endif
+
+int caps_fucknut (unsigned char *crap)
 {
 	int total = 0, allcaps = 0;
 /* removed from ComStud client */
@@ -4366,7 +4368,7 @@ int caps_fucknut (register unsigned char *crap)
 	return (0);
 }
 
-int char_fucknut (register unsigned char *crap, char looking, int max)
+int char_fucknut (unsigned char *crap, char looking, int max)
 {
 	int total = strlen(crap), allchar = 0;
 
@@ -4391,8 +4393,6 @@ int char_fucknut (register unsigned char *crap, char looking, int max)
 	}
 	return (0);
 }
-
-#endif
 
 static char *make_timestamp(int do_timestamp, char *timestr)
 {
