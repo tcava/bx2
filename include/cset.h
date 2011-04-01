@@ -5,6 +5,7 @@
 #ifndef _CSET_H_
 #define _CSET_H_
 
+#include "names.h"
 #include "struct.h"
 #include "window.h"
 /* This ensures we always have the offsetof() macro */
@@ -389,7 +390,7 @@ FORMAT_XTERM_TITLE_FSET,
 NUMBER_OF_FSET
 };
 
-void		cset_variable(char *, char *, char *, char *);
+BUILT_IN_COMMAND(cset_variable);
 int		BX_get_cset_int_var(CSetList *, int);
 void		BX_set_cset_int_var(CSetList *, int, int);
 char		*BX_get_cset_str_var(CSetList *, int);
@@ -397,9 +398,10 @@ void		BX_set_cset_str_var(CSetList *, int, char *);
 
 CSetList	*create_csets_for_channel(char *channel);
 void		remove_csets_for_channel(CSetList *);
-char		*BX_get_wset_string_var(WSet *, int);
+//char		*BX_get_wset_string_var(WSet *, int);
+char		*get_wset_string_var(WSet *, int);
 void		BX_set_wset_string_var(WSet *, int, char *);
-void		wset_variable(char *, char *, char *, char *);
+BUILT_IN_COMMAND(wset_variable);
 WSet		*create_wsets_for_window(Window *);
 void		create_fsets(Window *, int);
 void		remove_wsets_for_window(Window *);
@@ -410,11 +412,11 @@ void		BX_fset_string_var(enum FSET_TYPES, char *);
 void		fset_variable(const char *, char *, const char *);
 char		*make_fstring_var(const char *);
 char		**get_wset_format_var_address(WSet *, int);
-//char		*get_cset(char *, ChannelList *, char *);
+char		*get_cset(char *, Channel *, char *);
 void		delete_all_ext_fset(void);
 CSetList	*check_cset_queue(char *, int);
-//void		do_logchannel(unsigned long, ChannelList *, char *, ...);
-//void		check_channel_limit(ChannelList *chan);
+void		do_logchannel(unsigned long, Channel *, char *, ...);
+void		check_channel_limit(Channel *chan);
 
 void add_numeric_fset(char *name, int remove, char *args, int);
 char *find_numeric_fset(int numeric);
