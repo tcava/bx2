@@ -8,7 +8,10 @@
 #ifndef __names_h__
 #define __names_h__
 
+#include <stdio.h>
 #include "alist.h"
+#include "levels.h"
+#include "struct.h"
 
 typedef struct nick_stru
 {
@@ -19,6 +22,9 @@ typedef struct nick_stru
 	short	chanop;		/* True if they are a channel operator */
 	short	voice;		/* 1 if they are, 0 if theyre not, -1 if uk */
 	short	half_assed;	/* 1 if they are, 0 if theyre not, -1 if uk */
+
+	ShitList *shitlist;
+	UserList *userlist;
 }	Nick;
 
 typedef	struct	nick_list_stru
@@ -51,6 +57,11 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	char		voice;		/* true if i'm a channel voice */
 	char		half_assed;	/* true if i'm a channel helper */
 	Timeval		join_time;	/* When we joined the channel */
+
+	CSetList	*csets;		/* All Channel sets */
+	Timeval		limit_time;	/* time of last limit set */
+	FILE *		msglog_fp;
+	Mask		log_level;
 }	Channel;
 
 	void	add_channel		(Char *, int); 
@@ -104,5 +115,6 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	void    channels_swap_winrefs (int oldref, int newref);
 	Channel	*find_channel		(const char *, int);
 	int	traverse_all_channels	(Channel **, int, int);
+	Nick *	find_nick		(int, const char *, const char *);
 
 #endif /* _NAMES_H_ */
