@@ -110,7 +110,7 @@ extern LastMsg last_sent_ctcp[2];
 
 	void	log_toggle (int);
 
-	char	*cluster (char *);
+	char	*cluster (const char *);
 	int	caps_fucknut (unsigned char *);
 
 	void    do_reconnect (char *);
