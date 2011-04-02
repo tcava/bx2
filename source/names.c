@@ -136,6 +136,8 @@ static Channel *create_channel (const char *name, int server)
 	new_c->voice = 0;
 	new_c->half_assed = 0;
 
+	add_to_list((List **)&new_c->csets, (List *)create_csets_for_channel(name));
+
 	new_c->next = channel_list;
 	if (channel_list)
 		channel_list->prev = new_c;
@@ -303,7 +305,7 @@ static Nick *	find_nick_on_channel (Channel *ch, const char *nick)
 	return new_n;
 }
 
-static Nick *	find_nick (int server, const char *channel, const char *nick)
+Nick *	find_nick (int server, const char *channel, const char *nick)
 {
 	Channel *ch;
 	if ((ch = find_channel(channel, server)))
@@ -439,6 +441,15 @@ const	char	*prefix;
 	new_n->chanop = ischop;
 	new_n->voice = isvoice;
 	new_n->half_assed = half_assed;
+
+#if 0
+#ifdef WANT_USERLIST
+	new_n->userlist = lookup_userlevelc("*", userhost, channel, NULL);
+	new_n->shitlist = nickinshit(nick, userhost);
+#endif
+#endif
+	new_n->shitlist = NULL;
+	new_n->userlist = NULL;
 
 	if ((old = (Nick *)add_to_array((array *)&chan->nicks, (array_item *)new_n)))
 	{
