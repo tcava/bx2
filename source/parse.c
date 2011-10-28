@@ -442,6 +442,7 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 	const char	*hook_format;
 	const char	*flood_channel = NULL;
 	int	l;
+	Nick	*tmpnick;
 
 	PasteArgs(ArgList, 1);
 	if (!(target = ArgList[0]))
@@ -495,6 +496,8 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 			hook_type = PUBLIC_OTHER_LIST;
 			hook_format = "<%s:%s> %s";
 		}
+
+		tmpnick = find_nick(from_server, target, from);
 	}
 	else if (!is_me(from_server, target))
 	{
@@ -585,11 +588,13 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 		switch (hook_type)
 		{
 			case PUBLIC_LIST:
+				annoy_kicks(hook_type, real_target, from, message, tmpnick);
 				put_it("%s", convert_output_format(fget_string_var(FORMAT_PUBLIC_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(real_target), message));
 				logmsg(LEVEL_PUBLIC, from, 0, "%s %s", real_target, message);
 				break;
 
 			case PUBLIC_OTHER_LIST:
+				annoy_kicks(hook_type, real_target, from, message, tmpnick);
 				put_it("%s", convert_output_format(fget_string_var(FORMAT_PUBLIC_OTHER_FSET), "%s %s %s %s", get_clock(), from, check_channel_type(real_target), message));
 				logmsg(LEVEL_PUBLIC, from, 0, "%s %s", real_target, message);
 				break;
@@ -1665,4 +1670,75 @@ void 	parse_server (const char *orig_line, size_t orig_line_size)
 
 	FromUserHost = OldFromUserHost;
 	from_server = -1;
+}
+
+int annoy_kicks(int list_type, char *to, char *from, char *ptr, Nick *nick)
+{
+extern WordKickList *ban_words;
+int kick_em = 0;
+Channel *chan;
+	if (nick && (nick->userlist && nick->userlist->flags))
+		return 0;
+	if (/*!check_channel_match(get_string_var(PROTECT_CHANNELS_VAR), to) ||*/ !are_you_opped(to))
+		return 0;
+	if (!(chan = find_channel(to, from_server)))
+		return 0;
+	if (get_cset_int_var(chan->csets, ANNOY_KICK_CSET) && !nick->chanop && !nick->half_assed)
+	{	
+		char *buffer = NULL;
+		if (char_fucknut(ptr, '\002', 12))
+			malloc_sprintf(&buffer, "KICK %s %s :%s", to, from, "autokick for \002bold\002");
+		else if (char_fucknut(ptr, '\007', 1))
+			malloc_sprintf(&buffer, "KICK %s %s :%s", to, from, "autokick for beeping");
+		else if (char_fucknut(ptr, '\003', 12))
+			malloc_sprintf(&buffer, "KICK %s %s :%s", to, from, "autokick for \037mirc color\037");
+		else if (char_fucknut(ptr, '\037', 0))
+			malloc_sprintf(&buffer, "KICK %s %s :%s", to, from, "autokick for \037underline\037");
+		else if (char_fucknut(ptr, '\026', 12))
+			malloc_sprintf(&buffer, "KICK %s %s :%s", to, from, "autokick for \026inverse\026");
+		else if (caps_fucknut(ptr))
+			malloc_sprintf(&buffer, "KICK %s %s :%s", to, from, "autokick for CAPS LOCK");
+		else if (strstr(ptr, "0000027fed"))
+		{
+			char *host = NULL, *p;
+			malloc_strcpy(&host, FromUserHost);
+			p = strchr(host, '@'); *p++ = '\0';
+			send_to_server("MODE %s -o+b %s *!*%s", to, from, cluster(FromUserHost));
+			send_to_server("KICK %s %s :%s", to, from, "\002Zmodem rocks\002");
+// XXX: Segfaults
+#if 0
+			if (get_int_var(AUTO_UNBAN_VAR))
+				add_timer(0, empty_string, get_int_var(AUTO_UNBAN_VAR) * 1000, 1, timer_unban, malloc_sprintf(NULL, "%d %s *!*%s", from_server, to, cluster(FromUserHost)), NULL, GENERAL_TIMER, -1, 0);
+#endif
+			new_free(&host);
+			kick_em = 1;
+		}
+		if (buffer)
+		{
+			kick_em = 1;
+			send_to_server("%s", buffer);
+			new_free(&buffer);
+		}
+	}
+
+	if (ban_words)
+	{
+		WordKickList *word;
+		int ops = get_cset_int_var(chan->csets, KICK_OPS_CSET);
+		for (word = ban_words; word; word = word->next)
+		{
+			if (stristr(ptr, word->string) != -1)
+			{
+				if (wild_match(word->channel, to))
+				{
+					if (!ops && (nick->chanop || nick->half_assed || nick->voice))
+						break;
+					send_to_server("KICK %s %s :%s %s", to, from, "\002BitchX BWK\002:", word->string);
+					kick_em = 1;
+					break;
+				}
+			}
+		}
+	}
+	return kick_em;
 }
