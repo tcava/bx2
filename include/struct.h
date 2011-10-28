@@ -3,17 +3,6 @@
 
 #include <stdio.h>
 #include "hash.h"
-#include "window.h"
-
-typedef struct wset_array_struc
-{
-	char *name;
-	int type;
-	int offset;
-	int format_offset;
-	void (*func) (Window *, char *, int);
-	int flag;
-}	WSetArray;
 
 typedef struct _cset_stru
 {
@@ -69,107 +58,6 @@ typedef struct cset_array_struc
 	void (*func) (struct cset_array_struc *, CSetList *);
 	int flag;
 }	CSetArray;
-
-typedef struct WinSetStru
-{
-/* These are copied over from /set's */
-	char	*status_mode;
-	char	*status_topic;
-	char	*status_umode;
-	char	*status_hold_lines;
-	char	*status_hold;
-	char	*status_voice;
-	char	*status_channel;
-	char	*status_notify;
-	char	*status_oper_kills;
-	char	*status_lag;
-	char	*status_mail;
-	char	*status_query;
-	char	*status_server;
-	char	*status_clock;
-	char	*status_users;
-	char	*status_away;
-	char	*status_dcccount;
-	char	*status_cdcccount;
-	char	*status_chanop;
-	char	*status_cpu_saver;
-	char	*status_msgcount;
-	char	*status_nick;	
-	char	*status_flag;
-	char	*status_halfop;
-							
-/* These are the various formats from a window make_status() creates these */ 
-	char    *mode_format;
-	char    *umode_format;
-	char    *topic_format;
-	char    *query_format;
-	char    *clock_format;
-	char    *hold_lines_format;
-	char    *channel_format;
-	char    *mail_format;
-	char    *server_format;
-	char    *notify_format;
-	char    *kills_format;
-	char    *status_users_format;
-	char    *lag_format;
-	char	*cpu_saver_format;
-	char	*msgcount_format;
-	char	*dcccount_format;
-	char	*cdcc_format;
-	char	*nick_format;
-	char	*flag_format;
-	char	*away_format;
-	
-//#define MAX_FUNCTIONS		36
-	char	*status_user_formats0;
-	char	*status_user_formats1;
-	char	*status_user_formats2;
-	char	*status_user_formats3;
-	char	*status_user_formats4;
-	char	*status_user_formats5;
-	char	*status_user_formats6;
-	char	*status_user_formats7;
-	char	*status_user_formats8;
-	char	*status_user_formats9;
-	char	*status_user_formats10;
-	char	*status_user_formats11;
-	char	*status_user_formats12;
-	char	*status_user_formats13;
-	char	*status_user_formats14;
-	char	*status_user_formats15;
-	char	*status_user_formats16;
-	char	*status_user_formats17;
-	char	*status_user_formats18;
-	char	*status_user_formats19;
-	char	*status_user_formats20;
-	char	*status_user_formats21;
-	char	*status_user_formats22;
-	char	*status_user_formats23;
-	char	*status_user_formats24;
-	char	*status_user_formats25;
-	char	*status_user_formats26;
-	char	*status_user_formats27;
-	char	*status_user_formats28;
-	char	*status_user_formats29;
-	char	*status_user_formats30;
-	char	*status_user_formats31;
-	char	*status_user_formats32;
-	char	*status_user_formats33;
-	char	*status_user_formats34;
-	char	*status_user_formats35;
-	char	*status_user_formats36;
-	char	*status_user_formats37;
-	char	*status_user_formats38;
-	char	*status_user_formats39;
-	char	*status_scrollback;
-	char	*status_window;
-		
-	char	*status_line[3];	/* The status lines string current display */
-	char	*status_format[4];	/* holds formated status info from build_status */
-	char	*format_status[4];	/* holds raw format for window from /set */	
-
-	char	*window_special_format;
-}	 WSet;
 
 typedef struct
 {
@@ -314,5 +202,12 @@ typedef struct _ajoin_list
 	int	window;
 	int	ajoin_list;
 } AJoinList;
+
+typedef struct wordkicklist_stru
+{
+	struct	wordkicklist_stru *next;	/* pointer to next user entry */
+	char	*string;			/* string */
+	char	*channel;			/* channel */
+} WordKickList;
 
 #endif
