@@ -203,6 +203,28 @@ typedef struct _ajoin_list
 	int	ajoin_list;
 } AJoinList;
 
+typedef struct  userlist_stru
+{
+	struct	userlist_stru	*next;	/* pointer to next user entry */
+	char	*nick;			/* user's name in nick!user@host */
+	char	*host;
+	char	*comment;
+	char	*channels;		/* channel for list to take effect */
+	char	*password;		/* users password */
+unsigned long	flags;			/* this users flags */
+	time_t	time;			/* time when put on list */
+}	UserList;
+
+typedef struct  shitlist_stru
+{
+	struct	shitlist_stru	*next;	/* pointer to next shit entry */
+	char	*filter;		/* filter in nick!user@host */
+	int	level;			/* level of shitted */
+	char	*channels;		/* channel for list to take effect */
+	char	*reason;		/* Reason */
+	time_t	time;			/* time shit was put on */
+}	ShitList;
+
 typedef struct wordkicklist_stru
 {
 	struct	wordkicklist_stru *next;	/* pointer to next user entry */
