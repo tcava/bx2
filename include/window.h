@@ -21,6 +21,7 @@
  * That means we cant include "screen.h", so we kind of fake it.
  */
 struct	ScreenStru;
+struct	WSet;
 
 /* var_settings indexes */
 #define OFF 			0
@@ -181,6 +182,9 @@ struct	WindowStru	*next;		/* Window below us on screen */
 struct	WindowStru	*prev;		/* Window above us on screen */
 
 	short		deceased;	/* Set when the window is killed */
+
+	/* bx stuff */
+struct	WSet	*wset;
 }	Window;
 
 /*
