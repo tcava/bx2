@@ -49,7 +49,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.15 2011/02/09 10:59:00 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.16 2011/10/28 21:42:49 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -305,12 +305,12 @@ int check_serverlag (void)
 	}
 	return 0;
 }
+#endif
 
 int timer_unban (void *args, char *sub)
 {
 	char *p = (char *)args;
 	char *channel;
-	ChannelList *chan, *chan2;
 	char *ban;
 	char *serv;
 	int server = from_server;
@@ -318,18 +318,23 @@ int timer_unban (void *args, char *sub)
 	serv = next_arg(p, &p);
 	if (my_atol(serv) != server)
 		server = my_atol(serv);
-	if (server < 0 || server > server_list_size() || !is_server_connected(server))
+	if (server < 0 || server > server_list_size() || !is_server_registered(server))
 		server = from_server;
 	channel = next_arg(p, &p);
 	ban = next_arg(p, &p);
 
-	chan2 = get_server_channels(server);
+// XXX: Check if the ban exists before sending MODE -b
+#if 0
 	if ((chan = (ChannelList *)find_in_list((List **)&chan2, channel, 0)) && ban_is_on_channel(ban, chan))
-		my_send_to_server(server, "MODE %s -b %s", channel, ban);
+#endif
+	if (im_on_channel(channel, server))
+// XXX		my_send_to_server(server, "MODE %s -b %s", channel, ban);
+		send_to_server("MODE %s -b %s", channel, ban);
 	new_free(&serv); new_free(&sub);
 	return 0;
 }
 
+#if 0
 int timer_idlekick (void *args, char *sub)
 {
 char *channel = (char *)args;
@@ -3134,7 +3139,7 @@ int numchar(char *string, char c)
 	return num;
 }
 
-char *cluster (char *hostname)
+char *cluster (const char *hostname)
 {
 	static char result[IRCD_BUFFER_SIZE/4 + 1];
 	char temphost[BIG_BUFFER_SIZE + 1];
