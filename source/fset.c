@@ -1,5 +1,5 @@
 #include "irc.h"
-static char cvsrevision[] = "$Id: fset.c,v 1.3 2009/12/22 08:16:25 fb Exp $";
+static char cvsrevision[] = "$Id: fset.c,v 1.4 2011/11/09 05:12:40 fb Exp $";
 //CVS_REVISION(fset_c)
 #include "struct.h"
 
@@ -252,6 +252,7 @@ BX_IrcVariable fset_array[] =
 	{ "WHOIS_NICK",		0,STR_TYPE_VAR,	0, NULL, NULL, 0, 0},
 	{ "WHOIS_OPER",		0,STR_TYPE_VAR,	0, NULL, NULL, 0, 0},
 	{ "WHOIS_REGISTER",	0,STR_TYPE_VAR,	0, NULL, NULL, 0, 0},
+	{ "WHOIS_SECURE",	0,STR_TYPE_VAR,	0, NULL, NULL, 0, 0},
 	{ "WHOIS_SERVER",	0,STR_TYPE_VAR,	0, NULL, NULL, 0, 0},
 	{ "WHOIS_SERVICE",	0,STR_TYPE_VAR,	0, NULL, NULL, 0, 0},
 	{ "WHOIS_SHIT",		0,STR_TYPE_VAR,	0, NULL, NULL, 0, 0},
@@ -760,6 +761,7 @@ void create_fsets(Window *win, int ansi)
 	fset_string_var(FORMAT_WHOIS_NAME_FSET, DEFAULT_FORMAT_WHOIS_NAME_FSET);
 	fset_string_var(FORMAT_WHOIS_NICK_FSET, DEFAULT_FORMAT_WHOIS_NICK_FSET);
 	fset_string_var(FORMAT_WHOIS_OPER_FSET, DEFAULT_FORMAT_WHOIS_OPER_FSET);
+	fset_string_var(FORMAT_WHOIS_SECURE_FSET, DEFAULT_FORMAT_WHOIS_SECURE_FSET);
 	fset_string_var(FORMAT_WHOIS_SERVER_FSET, DEFAULT_FORMAT_WHOIS_SERVER_FSET);
 	fset_string_var(FORMAT_WHOLEFT_HEADER_FSET, DEFAULT_FORMAT_WHOLEFT_HEADER_FSET);
 	fset_string_var(FORMAT_WHOLEFT_USER_FSET, DEFAULT_FORMAT_WHOLEFT_USER_FSET);

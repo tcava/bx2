@@ -1596,6 +1596,13 @@ DISPLAY:
 		break;
 	}
 
+	case 671:		/* #define RPL_WHOISSECURE	671 */
+	{
+		/* ratbox / unreal / freenode: <nick> :is using a secure connection */
+		put_it("%s", convert_output_format(fget_string_var(FORMAT_WHOIS_SECURE_FSET), "%s %s", ArgList[0], ArgList[1]));
+		break;
+	}
+
 	default:
 		display_msg(from, comm, ArgList);
 	}
