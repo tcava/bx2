@@ -7,6 +7,7 @@
 #include "vars.h"
 #include "server.h"
 #include "clock.h"
+#include "hook.h"
 /* This should go in expr.h */
 extern char *alias_special_char(char **, char *, const char *, char *, int *);
 
@@ -49,7 +50,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.16 2011/10/28 21:42:49 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.17 2012/05/01 07:43:37 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -144,10 +145,10 @@ LastMsg last_sent_ctcp[2] = {{ NULL }};
 LastMsg last_sent_dcc[MAX_LAST_MSG+1] = {{ NULL }};
 
 extern int in_cparse;
+
+
+Channel *idlechan_list = NULL;
 #if 0
-
-
-ChannelList *idlechan_list = NULL;
 
 extern NickTab *tabkey_array, *autoreply_array;
 
@@ -527,10 +528,11 @@ int server = from_server;
 		}
 	}
 }
+#endif
 
 void save_idle(FILE *output)
 {
-ChannelList *chan;
+Channel *chan;
 int count = 0;
 
 	
@@ -538,7 +540,7 @@ int count = 0;
 		return;
 	if (idlechan_list)
 	{
-		fprintf(output, "# %s Idle Channel list\n", version);
+		fprintf(output, "# %s Idle Channel list\n", BX_version);
 		for (chan = idlechan_list; chan; chan = chan->next)
 		{
 			if (chan->max_idle)
@@ -552,6 +554,7 @@ int count = 0;
 		bitchsay("Saved %d Idle channels", count);
 }
 
+#if 0
 BUILT_IN_COMMAND(channel_stats)
 {
 ChannelList *new = NULL;

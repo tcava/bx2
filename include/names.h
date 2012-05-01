@@ -62,6 +62,7 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	Timeval		limit_time;	/* time of last limit set */
 	FILE *		msglog_fp;
 	Mask		log_level;
+	time_t		max_idle;	/* max idle time for this channel */
 }	Channel;
 
 	void	add_channel		(Char *, int); 
