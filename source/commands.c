@@ -77,6 +77,8 @@
 #include "cset.h"
 #include "misc.h"
 #include "list.h"
+#include "hash2.h"
+#include "userlist.h"
 
 /* used with input_move_cursor */
 #define RIGHT 1
@@ -182,6 +184,7 @@ static	void	vercmd		(const char *, char *, const char *);
 static	void	do_oops		(const char *, char *, const char *);
 static	void	do_forward	(const char *, char *, const char *);
 static	void	auto_join	(const char *, char *, const char *);
+static	void	do_scan		(const char *, char *, const char *);
 
 /* other */
 static	void	eval_inputlist 	(char *, char *);
@@ -250,6 +253,7 @@ static	IrcCommand irc_command[] =
 	{ "D",		describe	},
 	{ "DATE",	datecmd		},
 	{ "DCC",	dcc_cmd		}, /* dcc.c */
+	{ "DEBUGHASH",	show_hash	},
 	{ "DEFER",	defercmd	},
 	{ "DEHOP",	dodeop		},
 	{ "DEOP",	dodeop		},
@@ -381,6 +385,13 @@ static	IrcCommand irc_command[] =
 	{ "RUBY",	rubycmd		}, /* ruby.c */
 #endif
 	{ "SAY",	send_to_channel_first	},
+	{ "SCAN",	do_scan		},
+	{ "SCANF",	do_scan		},
+	{ "SCANI",	do_scan		},
+	{ "SCANN",	do_scan		},
+	{ "SCANO",	do_scan		},
+	{ "SCANS",	do_scan		},
+	{ "SCANV",	do_scan		},
 	{ "SEND",	send_to_query_first	},
 	{ "SENDLINE",	sendlinecmd	},
 	{ "SERVER",	servercmd	}, /* server.c */
@@ -4513,4 +4524,304 @@ BUILT_IN_COMMAND(auto_join)
 			send_to_server("JOIN %s %s", new->name, new->key? new->key:empty_string);
 		}
 	}
+}
+
+enum SCAN_TYPE {
+    SCAN_ALL, SCAN_VOICES, SCAN_CHANOPS, SCAN_NONOPS, SCAN_IRCOPS, 
+    SCAN_FRIENDS, SCAN_SHITLISTED
+};
+
+/* nick_in_scan
+ *
+ * Test if a nick should be shown in a /SCAN, according to the
+ * scan type and nick!user@host mask.  A NULL mask matches all nicks.
+ */
+int nick_in_scan(Nick *nick, enum SCAN_TYPE scan_type, char *mask)
+{
+    switch(scan_type)
+    {
+    case SCAN_VOICES:
+        if (!nick_isvoice(nick)) return 0;
+        break;
+
+    case SCAN_CHANOPS:
+        if (!nick_isop(nick) && !nick_ishalfop(nick)) return 0;
+        break;
+
+    case SCAN_NONOPS:
+        if (nick_isop(nick) || nick_ishalfop(nick)) return 0;
+        break;
+
+    case SCAN_IRCOPS:
+        if (!nick_isircop(nick)) return 0;
+        break;
+
+    case SCAN_FRIENDS:
+        if (!nick->userlist) return 0;
+        break;
+        
+    case SCAN_SHITLISTED:
+        if (!nick->shitlist) return 0;
+        break;
+
+    case SCAN_ALL:
+    default:
+        break;
+    }
+
+    /* mask == NULL matches all nicks */
+    if (!mask)
+        return 1;
+
+    return nick_match(nick, mask);
+}
+ 
+BUILT_IN_COMMAND(do_scan)
+{
+    enum SCAN_TYPE scan_type = SCAN_ALL;
+    char *channel = NULL;
+    Channel *chan;
+    Nick *nick;
+    NickSort *ns, *snick = NULL;
+    char *s;
+    char *buffer = NULL;
+    int n_inscan = 0, n_total = 0;
+    int count = 0;
+    int server;
+    int sorted = NICKSORT_NORMAL;
+    int l;
+    char *match_host = NULL;
+    int cols = get_int_var(NAMES_COLUMNS_VAR);
+
+	if (!cols)
+		cols = 1;	
+	
+    if (command)
+    {
+        if (!strcmp(command, "SCANV"))
+            scan_type = SCAN_VOICES;
+        else if (!strcmp(command, "SCANO"))
+            scan_type = SCAN_CHANOPS;
+        else if (!strcmp(command, "SCANN"))
+            scan_type = SCAN_NONOPS;
+        else if (!strcmp(command, "SCANF"))
+            scan_type = SCAN_FRIENDS;
+        else if (!strcmp(command, "SCANS"))
+            scan_type = SCAN_SHITLISTED;
+        else if (!strcmp(command, "SCANI"))
+		    scan_type = SCAN_IRCOPS;
+    }
+
+	while ((s = next_arg(args, &args)))
+	{
+		if (is_channel(s)) {
+            if (!channel)
+            {
+                channel = s;
+            }
+
+            continue;
+        }
+
+		if (*s == '-')
+		{
+			if (!my_strnicmp(s, "-sort", 3))
+				sorted = NICKSORT_NONE;
+			else if (!my_strnicmp(s, "-nick", 3))
+				sorted = NICKSORT_NICK;
+			else if (!my_strnicmp(s, "-host", 3))
+				sorted = NICKSORT_HOST;
+			else if (!my_strnicmp(s, "-stat", 3))
+				sorted = NICKSORT_STAT;
+
+            continue;
+		}
+
+		if ((strlen(s) == 1) && (scan_type == SCAN_ALL))
+		{
+            switch(*s)
+            {
+            case 'v':
+            case 'V':
+                scan_type = SCAN_VOICES;
+                break;
+
+            case 'o':
+            case 'O':
+                scan_type = SCAN_CHANOPS;
+                break;
+
+            case 'n':
+            case 'N':
+                scan_type = SCAN_NONOPS;
+                break;
+
+            case 'f':
+            case 'F':
+                scan_type = SCAN_FRIENDS;
+                break;
+
+            case 's':
+            case 'S':
+                scan_type = SCAN_SHITLISTED;
+                break;
+
+            case 'i':
+            case 'I':
+                scan_type = SCAN_IRCOPS;
+                break;
+            }
+
+            continue;
+		}
+
+        if (!match_host)
+        {
+            match_host = s;
+        }
+	}
+
+	if (!(chan = prepare_command(&server, channel, NO_OP)))
+		return;
+
+	l = message_setall(current_window->refnum, NULL, LEVEL_OTHER);
+
+	snick = sorted_nicklist(chan, sorted);
+
+    /* Count nicks - total and shown */
+	for (ns = snick; ns; ns = ns->next)
+	{
+        n_total++;
+
+        if (nick_in_scan(ns->nptr, scan_type, match_host))
+            n_inscan++;
+	}
+
+    /* Output the header line */
+    switch(scan_type)
+    {
+    case SCAN_VOICES:
+		s = fget_string_var(FORMAT_NAMES_VOICE_FSET);
+        break;
+
+    case SCAN_CHANOPS:
+		s = fget_string_var(FORMAT_NAMES_OP_FSET);
+        break;
+
+    case SCAN_IRCOPS:
+		s = fget_string_var(FORMAT_NAMES_IRCOP_FSET);
+        break;
+
+    case SCAN_FRIENDS:
+		s = fget_string_var(FORMAT_NAMES_FRIEND_FSET);
+        break;
+        
+    case SCAN_NONOPS:
+		s = fget_string_var(FORMAT_NAMES_NONOP_FSET);
+        break;
+
+    case SCAN_SHITLISTED:
+		s = fget_string_var(FORMAT_NAMES_SHIT_FSET);
+        break;
+
+    case SCAN_ALL:
+    default:
+		s = fget_string_var(FORMAT_NAMES_FSET);
+    }
+
+	put_it("%s", 
+        convert_output_format(s, "%s %s %d %d %s", 
+            get_clock(), chan->channel, n_inscan, n_total, 
+            match_host ? match_host : empty_string));
+
+    for (ns = snick; ns; ns = ns->next)
+    {
+        char *nick_format;
+        char *user_format;
+        char *nick_buffer = NULL;
+        char nick_sym;
+
+	nick = ns->nptr;
+
+        if (!nick_in_scan(nick, scan_type, match_host))
+            continue;
+            
+        /* Determine the nick format string to use */
+        if (!my_stricmp(nick->nick, get_server_nickname(server)))
+            nick_format = fget_string_var(FORMAT_NAMES_NICK_ME_FSET);
+        else if (nick->userlist && (nick->userlist->flags & ADD_BOT))
+            nick_format = fget_string_var(FORMAT_NAMES_NICK_BOT_FSET);
+        else if (nick->userlist)
+            nick_format = fget_string_var(FORMAT_NAMES_NICK_FRIEND_FSET);
+        else if (nick->shitlist)
+            nick_format = fget_string_var(FORMAT_NAMES_NICK_SHIT_FSET);
+        else
+            nick_format = fget_string_var(FORMAT_NAMES_NICK_FSET);
+
+        /* Determine the user format and indicator symbol to use. */
+        if (nick_isop(nick))
+        {
+            user_format = fget_string_var(FORMAT_NAMES_USER_CHANOP_FSET);
+            nick_sym = '@';
+        }
+        else if (nick_ishalfop(nick))
+        {
+            user_format = fget_string_var(FORMAT_NAMES_USER_CHANOP_FSET);
+            nick_sym = '%';
+        }
+        else if (nick_isvoice(nick))
+        {
+            user_format = fget_string_var(FORMAT_NAMES_USER_VOICE_FSET);
+            nick_sym = '+';
+        }
+        else if (nick_isircop(nick))
+        {
+            user_format = fget_string_var(FORMAT_NAMES_USER_IRCOP_FSET);
+            nick_sym = '*';
+        }
+        else
+        {
+            user_format = fget_string_var(FORMAT_NAMES_USER_FSET);
+            nick_sym = '.';
+        }
+
+        /* Construct the string */
+        malloc_strcpy(&nick_buffer, convert_output_format(nick_format,
+                    "%s", nick->nick));
+        malloc_strcat(&buffer, 
+                convert_output_format(user_format, "%c %s", nick_sym, 
+                    nick_buffer));
+        malloc_strcat(&buffer, space);
+        new_free(&nick_buffer);
+
+        /* If this completes a line, output it */
+        if (count++ >= (cols - 1))
+        {
+            if (fget_string_var(FORMAT_NAMES_BANNER_FSET))
+                put_it("%s%s", convert_output_format(fget_string_var(FORMAT_NAMES_BANNER_FSET), NULL, NULL), buffer);
+            else
+                put_it("%s", buffer);
+            new_free(&buffer);
+            count = 0;
+        }
+    }
+
+    /* If a partial line is left, output it */
+    if (count)
+    {
+        if (fget_string_var(FORMAT_NAMES_BANNER_FSET))
+            put_it("%s%s", convert_output_format(fget_string_var(FORMAT_NAMES_BANNER_FSET), NULL, NULL), buffer);
+        else
+            put_it("%s", buffer);
+        new_free(&buffer);
+    }
+
+    /* Write the footer */
+    if (fget_string_var(FORMAT_NAMES_FOOTER_FSET))
+        put_it("%s", 
+            convert_output_format(fget_string_var(FORMAT_NAMES_FOOTER_FSET), 
+                "%s %s %d %d %s", get_clock(), chan->channel, 
+                n_inscan, n_total, match_host ? match_host : empty_string));
+
+	clear_sorted_nicklist(&snick);
 }

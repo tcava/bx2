@@ -59,5 +59,6 @@ const   char *  current_package         (void);
 	BUILT_IN_COMMAND(awaylog);
 	BUILT_IN_COMMAND(add_ban_word);
 	BUILT_IN_COMMAND(show_word_kick);
+	BUILT_IN_COMMAND(show_hash);
 
 #endif /* __commands_h__ */
