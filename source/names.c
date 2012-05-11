@@ -47,6 +47,7 @@
 #include "list.h"
 #include "hook.h"
 #include "parse.h"
+#include "hash2.h"
 
 static	int	current_channel_counter = 0;
 
@@ -456,6 +457,8 @@ const	char	*prefix;
 		new_free(&old->nick);
 		new_free(&old->userhost);
 	}
+
+	add_nicklist_to_channellist(new_n, chan);
 }
 
 void 	add_userhost_to_channel (const char *channel, const char *nick, int server, const char *uh)

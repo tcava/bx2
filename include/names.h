@@ -13,6 +13,11 @@
 #include "levels.h"
 #include "struct.h"
 
+#define nick_isop(nick) (nick->chanop == 1)
+#define nick_ishalfop(nick) (nick->half_assed == 1)
+#define nick_isvoice(nick) (nick->voice == 1)
+#define nick_isircop(nick) (/*nick->oper == 1*/0)
+
 typedef struct nick_stru
 {
 	char 	*nick;		/* nickname of person on channel */
@@ -22,10 +27,22 @@ typedef struct nick_stru
 	short	chanop;		/* True if they are a channel operator */
 	short	voice;		/* 1 if they are, 0 if theyre not, -1 if uk */
 	short	half_assed;	/* 1 if they are, 0 if theyre not, -1 if uk */
+	short	ircop;		/* True if they are an ircop */
 
+	struct	nick_stru	*next;	/* XXX */
+	char	*ip;
+	char	*server;
+	time_t	idle_time;
 	ShitList *shitlist;
 	UserList *userlist;
 }	Nick;
+
+typedef struct nicksort_stru
+{
+	struct	nicksort_stru	*next;
+	char	*nick;
+	Nick	*nptr;
+} NickSort;
 
 typedef	struct	nick_list_stru
 {
@@ -63,6 +80,7 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	FILE *		msglog_fp;
 	Mask		log_level;
 	time_t		max_idle;	/* max idle time for this channel */
+	HashEntry	NickListTable[NICKLIST_HASHSIZE];
 }	Channel;
 
 	void	add_channel		(Char *, int); 
