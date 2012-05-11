@@ -7,7 +7,7 @@
  *
  * See the COPYRIGHT file, or do a HELP IRCII COPYRIGHT
  *
- * @(#)$Id: hash.h,v 1.1 2009/09/09 06:30:21 fb Exp $
+ * @(#)$Id: hash.h,v 1.2 2012/05/11 23:27:27 fb Exp $
  */
 
 #ifndef _HASH_H_
