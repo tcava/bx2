@@ -345,4 +345,23 @@ typedef struct wordkicklist_stru
 	char	*channel;			/* channel */
 } WordKickList;
 
+typedef struct	flood_stru
+{
+	struct flood_stru	*next;
+	char	*name;
+	char	*host;
+	char	*channel;
+	int	type;
+	char	flood;
+	unsigned long	cnt;
+	time_t	start;
+}	Flooding;
+
+/* LameList: structure for the users on your LameNick Kick*/
+typedef struct	lamelist_stru
+{
+	struct	lamelist_stru	*next;	/* pointer to next lame entry */
+	char	*nick;			/* Lame Nick */
+}	LameList;
+
 #endif
