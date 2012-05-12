@@ -22,7 +22,7 @@
  */
 
 #include "irc.h"
-static char cvsrevision[] = "$Id: hash.c,v 1.1 2012/05/12 00:13:32 fb Exp $";
+static char cvsrevision[] = "$Id: hash.c,v 1.2 2012/05/12 00:59:00 fb Exp $";
 //CVS_REVISION(hash_c)
 #include "struct.h"
 #include "ircaux.h"
@@ -794,7 +794,7 @@ int nick_match(Nick *nick, char *mask)
     return match;
 }
 
-NickSort *sorted_nicklist(Channel *chan, int sort)
+NickSort *BX_sorted_nicklist(Channel *chan, int sort)
 {
 	Nick *tmp;
 	NickSort *l = NULL, *list = NULL, *last = NULL;
@@ -837,7 +837,7 @@ NickSort *sorted_nicklist(Channel *chan, int sort)
 	return list;
 }
 
-void clear_sorted_nicklist(NickSort **list)
+void BX_clear_sorted_nicklist(NickSort **list)
 {
 	register NickSort *t;
 	while(*list)
