@@ -362,6 +362,8 @@ static void	p_topic (const char *from, const char *comm, const char **ArgList)
 				channel, new_topic, LEVEL_TOPIC))
 		return;
 
+	add_last_type(&last_topic[0], 1, from, FromUserHost, channel, new_topic);
+
 	l = message_from(channel, LEVEL_TOPIC);
 	if (do_hook(TOPIC_LIST, "%s %s %s", from, channel, new_topic))
 	{
@@ -422,6 +424,8 @@ static void	p_wallops (const char *from, const char *comm, const char **ArgList)
 	if (!server_wallop && check_flooding(from, FromUserHost, 
 						LEVEL_WALLOP, message))
 		return;
+
+	add_last_type(&last_wall[0], MAX_LAST_MSG, from, NULL, server_wallop ? "S":"*", message);
 
 	l = message_from(from, LEVEL_WALLOP);
 	if (do_hook(WALLOP_LIST, "%s %c %s", 
@@ -570,6 +574,8 @@ static void	p_privmsg (const char *from, const char *comm, const char **ArgList)
 
 		if (forwardnick)
 			send_to_server("NOTICE %s :*%s* %s", forwardnick, from, message);
+
+		add_last_type(&last_msg[0], MAX_LAST_MSG, from, FromUserHost, target, message);
 
 		if (do_hook(hook_type, "%s %s", from, message))
 		{
