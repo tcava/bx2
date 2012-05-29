@@ -229,6 +229,8 @@ static	IrcCommand irc_command[] =
 	{ "AWAY",	away		},
 	{ "AWAYLOG",	awaylog		},
 	{ "AWAYMSG",	away		},
+	{ "B",		ban		},
+	{ "BAN",	ban		},
 	{ "BANWORDS",	add_ban_word	},
 	{ "BEEP",	beepcmd		},
 	{ "BIND",	bindcmd		}, /* keys.c */

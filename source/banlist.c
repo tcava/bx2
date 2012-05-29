@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.2 2012/05/29 06:05:13 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.3 2012/05/29 06:30:39 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -1283,6 +1283,7 @@ BUILT_IN_COMMAND(kickban)
 		userhostbase(spec, userhost_ban, 1, "%s %s %s", chan->channel, spec, command ? (!strcmp(command, "FUCK") ? "FUCK": set_ignore ? "BKI":empty_string):empty_string);
 	reset_display_target();
 }
+#endif
 
 BUILT_IN_COMMAND(ban)
 {
@@ -1290,7 +1291,7 @@ BUILT_IN_COMMAND(ban)
 		*spec = NULL, 
 		*rest = NULL;
 	Channel *chan;
-	NickList *nicks;
+	Nick *nicks;
 	int server = from_server;
 	int found = 0;
 	
@@ -1319,7 +1320,7 @@ BUILT_IN_COMMAND(ban)
 		if (!my_stricmp(spec, nicks->nick))
 		{
 			char *t, *host, *user;
-			t = LOCAL_COPY(nicks->host);
+			t = LOCAL_COPY(nicks->userhost);
 			user = clear_server_flags(t);
 			host = strchr(user, '@');
 			*host++ = 0;
@@ -1334,10 +1335,11 @@ BUILT_IN_COMMAND(ban)
 		if (strchr(spec, '!') && strchr(spec, '@'))
 			send_to_server("MODE %s +b %s", chan->channel, spec);
 		else
-			userhostbase(spec, userhost_ban, 1, "%s %s", chan->channel, spec);
+			userhostbase(server, spec, NULL, userhost_ban, 1, "%s %s", chan->channel, spec);
 	}
 }
 
+#if 0
 BUILT_IN_COMMAND(banstat)
 {
 char *channel = NULL, *tmp = NULL, *check = NULL;
