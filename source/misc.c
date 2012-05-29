@@ -4,10 +4,12 @@
 #include "irc_std.h"
 #include "misc.h"
 #include "window.h"
+#include "who.h"
 #include "vars.h"
 #include "server.h"
 #include "clock.h"
 #include "hook.h"
+#include "cset.h"
 /* This should go in expr.h */
 extern char *alias_special_char(char **, char *, const char *, char *, int *);
 
@@ -50,7 +52,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.17 2012/05/01 07:43:37 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.18 2012/05/29 06:09:55 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -1323,10 +1325,11 @@ int isme(char *nick)
 {
 	return ((my_stricmp(nick, get_server_nickname(from_server)) == 0) ? 1 : 0);
 }
+#endif
 
 
 enum REDIR_TYPES { PRIVMSG = 0, KICK, TOPIC, WALL, WALLOP, NOTICE, KBOOT, KILL, DCC, LIST};
-void userhost_ban(UserhostItem *stuff, char *nick1, char *args);
+extern void userhost_ban(int refnum, UserhostItem *stuff, char *nick1, char *args);
 
 int redirect_msg(char *to, enum REDIR_TYPES what, char *str, int showansi)
 {
@@ -1339,12 +1342,12 @@ char *new_str;
 	{
 		case PRIVMSG:
 			if (is_channel(to))
-				put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_PUBLIC_FSET), "%s %s %s %s", update_clock(GET_TIME), to, get_server_nickname(from_server), new_str));
-			else if ((*to == '=') && dcc_activechat(to+1))
+				put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_PUBLIC_FSET), "%s %s %s %s", get_clock(), to, get_server_nickname(from_server), new_str));
+			else if ((*to == '=') && dcc_chat_active(to+1))
 				;
 			else
-				put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_MSG_FSET), "%s %s %s %s", update_clock(GET_TIME), to, get_server_nickname(from_server), new_str));
-			if ((*to == '=') && dcc_activechat(to+1))
+				put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_MSG_FSET), "%s %s %s %s", get_clock(), to, get_server_nickname(from_server), new_str));
+			if ((*to == '=') && dcc_chat_active(to+1))
 				dcc_chat_transmit(to+1, new_str, new_str, "PRIVMSG", 1);
 			else
 				send_to_server("PRIVMSG %s :%s", to, new_str);
@@ -1353,24 +1356,27 @@ char *new_str;
 			send_to_server("KILL %s :%s", to, new_str);
 			break;
 		case KBOOT:
-			userhostbase(to, userhost_ban, 1, "%s %s %s", get_current_channel_by_refnum(0), to, empty_string);
+			userhostbase(from_server, to, NULL, userhost_ban, 1, "%s %s %s", get_echannel_by_refnum(0), to, empty_string);
 		case KICK:
-			send_to_server("KICK %s %s :%s", get_current_channel_by_refnum(0), to, new_str);
+			send_to_server("KICK %s %s :%s", get_echannel_by_refnum(0), to, new_str);
 			break;
 		case TOPIC:
 			send_to_server("TOPIC %s :%s", to, new_str);
 			break;
+/* XXX: caf is going to rewrite ChanWallOp soon */
+#if 0
 		case WALL:
 		{
 			ChanWallOp(NULL, new_str, NULL, NULL);
 			break;
 		}
+#endif
 		case WALLOP:
 			put_it("!! %s", str); 
 			send_to_server("WALLOPS :%s", new_str);
 			break;
 		case NOTICE:
-			put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_NOTICE_FSET), "%s %s %s %s", update_clock(GET_TIME), to, get_server_nickname(from_server), new_str));
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_SEND_NOTICE_FSET), "%s %s %s %s", get_clock(), to, get_server_nickname(from_server), new_str));
 			send_to_server("NOTICE %s :%s", to, new_str);
 			break;
 		case LIST:
@@ -1392,7 +1398,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 	int showansi = 0;
 	enum REDIR_TYPES what = PRIVMSG;
 
-	if (!my_strnicmp(command, "RELCR", 5))
+	if (!strncmp(command, "RELCR", 5))
 	{
 		t = &last_ctcp[0];
 		form = fget_string_var(FORMAT_CTCP_REPLY_FSET);
@@ -1400,7 +1406,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len == 6 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELC", 4))
+	else if (!strncmp(command, "RELC", 4))
 	{
 		t = &last_sent_ctcp[0];
 		form = fget_string_var(FORMAT_SEND_CTCP_FSET);
@@ -1408,7 +1414,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 4 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELD", 4))
+	else if (!strncmp(command, "RELD", 4))
 	{
 		t = &last_dcc[0];
 		size = MAX_LAST_MSG;
@@ -1418,7 +1424,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 			what = TOPIC;
 		numargs = 4;
 	}
-	else if (!my_strnicmp(command, "RELSD", 5))
+	else if (!strncmp(command, "RELSD", 5))
 	{
 		t = &last_sent_dcc[0];
 		size = MAX_LAST_MSG;
@@ -1428,7 +1434,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 			what = TOPIC;
 		numargs = 4;
 	}
-	else if (!my_strnicmp(command, "RELI", 4))
+	else if (!strncmp(command, "RELI", 4))
 	{
 		t = &last_invite_channel[0];
 		form = fget_string_var(FORMAT_INVITE_FSET);
@@ -1437,7 +1443,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 4 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELM", 4))
+	else if (!strncmp(command, "RELM", 4))
 	{
 		/* ??? */
 		t = &last_msg[0]; size = MAX_LAST_MSG;
@@ -1446,7 +1452,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 4 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELN", 4))
+	else if (!strncmp(command, "RELN", 4))
 	{
 		/* ??? */
 		t = &last_notice[0]; size = MAX_LAST_MSG;
@@ -1455,7 +1461,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 4 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELSM", 5))
+	else if (!strncmp(command, "RELSM", 5))
 	{
 		/* ??? */
 		t = &last_sent_msg[0]; size = MAX_LAST_MSG;
@@ -1464,7 +1470,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 5 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELSN", 5))
+	else if (!strncmp(command, "RELSN", 5))
 	{
 		/* ??? */
 		t = &last_sent_notice[0]; size = MAX_LAST_MSG;
@@ -1474,7 +1480,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 5 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELST", 5))
+	else if (!strncmp(command, "RELST", 5))
 	{
 		/* ??? */
 		t = &last_sent_topic[0];
@@ -1484,7 +1490,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 5 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELSW", 5))
+	else if (!strncmp(command, "RELSW", 5))
 	{
 		/* ??? */
 		t = &last_sent_wall[0];
@@ -1493,7 +1499,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 5 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELS", 4))
+	else if (!strncmp(command, "RELS", 4))
 	{
 		t = &last_servermsg[0]; size = MAX_LAST_MSG;
 		form = fget_string_var(FORMAT_RELS_FSET);
@@ -1502,7 +1508,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 4 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELT", 4))
+	else if (!strncmp(command, "RELT", 4))
 	{
 		/* ??? */
 		t = &last_topic[0];
@@ -1512,7 +1518,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		if (len > 4 && command[len-1] == 'T')
 			what = TOPIC;
 	}
-	else if (!my_strnicmp(command, "RELW", 4))
+	else if (!strncmp(command, "RELW", 4))
 	{
 		/* ??? */
 		t = &last_wall[0]; 
@@ -1565,8 +1571,11 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		}
 		else if (!my_strnicmp(comm, "-kick", strlen(comm)))
 			what = KICK;
+/* XXX */
+#if 0
 		else if (!my_strnicmp(comm, "-wall", strlen(comm)))
 			what = WALL;
+#endif
 		else if (!my_strnicmp(comm, "-wallop", strlen(comm)))
 			what = WALLOP;
 		else if (!my_strnicmp(comm, "-msg", strlen(comm)))
@@ -1632,6 +1641,7 @@ BUILT_IN_COMMAND(do_dirlasttype)
 		bitchsay("Can not %s what you requested", command);
 }
 
+#if 0
 /*
  * Wallop   Sends NOTICE to all ops of Current Channel!       
  */
@@ -1689,7 +1699,7 @@ BUILT_IN_COMMAND(ChanWallOp)
 		if (ver >= Server_u2_10 || enable_all)
 		{
 			send_to_server(enable_all?"NOTICE @%s :%s":"WALLCHOPS %s :%s", channel, buffer);
-			put_it("%s", convert_output_format(fget_string_var(FORMAT_BWALL_FSET), "%s %s %s %s %s", update_clock(GET_TIME), channel, "*", "*", args));
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_BWALL_FSET), "%s %s %s %s %s", get_clock(), channel, "*", "*", args));
 			add_last_type(&last_sent_wall[0], 1, NULL, NULL, channel, buffer);
 			new_free(&channel);
 			reset_display_target();
@@ -1721,7 +1731,7 @@ BUILT_IN_COMMAND(ChanWallOp)
 			send_to_server("%s %s :%s", "NOTICE", chops, buffer);
 		if (i) 
 		{
-			put_it("%s", convert_output_format(fget_string_var(FORMAT_BWALL_FSET), "%s %s %s %s %s", update_clock(GET_TIME), channel, "*", "*", args));
+			put_it("%s", convert_output_format(fget_string_var(FORMAT_BWALL_FSET), "%s %s %s %s %s", get_clock(), channel, "*", "*", args));
 			add_last_type(&last_sent_wall[0], 1, NULL, NULL, channel, buffer);
 			if (exclude)
 				bitchsay("Excluded <%s> from wallmsg", exclude);
