@@ -1545,26 +1545,29 @@ static UserhostEntry *get_new_userhost_entry (int refnum)
  */
 BUILT_IN_COMMAND(userhostcmd)
 {
-	userhostbase(from_server, args, subargs, NULL, 1);
+	userhostbase(from_server, args, subargs, NULL, 1, NULL);
 }
 
 BUILT_IN_COMMAND(useripcmd)
 {
-	userhostbase(from_server, args, subargs, NULL, 0);
+	userhostbase(from_server, args, subargs, NULL, 0, NULL);
 }
 
 BUILT_IN_COMMAND(usripcmd)
 {
-	userhostbase(from_server, args, subargs, NULL, 2);
+	userhostbase(from_server, args, subargs, NULL, 2, NULL);
 }
 
-void userhostbase (int refnum, char *args, const char *subargs, void (*line) (int, UserhostItem *, const char *, const char *), int do_userhost)
+extern void userhost_ban(int, void (*)(int, UserhostItem *, char *, char *));
+
+void userhostbase (int refnum, char *args, const char *subargs, void (*line) (int, UserhostItem *, const char *, const char *), int do_userhost, const char *format, ...)
 {
 	int	total = 0,
 		userhost_cmd = 0;
 	int	server_query_reqd = 0;
 	char	*nick;
 	char	buffer[BIG_BUFFER_SIZE + 1];
+	char	buf_data[BIG_BUFFER_SIZE + 1];
 	char 	*ptr, 
 		*next_ptr,
 		*body = NULL;
@@ -1574,6 +1577,16 @@ void userhostbase (int refnum, char *args, const char *subargs, void (*line) (in
 	/* Maybe should output a warning? */
 	if (!is_server_registered(refnum))
 		return;
+
+	if (format)
+	{
+		va_list args;
+		va_start(args, format);
+		vsnprintf(buf_data, BIG_BUFFER_SIZE, format, args);
+		va_end(args);
+	}
+	else
+		*buf_data = 0;
 
 	*buffer = 0;
 	while ((nick = next_arg(args, &args)) != NULL)
@@ -1671,6 +1684,8 @@ void userhostbase (int refnum, char *args, const char *subargs, void (*line) (in
 
 			if (userhost_cmd)
 				new_u->text = malloc_strdup(body);
+			else if (*buf_data)
+				new_u->text = malloc_strdup(buf_data);
 
 			if (line)
 				new_u->func = line;
@@ -1707,11 +1722,11 @@ void userhostbase (int refnum, char *args, const char *subargs, void (*line) (in
 				item.host = "<UNKNOWN>";
 
 			if (line)
-				line(refnum, &item, my_nick, body);
+				line(refnum, &item, my_nick, body ? body : *buf_data ? buf_data : NULL);
 			else if (userhost_cmd)
 				userhost_cmd_returned(refnum, &item, my_nick, body);
 			else
-				yell("Yowza!  I dont know what to do here!");
+				yell("Yowza!  I don't know what to do here!");
 		}
 		new_free(&extra);
 	}

@@ -94,7 +94,8 @@ typedef struct UserhostEntryT
 	BUILT_IN_COMMAND(usripcmd);
 	void 	userhostbase 		(int refnum, char *arg, const char *subargs,
 					void (*line) (int, UserhostItem *, 
-						const char *, const char *), int);
+						const char *, const char *), int,
+						const char *, ...);
 	void 	userhost_returned 	(int, const char *, const char *, const char **);
 	void 	userhost_cmd_returned 	(int, UserhostItem *, const char *, const char *);
 
