@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.1 2010/04/16 23:29:23 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.2 2012/05/29 06:05:13 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -16,12 +16,13 @@ static char cvsrevision[] = "$Id: banlist.c,v 1.1 2010/04/16 23:29:23 fb Exp $";
 #include "server.h"
 #include "window.h"
 #include "who.h"
-//#include "whowas.h"
+#include "names.h"
+#include "whowas.h"
 #include "vars.h"
-//#include "userlist.h"
+#include "userlist.h"
 #include "misc.h"
 #include "timer.h"
-//#include "hash2.h"
+#include "hash2.h"
 #include "cset.h"
 #define MAIN_SOURCE
 //#include "modval.h"
@@ -397,15 +398,16 @@ int old_server = from_server;
 	new_free(&host);
 	from_server = old_server;
 }
+#endif
 
 
-void userhost_ban(UserhostItem *stuff, char *nick1, char *args)
+void userhost_ban(int refnum, UserhostItem *stuff, char *nick1, char *args)
 {
 	char *temp;
 	char *str= NULL;
 	char *channel;
 	Channel *c = NULL;
-	NickList *n = NULL;
+	Nick *n = NULL;
 
 	char *ob = "-o+b";
 	char *b = "+b";
@@ -415,8 +417,7 @@ void userhost_ban(UserhostItem *stuff, char *nick1, char *args)
 		
 	int fuck = 0;
 	int set_ignore = 0;
-	
-	
+
 	channel = next_arg(args, &args);
 	temp = next_arg(args, &args);
 
@@ -425,16 +426,17 @@ void userhost_ban(UserhostItem *stuff, char *nick1, char *args)
 	
 	if (!stuff || !stuff->nick || !nick1 || !strcmp(stuff->user, "<UNKNOWN>") || my_stricmp(stuff->nick, nick1))
 	{
+/* XXX
 		if (nick1 && channel && (whowas = check_whowas_nick_buffer(nick1, channel, 0)))
 		{
 			nick = whowas->nicklist->nick;
-			user = m_strdup(clear_server_flags(whowas->nicklist->host));
+			user = malloc_strdup(clear_server_flags(whowas->nicklist->userhost));
 			host = strchr(user, '@');
 			*host++ = 0;
 			bitchsay("Using WhoWas info for ban of %s ", nick1);
 			n = whowas->nicklist;
 		}
-		else if (nick1)
+		else*/ if (nick1)
 		{
 			bitchsay("No match for the %s of %s on %s", fuck ? "Fuck":"Ban", nick1, channel);
 			return;
@@ -443,7 +445,7 @@ void userhost_ban(UserhostItem *stuff, char *nick1, char *args)
 	else
 	{
 		nick = stuff->nick;
-		user = m_strdup(clear_server_flags(stuff->user));
+		user = malloc_strdup(clear_server_flags(stuff->user));
 		host = stuff->host;
 	}
 
@@ -454,9 +456,9 @@ void userhost_ban(UserhostItem *stuff, char *nick1, char *args)
 		return;
 	}
 
-	if (is_on_channel(channel, from_server, nick))
+	if (is_on_channel(channel, nick))
 		chan = channel;
-	c = lookup_channel(channel, from_server, 0);
+	c = find_channel(channel, from_server);
 	if (c && !n)
 		n = find_nicklist_in_channellist(nick, c, 0);
 	send_to_server("MODE %s %s %s %s", channel, chan ? ob : b, chan?nick:empty_string, ban_it(nick, user, host, (n && n->ip)?n->ip:NULL));
@@ -468,10 +470,9 @@ void userhost_ban(UserhostItem *stuff, char *nick1, char *args)
 #endif
 		new_free(&str);
 	} else if (set_ignore)
-		ignore_nickname(ban_it("*", user, host, NULL)	, IGNORE_ALL, 0);
+; //		ignore_nickname(ban_it("*", user, host, NULL)	, IGNORE_ALL, 0);
 	new_free(&user);
 }
-#endif
 
 BUILT_IN_COMMAND(multkick)
 {
