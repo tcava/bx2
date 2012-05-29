@@ -2286,7 +2286,7 @@ void  server_is_registered (int refnum, const char *itsname, const char *ourname
 	my_sleep(0.005);
 
 	reinstate_user_modes();
-	userhostbase(from_server, NULL, NULL, got_my_userhost, 1);
+	userhostbase(from_server, NULL, NULL, got_my_userhost, 1, NULL);
 
 	if (default_channel)
 	{

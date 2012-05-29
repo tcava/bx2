@@ -468,7 +468,7 @@ void 	dispatch_notify_userhosts (int refnum)
 	{
 		if (x_debug & DEBUG_NOTIFY)
 			yell("Dispatching notifies to server [%d], [%s]", from_server, batched_notify_userhosts);
-		userhostbase(refnum, batched_notify_userhosts, NULL, notify_userhost_dispatch, 1);
+		userhostbase(refnum, batched_notify_userhosts, NULL, notify_userhost_dispatch, 1, NULL);
 		new_free(&batched_notify_userhosts);
 		batched_notifies = 0;
 	}
