@@ -62,5 +62,8 @@ const   char *  current_package         (void);
 	BUILT_IN_COMMAND(show_hash);
 	BUILT_IN_COMMAND(do_dirlasttype);
 	BUILT_IN_COMMAND(ban);
+	BUILT_IN_COMMAND(massdeop);
+	BUILT_IN_COMMAND(massop);
+	BUILT_IN_COMMAND(mknu);
 
 #endif /* __commands_h__ */

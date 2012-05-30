@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.3 2012/05/29 06:30:39 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.4 2012/05/30 06:33:26 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -520,12 +520,11 @@ BUILT_IN_COMMAND(multkick)
 	}
 }
 
-#if 0
 BUILT_IN_COMMAND(massdeop)
 {
 	Channel *chan;
 
-register NickList *nicks;
+register Nick *nicks;
 
 	char *spec, *rest, *to;
 	int maxmodes, count, all = 0;
@@ -536,7 +535,7 @@ register NickList *nicks;
 	
 	maxmodes = get_int_var(NUM_OPMODES_VAR);
 
-	if (command && !my_stricmp(command, "mdvoice"))
+	if (command && !strcmp(command, "MDVOICE"))
 		isvoice = 1;
 	
 	rest = NULL;
@@ -568,7 +567,7 @@ register NickList *nicks;
 	count = 0;
 	for (nicks = next_nicklist(chan, NULL); nicks; nicks = next_nicklist(chan, nicks))
 	{
-		sprintf(buffer, "%s!%s", nicks->nick, nicks->host);
+		sprintf(buffer, "%s!%s", nicks->nick, nicks->userhost);
 #if 0
 		if ((all || (!isvoice && nicks->chanop) || (isvoice && nicks->voice)) &&
 		    my_stricmp(nicks->nick, get_server_nickname(from_server)) &&
@@ -588,7 +587,6 @@ register NickList *nicks;
 	if (!count)
 		say("No matches for %s of %s on %s", command?command:"massdeop", spec, chan->channel);
 }
-#endif
 
 BUILT_IN_COMMAND(doop)
 {
@@ -599,11 +597,6 @@ BUILT_IN_COMMAND(doop)
 		max = get_int_var(NUM_OPMODES_VAR);
 	int	old_server = from_server;
 
-#if 0
-	/* command is mode char to use - if none given, default to op */
-	if (!command)
-		command = "o";
-#endif
 	if (!strcmp(command, "HOP"))
 		command = "h";
 	else if (!strcmp(command, "OP"))
@@ -648,11 +641,6 @@ BUILT_IN_COMMAND(dodeop)
 	temp = NULL;
 	max = get_int_var(NUM_OPMODES_VAR);
 
-#if 0
-	/* command is mode char to use - if none given, default to deop */
-	if (!command)
-		command = "o";
-#endif
 	if (!strcmp(command, "DEHOP"))
 		command = "h";
 	else if (!strcmp(command, "DEOP") || !strcmp(command, "DOP"))
@@ -683,12 +671,11 @@ BUILT_IN_COMMAND(dodeop)
 	flush_mode_all(chan);
 }
 
-#if 0
 BUILT_IN_COMMAND(massop)
 {
 	Channel *chan;
 	
-	register NickList *nicks;
+	register Nick *nicks;
 
 	char	*to = NULL, 
 		*spec, 
@@ -703,7 +690,7 @@ BUILT_IN_COMMAND(massop)
 	int	server = 0;
 		
 	
-	if (command)
+	if (!strcmp(command, "MVOICE"))
 		massvoice = 1;
 
 	rest = NULL;
@@ -737,7 +724,7 @@ BUILT_IN_COMMAND(massop)
 	for (nicks = next_nicklist(chan, NULL); nicks; nicks = next_nicklist(chan, nicks))
 	{
 		i = 0;
-		sprintf(buffer, "%s!%s", nicks->nick, nicks->host);
+		sprintf(buffer, "%s!%s", nicks->nick, nicks->userhost);
 		if ((my_stricmp(nicks->nick, get_server_nickname(from_server)) && wild_match(spec, buffer)))
 		{
 			if ((massvoice && !nick_isvoice(nicks) && !nick_isop(nicks)) || !nick_isop(nicks))
@@ -751,7 +738,6 @@ BUILT_IN_COMMAND(massop)
 	if (!count)
 		say("No matches for %s of %s on %s", command? command : "massop", spec, chan->channel);
 }
-#endif
 
 #if 0
 BUILT_IN_COMMAND(masskick)
@@ -855,11 +841,12 @@ register NickList *nicks;
 	else
 		bitchsay("No matches for mass kick of %s on %s", spec, chan->channel);
 }
+#endif
 
 BUILT_IN_COMMAND(mknu)
 {
 	Channel *chan;
-register NickList *nicks;
+register Nick *nicks;
 	char *to = NULL, *rest;
 	int count;
 	int server = from_server;
@@ -883,7 +870,7 @@ register NickList *nicks;
 	count = 0;
 	for (nicks = next_nicklist(chan, NULL); nicks; nicks = next_nicklist(chan, nicks))
 	{
-		if (!nick_isop(nicks) && !isme(nicks->nick))
+		if (!nick_isop(nicks) && !is_me(server, nicks->nick))
 		{
 			count++;
 			send_to_server("KICK %s %s :(non-users) \002%cX002", chan->channel, nicks->nick, rest ? rest : get_reason(nicks->nick, NULL));
@@ -893,6 +880,7 @@ register NickList *nicks;
 		say("No matches for masskick of non-users on %s", chan->channel);
 }
 
+#if 0
 BUILT_IN_COMMAND(masskickban)
 {
 	Channel *chan;
