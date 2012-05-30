@@ -281,6 +281,7 @@ static	IrcCommand irc_command[] =
 	{ "FORWARD",	do_forward	},
 	{ "FPROT",	tog_fprot	},
 	{ "FSET",	fset_variable	},
+	{ "FUCKEM",	fuckem		},
 	{ "GONE",	away		},
 	{ "HASH",	send_comm	},
 #ifdef WANT_CHAN_NICK_SERV

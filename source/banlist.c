@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.4 2012/05/30 06:33:26 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.5 2012/05/30 11:19:00 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -150,7 +150,6 @@ MODE $C +/-b userhost
 }
 
 
-#if 0
 BUILT_IN_COMMAND(fuckem)
 {
 char c;
@@ -169,7 +168,6 @@ BanList *Bans;
 	}         
 	flush_mode_all(chan);
 }
-#endif
 
 
 /*

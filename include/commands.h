@@ -65,5 +65,6 @@ const   char *  current_package         (void);
 	BUILT_IN_COMMAND(massdeop);
 	BUILT_IN_COMMAND(massop);
 	BUILT_IN_COMMAND(mknu);
+	BUILT_IN_COMMAND(fuckem);
 
 #endif /* __commands_h__ */
