@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.5 2012/05/30 11:19:00 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.6 2012/06/09 01:40:46 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -226,6 +226,7 @@ BUILT_IN_COMMAND(LameKick)
 	}
 	from_server = old_server;
 }
+#endif
 
 static void shitlist_erase(ShitList **clientlist)
 {
@@ -241,7 +242,6 @@ static void shitlist_erase(ShitList **clientlist)
 	}
 	*clientlist = NULL;
 }
-#endif
 
 static char *screw(char *user)
 {
@@ -322,8 +322,7 @@ char *tmp;
 	return banstr;
 }
 
-#if 0
-void userhost_unban(UserhostItem *stuff, char *nick1, char *args)
+void userhost_unban(int refnum, UserhostItem *stuff, char *nick1, char *args)
 {
 char *tmp;
 Channel *chan;
@@ -333,7 +332,7 @@ BanList *bans;
 char *host = NULL;
 char *ip_str = NULL;
 WhowasList *whowas = NULL;
-NickList *n = NULL;
+Nick *n = NULL;
 int count = 0;
 int old_server = from_server;
 
@@ -342,13 +341,14 @@ int old_server = from_server;
 		!strcmp(stuff->user, "<UNKNOWN>") || 
 		my_stricmp(stuff->nick, nick1))
 	{
+/* XXX
 		if (nick1 && (whowas = check_whowas_nick_buffer(nick1, args, 0)))
 		{
 			malloc_sprintf(&host, "%s!%s", whowas->nicklist->nick, whowas->nicklist->host);
 			bitchsay("Using WhoWas info for unban of %s ", nick1);
 			n = whowas->nicklist;
 		}
-		else if (nick1)
+		else*/ if (nick1)
 		{
 			bitchsay("No match for the unban of %s on %s", nick1, args);
 			return;
@@ -375,10 +375,10 @@ int old_server = from_server;
 
 	if (n && n->ip)
 	{
-		size_t len = strlen(n->nick)+strlen(n->host)+strlen(n->ip)+10;
+		size_t len = strlen(n->nick)+strlen(n->userhost)+strlen(n->ip)+10;
 		ip_str = alloca(len); 
 		*ip_str = 0;
-		strmopencat(ip_str, len, stuff->nick, "!", stuff->user, "@", n->ip, NULL);
+		strlopencat(ip_str, len, stuff->nick, "!", stuff->user, "@", n->ip, NULL);
 	}
 	for (bans = chan->bans; bans; bans = bans->next)
 	{
@@ -396,7 +396,6 @@ int old_server = from_server;
 	new_free(&host);
 	from_server = old_server;
 }
-#endif
 
 
 void userhost_ban(int refnum, UserhostItem *stuff, char *nick1, char *args)
@@ -522,7 +521,7 @@ BUILT_IN_COMMAND(massdeop)
 {
 	Channel *chan;
 
-register Nick *nicks;
+	Nick *nicks;
 
 	char *spec, *rest, *to;
 	int maxmodes, count, all = 0;
@@ -673,7 +672,7 @@ BUILT_IN_COMMAND(massop)
 {
 	Channel *chan;
 	
-	register Nick *nicks;
+	Nick *nicks;
 
 	char	*to = NULL, 
 		*spec, 
@@ -741,7 +740,7 @@ BUILT_IN_COMMAND(massop)
 BUILT_IN_COMMAND(masskick)
 {
 	Channel *chan;
-register NickList *nicks;
+register Nick *nicks;
 	ShitList *masskick_list = NULL, *new = NULL;
 	char *to, *spec, *rest, *buffer = NULL, *q;
 	int server = from_server;
@@ -785,7 +784,7 @@ register NickList *nicks;
 	for (nicks = next_nicklist(chan, NULL); nicks; nicks = next_nicklist(chan, nicks))
 	{
 		int doit = 0;
-		q = clear_server_flags(nicks->host);
+		q = clear_server_flags(nicks->userhost);
 		malloc_sprintf(&buffer, "%s!*%s", nicks->nick, q);		
 		if (all)
 			doit = 1;
@@ -795,7 +794,7 @@ register NickList *nicks;
 			doit = 1;
 		else if (get_cset_int_var(chan->csets, KICK_OPS_CSET))
 			doit = 1;
-		if (doit && !isme(nicks->nick) && (wild_match(spec, buffer) || wild_match(nicks->nick, spec)))
+		if (doit && !is_me(server, nicks->nick) && (wild_match(spec, buffer) || wild_match(nicks->nick, spec)))
 #if 0
 		if ((all || (ops && nicks->chanop) || !nicks->chanop || get_cset_int_var(chan->csets, KICK_OPS_CSET)) &&
 		    my_stricmp(nicks->nick, get_server_nickname(from_server)) &&
@@ -844,19 +843,14 @@ register NickList *nicks;
 BUILT_IN_COMMAND(mknu)
 {
 	Channel *chan;
-register Nick *nicks;
+	Nick *nicks;
 	char *to = NULL, *rest;
 	int count;
 	int server = from_server;
+	int kickops;
 	
-	
-	if (!args || !*args)
-		to = NULL;
-	else if (*args == '#' || *args == '&' || !strncmp(args, "* ", 2) ||
-		 !strcmp(args, "*"))
+	if (args && (is_channel(args) || !strncmp(args, "* ", 2) || !strcmp(args, "*")))
 		to = next_arg(args, &args);
-	else
-		to = NULL;
 
 	if (!(chan = prepare_command(&server, to, NEED_OP)))
 		return;
@@ -865,24 +859,23 @@ register Nick *nicks;
 	if (rest && !*rest)
 		rest = NULL;
 
+	kickops = get_cset_int_var(chan->csets, KICK_OPS_CSET);
 	count = 0;
 	for (nicks = next_nicklist(chan, NULL); nicks; nicks = next_nicklist(chan, nicks))
 	{
-		if (!nick_isop(nicks) && !is_me(server, nicks->nick))
-		{
-			count++;
-			send_to_server("KICK %s %s :(non-users) \002%cX002", chan->channel, nicks->nick, rest ? rest : get_reason(nicks->nick, NULL));
-		}
+		if (nicks->userlist || (nick_isop(nicks) && !kickops) || is_me(server, nicks->nick))
+			continue;
+		count++;
+		send_to_server("KICK %s %s :(non-users) \002%s\002", chan->channel, nicks->nick, rest ? rest : get_reason(nicks->nick, NULL));
 	}
 	if (!count)
 		say("No matches for masskick of non-users on %s", chan->channel);
 }
 
-#if 0
 BUILT_IN_COMMAND(masskickban)
 {
 	Channel *chan;
-register NickList *nicks;
+	Nick *nicks;
 	char *to = NULL, *spec, *rest;
 	int count, all = 0;
 	int server = from_server;
@@ -930,9 +923,9 @@ register NickList *nicks;
 	for (nicks = next_nicklist(chan, NULL); nicks; nicks = next_nicklist(chan, nicks))
 	{
 		*buffer = '\0';
-		strmopencat(buffer, IRCD_BUFFER_SIZE, nicks->nick, "!", nicks->host, NULL);
+		strlopencat(buffer, IRCD_BUFFER_SIZE, nicks->nick, "!", nicks->userhost, NULL);
 		if ((all || !nick_isop(nicks) || get_cset_int_var(chan->csets, KICK_OPS_CSET)) &&
-		   !isme(nicks->nick) && wild_match(tempbuf, buffer))
+		   !is_me(server, nicks->nick) && wild_match(tempbuf, buffer))
 		{
 			count++;
 			send_to_server("KICK %s %s :(%s) \002%s\002", chan->channel, nicks->nick, spec, rest ? rest : get_reason(nicks->nick, NULL));
@@ -945,7 +938,7 @@ register NickList *nicks;
 BUILT_IN_COMMAND(massban)
 {
 	Channel *chan;
-register NickList *nicks;
+	Nick *nicks;
 	ShitList *massban_list = NULL, *tmp;
 	char *to = NULL, *spec, *rest;
 	char *buffer = NULL;
@@ -986,15 +979,15 @@ register NickList *nicks;
 	for (nicks = next_nicklist(chan, NULL); nicks; nicks = next_nicklist(chan, nicks))
 	{
 		new_free(&buffer);
-		malloc_sprintf(&buffer, "%s!%s", nicks->nick, nicks->host);
+		malloc_sprintf(&buffer, "%s!%s", nicks->nick, nicks->userhost);
 
 		if ((all || !nick_isop(nicks) || get_cset_int_var(chan->csets, KICK_OPS_CSET)) &&
-		    !isme(nicks->nick) && wild_match(spec, buffer))
+		    !is_me(server, nicks->nick) && wild_match(spec, buffer))
 		{
 			char *temp = NULL;
 			char *p, *q;
 			ShitList *new;
-			temp = LOCAL_COPY(nicks->host);
+			temp = LOCAL_COPY(nicks->userhost);
 
 			q = clear_server_flags(temp);
 			p = strchr(temp, '@');
@@ -1043,6 +1036,7 @@ BUILT_IN_COMMAND(unban)
 	BanList *bans;
 	int count = 0;
 	int server = from_server;
+	int l;
 			
 	
 	to = spec = host = NULL;
@@ -1058,7 +1052,7 @@ BUILT_IN_COMMAND(unban)
 	if (!(chan = prepare_command(&server, to, NEED_OP)))
 		return;
 
-	set_display_target(chan->channel, LEVEL_OTHER);
+	l = message_from(chan->channel, LEVEL_OTHER);
 	if (!spec && !(spec = next_arg(args, &args)))
 	{
 		spec = "*";
@@ -1071,8 +1065,8 @@ BUILT_IN_COMMAND(unban)
 	}
 	if (!strchr(spec, '*'))
 	{
-		userhostbase(spec, userhost_unban, 1, "%s %d", chan->channel, current_window->refnum);
-		reset_display_target();
+		userhostbase(server, spec, NULL, userhost_unban, 1, "%s %d", chan->channel, current_window->refnum);
+		pop_message_from(l);
 		return;
 	}
 
@@ -1126,9 +1120,8 @@ BUILT_IN_COMMAND(unban)
 	}
 	if (!count)
 		bitchsay("No ban matching %s found", spec);
-	reset_display_target();
+	pop_message_from(l);
 }
-#endif
 
 BUILT_IN_COMMAND(dokick)
 {

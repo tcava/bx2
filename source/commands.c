@@ -254,6 +254,7 @@ static	IrcCommand irc_command[] =
 	{ "CTCP",	ctcp		},
 	{ "D",		describe	},
 	{ "DATE",	datecmd		},
+	{ "DBAN",	unban		},
 	{ "DCC",	dcc_cmd		}, /* dcc.c */
 	{ "DEBUGHASH",	show_hash	},
 	{ "DEFER",	defercmd	},
@@ -325,6 +326,7 @@ static	IrcCommand irc_command[] =
 	{ "LUSERS",	send_comm	},
 	{ "M",		e_privmsg	},
 	{ "MAP",	send_comm	},
+	{ "MB",		massban		},
 	{ "MD",		massdeop	},
 	{ "MDOP",	massdeop	},
 	{ "MDVOICE",	massdeop	},
@@ -333,6 +335,7 @@ static	IrcCommand irc_command[] =
 	{ "MEMOSERV",	send_comm	},
 #endif
 	{ "MESG",	extern_write	},
+	{ "MKB",	masskickban	},
 	{ "MKNU",	mknu		},
 	{ "MODE",	send_channel_com},
 	{ "MOP",	massop		},
@@ -340,6 +343,7 @@ static	IrcCommand irc_command[] =
 	{ "MSAY",	do_msay		},
 	{ "MSG",	e_privmsg	},
 	{ "MTOPIC",	do_mtopic	},
+	{ "MUB",	unban		},
 	{ "MULT",	multkick	},
 	{ "MVOICE",	massop		},
 	{ "N",		do_mynames	},
@@ -461,8 +465,10 @@ static	IrcCommand irc_command[] =
 	{ "TOPIC",	e_topic		},
 	{ "TRACE",	send_comm	},
 	{ "TYPE",	typecmd		}, /* keys.c */
+	{ "UB",		unban		},
 	{ "UMODE",	umodecmd	},
 	{ "UNAJOIN",	auto_join	},
+	{ "UNBAN",	unban		},
 	{ "UNBANWORD",	add_ban_word	},
 	{ "UNCLEAR",	e_clear		},
 	{ "UNFORWARD",	do_forward	},

@@ -66,5 +66,8 @@ const   char *  current_package         (void);
 	BUILT_IN_COMMAND(massop);
 	BUILT_IN_COMMAND(mknu);
 	BUILT_IN_COMMAND(fuckem);
+	BUILT_IN_COMMAND(masskickban);
+	BUILT_IN_COMMAND(massban);
+	BUILT_IN_COMMAND(unban);
 
 #endif /* __commands_h__ */
