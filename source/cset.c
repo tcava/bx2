@@ -30,7 +30,7 @@
 #define BX_build_status build_status
 
 #include "irc.h"
-static char cvsrevision[] = "$Id: cset.c,v 1.1 2012/02/17 20:01:00 fb Exp $";
+static char cvsrevision[] = "$Id: cset.c,v 1.2 2012/06/11 08:12:56 fb Exp $";
 //CVS_REVISION(cset_c)
 #include "struct.h"
 #include "vars.h"    /* for do_boolean() and var_settings[] */
@@ -1285,15 +1285,12 @@ void set_channel_limit(Channel *channel, int currentlimit, int add, int numusers
 	if (add && numusers)
 	{
 		if ((currentlimit - numusers) < (add / 2) && ((numusers + add) != currentlimit))
-// XXX			my_send_to_server(channel->server, "MODE %s +l %d", channel->channel, numusers + add);
-			send_to_server("MODE %s +l %d", channel->channel, numusers + add);
+			my_send_to_server(channel->server, "MODE %s +l %d", channel->channel, numusers + add);
 		else if ((currentlimit - numusers) > (currentlimit + (add / 2)) && ((numusers + add) != currentlimit))
-// XXX			my_send_to_server(channel->server, "MODE %s +l %d", channel->channel, numusers + add);
-			send_to_server("MODE %s +l %d", channel->channel, numusers + add);
+			my_send_to_server(channel->server, "MODE %s +l %d", channel->channel, numusers + add);
 	}
 	else
-// XXX		my_send_to_server(channel->server, "MODE %s -l", channel->channel);
-		send_to_server("MODE %s -l", channel->channel);
+		my_send_to_server(channel->server, "MODE %s -l", channel->channel);
 	channel->limit_time = now;
 }
 

@@ -395,5 +395,8 @@ const char *	get_server_funny_match         	(int);
 const char *	get_server_altname		(int refnum, int which);
 	int     which_server_altname		(int refnum, const char *);
 
+/* XXX */
+#define my_send_to_server send_to_aserver
+
 #endif /* _SERVER_H_ */
 

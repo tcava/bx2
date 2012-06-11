@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.6 2012/06/09 01:40:46 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.7 2012/06/11 08:12:56 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -53,8 +53,7 @@ void flush_mode(Channel *chan)
 {
 	
 	if (mode_buf)
-		send_to_server("%s", mode_buf);
-// XXX:		my_send_to_server(chan?chan->server:from_server, "%s", mode_buf);
+		my_send_to_server(chan?chan->server:from_server, "%s", mode_buf);
 	new_free(&mode_buf);
 	mode_len = 0;
 }
@@ -511,8 +510,7 @@ BUILT_IN_COMMAND(multkick)
 
 	while (temp && *temp)
 	{
-		send_to_server("KICK %s %s :\002%s\002", chan->channel,
-// XXX:		my_send_to_server(server, "KICK %s %s :\002%s\002", chan->channel,
+		my_send_to_server(server, "KICK %s %s :\002%s\002", chan->channel,
 			       next_arg(temp, &temp), reason);
 	}
 }

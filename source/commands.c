@@ -4269,8 +4269,7 @@ BUILT_IN_COMMAND(do_unkey)
 	if (!(chan = prepare_command(&server, channel, NEED_OP)))
 		return;
 	if (chan->key)
-		send_to_server("MODE %s -k %s", chan->channel, chan->key);
-// XXX:	my_send_to_server(server, "MODE %s -k %s", chan->channel, chan->key);
+		my_send_to_server(server, "MODE %s -k %s", chan->channel, chan->key);
 }
 
 BUILT_IN_COMMAND(do_4op)
@@ -4300,8 +4299,7 @@ BUILT_IN_COMMAND(do_4op)
 	if (!(chan = prepare_command(&server, channel, NEED_OP)))
 		return;
 
-	send_to_server("MODE %s +oooo %s %s %s %s", chan->channel, nick, nick, nick, nick);
-// XXX: my_send_to_server(server, "MODE %s +oooo %s %s %s %s", chan->channel, nick, nick, nick, nick);
+	my_send_to_server(server, "MODE %s +oooo %s %s %s %s", chan->channel, nick, nick, nick, nick);
 }
 
 BUILT_IN_COMMAND(do_mynames)
@@ -4321,16 +4319,14 @@ BUILT_IN_COMMAND(do_mynames)
 	if (all)
 	{
 		while (traverse_all_channels(&chan, server, 1))
-			send_to_server("NAMES %s", chan->channel);
-// XXX:			my_send_to_server(server, "NAMES %s", chan->channel);
+			my_send_to_server(server, "NAMES %s", chan->channel);
 	}
 	else
 	{
 		if (!(chan = prepare_command(&server, channel, NO_OP)))
 			return;
 
-		send_to_server("NAMES %s", chan->channel);
-// XXX:		my_send_to_server(server, "NAMES %s", chan->channel);
+		my_send_to_server(server, "NAMES %s", chan->channel);
 	}
 }
 

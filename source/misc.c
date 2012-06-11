@@ -52,7 +52,7 @@ char *stripansicodes(const unsigned char *line)
  *  Copyright Colten Edwards (c) 1996
  */
 #include "irc.h"
-static char cvsrevision[] = "$Id: misc.c,v 1.18 2012/05/29 06:09:55 fb Exp $";
+static char cvsrevision[] = "$Id: misc.c,v 1.19 2012/06/11 08:12:56 fb Exp $";
 CVS_REVISION(misc_c)
 #include "struct.h"
 
@@ -331,8 +331,7 @@ int timer_unban (void *args, char *sub)
 	if ((chan = (ChannelList *)find_in_list((List **)&chan2, channel, 0)) && ban_is_on_channel(ban, chan))
 #endif
 	if (im_on_channel(channel, server))
-// XXX		my_send_to_server(server, "MODE %s -b %s", channel, ban);
-		send_to_server("MODE %s -b %s", channel, ban);
+		my_send_to_server(server, "MODE %s -b %s", channel, ban);
 	new_free(&serv); new_free(&sub);
 	return 0;
 }
@@ -3979,8 +3978,7 @@ BUILT_IN_COMMAND(cycle)
 		
 	if (!(chan = prepare_command(&server, to, NO_OP)))
 		return;
-	send_to_server("PART %s\nJOIN %s%s%s", chan->channel, chan->channel, chan->key?space:empty_string, chan->key?chan->key:empty_string);
-// XXX:	my_send_to_server(server, "PART %s\nJOIN %s%s%s", chan->channel, chan->channel, chan->key?space:empty_string, chan->key?chan->key:empty_string);
+	my_send_to_server(server, "PART %s\nJOIN %s%s%s", chan->channel, chan->channel, chan->key?space:empty_string, chan->key?chan->key:empty_string);
 }
 
 #if 0
