@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.7 2012/06/11 08:12:56 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.8 2012/07/01 09:30:12 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -580,7 +580,7 @@ BUILT_IN_COMMAND(massdeop)
 	flush_mode_all(chan);
 	from_server = old_server;
 	if (!count)
-		say("No matches for %s of %s on %s", command?command:"massdeop", spec, chan->channel);
+		say("No matches for %s of %s on %s", command, spec, chan->channel);
 }
 
 BUILT_IN_COMMAND(doop)
@@ -731,7 +731,7 @@ BUILT_IN_COMMAND(massop)
 	}
 	flush_mode_all(chan);
 	if (!count)
-		say("No matches for %s of %s on %s", command? command : "massop", spec, chan->channel);
+		say("No matches for %s of %s on %s", command, spec, chan->channel);
 }
 
 #if 0
