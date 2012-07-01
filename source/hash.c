@@ -22,7 +22,7 @@
  */
 
 #include "irc.h"
-static char cvsrevision[] = "$Id: hash.c,v 1.2 2012/05/12 00:59:00 fb Exp $";
+static char cvsrevision[] = "$Id: hash.c,v 1.3 2012/07/01 03:01:20 fb Exp $";
 //CVS_REVISION(hash_c)
 #include "struct.h"
 #include "ircaux.h"
@@ -800,7 +800,7 @@ NickSort *BX_sorted_nicklist(Channel *chan, int sort)
 	NickSort *l = NULL, *list = NULL, *last = NULL;
 	for (tmp = next_nicklist(chan, NULL); tmp; tmp = next_nicklist(chan, tmp))
 	{
-		l = (NickSort *)new_malloc(sizeof(Nick));
+		l = (NickSort *)new_malloc(sizeof(NickSort));
 		l->nptr = (Nick *)new_malloc(sizeof(Nick));
 		memcpy(l->nptr, tmp, sizeof(Nick));
 		l->nick = malloc_strdup(tmp->nick);
