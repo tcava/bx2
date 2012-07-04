@@ -22,7 +22,7 @@
  */
 
 #include "irc.h"
-static char cvsrevision[] = "$Id: hash.c,v 1.3 2012/07/01 03:01:20 fb Exp $";
+static char cvsrevision[] = "$Id: hash.c,v 1.4 2012/07/04 20:37:25 fb Exp $";
 //CVS_REVISION(hash_c)
 #include "struct.h"
 #include "ircaux.h"
@@ -190,7 +190,7 @@ List *BX_find_name_in_genericlist(char *name, HashEntry *list, unsigned int size
  * insert the struct correctly into the channelist's Nicklist hash
  * array
  */
-void add_nicklist_to_channellist(Nick *nptr, Channel *cptr)
+void BX_add_nicklist_to_channellist(Nick *nptr, Channel *cptr)
 {
 	unsigned long hvalue = hash_nickname(nptr->nick, NICKLIST_HASHSIZE);
 
@@ -252,7 +252,7 @@ Nick *BX_find_nicklist_in_channellist(char *nick, Channel *cptr, int remove)
  *	     next_nicklist(cptr, nptr))
  *		YourCodeOnTheNickStruct
  */
-Nick *next_nicklist(Channel *cptr, Nick *nptr)
+Nick *BX_next_nicklist(Channel *cptr, Nick *nptr)
 {
 	unsigned long hvalue = 0;
 	if (!cptr) 
@@ -527,7 +527,7 @@ void BX_add_whowas_userhost_channel(WhowasList *wptr, WhowasWrapList *list)
 	list->total_links++;
 }
 
-WhowasList *find_userhost_channel(char *host, char *channel, int remove, WhowasWrapList *wptr)
+WhowasList *BX_find_userhost_channel(char *host, char *channel, int remove, WhowasWrapList *wptr)
 {
 	HashEntry *location;
 	register WhowasList *tmp, *prev = NULL;
@@ -571,7 +571,7 @@ WhowasList *find_userhost_channel(char *host, char *channel, int remove, WhowasW
  *	     next_userhost(cptr, nptr))
  *		YourCodeOnTheWhowasListStruct
  */
-WhowasList *next_userhost(WhowasWrapList *cptr, WhowasList *nptr)
+WhowasList *BX_next_userhost(WhowasWrapList *cptr, WhowasList *nptr)
 {
 	unsigned long hvalue = 0;
 	if (!cptr) 
