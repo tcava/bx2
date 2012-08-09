@@ -22,7 +22,7 @@
  */
 
 #include "irc.h"
-static char cvsrevision[] = "$Id: hash.c,v 1.4 2012/07/04 20:37:25 fb Exp $";
+static char cvsrevision[] = "$Id: hash.c,v 1.5 2012/08/09 04:03:19 fb Exp $";
 //CVS_REVISION(hash_c)
 #include "struct.h"
 #include "ircaux.h"
@@ -41,11 +41,6 @@ static char cvsrevision[] = "$Id: hash.c,v 1.4 2012/07/04 20:37:25 fb Exp $";
 #include "hash2.h"
 #define MAIN_SOURCE
 //#include "modval.h"
-
-/* XXX: These are from whowas.c, once it's brought in */
-WhowasWrapList whowas_userlist_list = { 0 };
-WhowasWrapList whowas_reg_list = { 0 };
-WhowasWrapList whowas_splitin_list = { 0 };
 
 /*
  * hash_nickname: for now, does a simple hash of the 
