@@ -3,7 +3,7 @@
  */
  
 #include "irc.h"
-static char cvsrevision[] = "$Id: banlist.c,v 1.8 2012/07/01 09:30:12 fb Exp $";
+static char cvsrevision[] = "$Id: banlist.c,v 1.9 2012/08/09 04:04:56 fb Exp $";
 //CVS_REVISION(banlist_c)
 #include "struct.h"
 #include "commands.h"
@@ -340,14 +340,13 @@ int old_server = from_server;
 		!strcmp(stuff->user, "<UNKNOWN>") || 
 		my_stricmp(stuff->nick, nick1))
 	{
-/* XXX
 		if (nick1 && (whowas = check_whowas_nick_buffer(nick1, args, 0)))
 		{
-			malloc_sprintf(&host, "%s!%s", whowas->nicklist->nick, whowas->nicklist->host);
+			malloc_sprintf(&host, "%s!%s", whowas->nicklist->nick, whowas->nicklist->userhost);
 			bitchsay("Using WhoWas info for unban of %s ", nick1);
 			n = whowas->nicklist;
 		}
-		else*/ if (nick1)
+		else if (nick1)
 		{
 			bitchsay("No match for the unban of %s on %s", nick1, args);
 			return;
@@ -422,7 +421,6 @@ void userhost_ban(int refnum, UserhostItem *stuff, char *nick1, char *args)
 	
 	if (!stuff || !stuff->nick || !nick1 || !strcmp(stuff->user, "<UNKNOWN>") || my_stricmp(stuff->nick, nick1))
 	{
-/* XXX
 		if (nick1 && channel && (whowas = check_whowas_nick_buffer(nick1, channel, 0)))
 		{
 			nick = whowas->nicklist->nick;
@@ -432,7 +430,7 @@ void userhost_ban(int refnum, UserhostItem *stuff, char *nick1, char *args)
 			bitchsay("Using WhoWas info for ban of %s ", nick1);
 			n = whowas->nicklist;
 		}
-		else*/ if (nick1)
+		else if (nick1)
 		{
 			bitchsay("No match for the %s of %s on %s", fuck ? "Fuck":"Ban", nick1, channel);
 			return;
