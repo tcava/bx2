@@ -7,7 +7,7 @@
  *
  * See the COPYRIGHT file, or do a HELP IRCII COPYRIGHT
  *
- * @(#)$Id: hash2.h,v 1.4 2012/07/25 21:30:04 fb Exp $
+ * @(#)$Id: hash2.h,v 1.5 2012/08/09 04:11:08 fb Exp $
  */
 
 #ifndef _HASH2_H_
@@ -69,5 +69,7 @@ int nick_match(Nick *nick, char *mask);
 #define BX_sorted_nicklist sorted_nicklist
 #define BX_clear_sorted_nicklist clear_sorted_nicklist
 #define BX_find_nicklist_in_channellist find_nicklist_in_channellist
+#define BX_remove_oldest_whowas_hashlist remove_oldest_whowas_hashlist
+#define BX_add_whowas_userhost_channel add_whowas_userhost_channel
 
 #endif
