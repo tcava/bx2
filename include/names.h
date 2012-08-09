@@ -82,6 +82,8 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	time_t		max_idle;	/* max idle time for this channel */
 	HashEntry	NickListTable[NICKLIST_HASHSIZE];
 	BanList		*bans;
+	char 		*topic;		/* cached topic */
+	char 		*modelock_key;
 }	Channel;
 
 	void	add_channel		(Char *, int); 
@@ -136,5 +138,8 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	Channel	*find_channel		(const char *, int);
 	int	traverse_all_channels	(Channel **, int, int);
 	Nick *	find_nick		(int, const char *, const char *);
+	void	BX_clear_bans		(Channel *);
+
+#define BX_clear_bans clear_bans
 
 #endif /* _NAMES_H_ */
