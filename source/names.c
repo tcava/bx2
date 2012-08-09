@@ -48,6 +48,7 @@
 #include "hook.h"
 #include "parse.h"
 #include "hash2.h"
+#include "whowas.h"
 
 static	int	current_channel_counter = 0;
 
@@ -459,6 +460,8 @@ const	char	*prefix;
 	}
 
 	add_nicklist_to_channellist(new_n, chan);
+/* XXX: get_server_itsname appropriate? */
+	add_to_whowas_buffer(new_n, channel, get_server_itsname(server), NULL);
 }
 
 void 	add_userhost_to_channel (const char *channel, const char *nick, int server, const char *uh)
@@ -1706,3 +1709,27 @@ void	channels_swap_winrefs (int oldref, int newref)
 	}
 }
 
+void BX_clear_bans(Channel *channel)
+{
+	BanList *bans, 
+		*next;
+	
+	if (!channel)
+		return;
+	for (bans = channel->bans; bans; bans = next)
+	{
+		next = bans->next;
+		new_free(&bans->setby);
+		new_free(&bans->ban);
+		new_free((char **)&bans);
+	}
+	channel->bans = NULL;
+	for (bans = channel->exemptbans; bans; bans = next)
+	{
+		next = bans->next;
+		new_free(&bans->setby);
+		new_free(&bans->ban);
+		new_free((char **)&bans);
+	}
+	channel->exemptbans = NULL;
+}

@@ -82,6 +82,7 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	time_t		max_idle;	/* max idle time for this channel */
 	HashEntry	NickListTable[NICKLIST_HASHSIZE];
 	BanList		*bans;
+	BanList		*exemptbans;
 	char 		*topic;		/* cached topic */
 	char 		*modelock_key;
 }	Channel;
