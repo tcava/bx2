@@ -85,6 +85,7 @@ struct	channel_stru *	prev;		/* pointer to previous channel */
 	BanList		*exemptbans;
 	char 		*topic;		/* cached topic */
 	char 		*modelock_key;
+	int		totalnicks;	/* total number of users in channel */
 }	Channel;
 
 	void	add_channel		(Char *, int); 

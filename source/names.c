@@ -151,7 +151,16 @@ static Channel *create_channel (const char *name, int server)
 static void 	clear_channel (Channel *chan)
 {
 	NickList *list = &chan->nicks;
+	Nick *Nick, *n;
 	int	i;
+
+	while((Nick = next_nicklist(chan, NULL)))
+	{
+		n = find_nicklist_in_channellist(Nick->nick, chan, REMOVE_FROM_LIST);
+		add_to_whowas_buffer(n, chan->channel, NULL, NULL);
+	}
+	clear_nicklist_hashtable(chan);
+	chan->totalnicks = 0;
 
 	for (i = 0; i < list->max; i++)
 	{
