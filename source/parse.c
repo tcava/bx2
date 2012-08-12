@@ -768,7 +768,7 @@ static void	p_channel (const char *from, const char *comm, const char **ArgList)
 	if (is_me(from_server, from))
 	{
 		add_channel(channel, from_server);
-		send_to_server("MODE %s", channel);
+		send_to_server("MODE %s\r\nMODE %s b\r\n", channel, channel);
 	}
 	else
 	{
