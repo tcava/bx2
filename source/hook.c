@@ -140,6 +140,9 @@ typedef struct Hookables
 Hookables hook_function_templates[] =
 {
 	{ "ACTION",		NULL,	3,	0,	0,	NULL, 0 },
+	{ "BANS",		NULL,	4,	0,	0,	NULL, 0 },
+	{ "BANS_FOOTER",	NULL,	2,	0,	0,	NULL, 0 },
+	{ "BANS_HEADER",	NULL,	4,	0,	0,	NULL, 0 },
 	{ "CHANNEL_LOST", 	NULL, 	2,  	0,  	0,  	NULL, 0 },
 	{ "CHANNEL_NICK",	NULL,	3,	0,	0,	NULL, 0 },
 	{ "CHANNEL_SIGNOFF",	NULL,	3,	0,	0,	NULL, 0 },
@@ -157,6 +160,9 @@ Hookables hook_function_templates[] =
 	{ "DCC_RAW",		NULL,	3,	0,	0,	NULL, 0 },
         { "DCC_REQUEST",        NULL,   4,      0,      0,	NULL, 0 },
 	{ "DISCONNECT",		NULL,	1,	0,	0,	NULL, 0 },
+	{ "EBANS",		NULL,	4,	0,	0,	NULL, 0 },
+	{ "EBANS_FOOTER",	NULL,	2,	0,	0,	NULL, 0 },
+	{ "EBANS_HEADER",	NULL,	4,	0,	0,	NULL, 0 },
         { "ENCRYPTED_NOTICE",   NULL,   3,      0,      0,	NULL, 0 },
         { "ENCRYPTED_PRIVMSG",  NULL,   3,      0,      0,	NULL, 0 },
 	{ "ERROR",		NULL,	1,	0,	0,	NULL, 0 },
